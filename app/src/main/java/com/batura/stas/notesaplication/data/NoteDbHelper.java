@@ -15,7 +15,7 @@ public class NoteDbHelper extends SQLiteOpenHelper {
     /**
      * Name of the database file
      */
-    private static final String DATABASE_NAME = "shelter.db";
+    private static final String DATABASE_NAME = "notepad.db";
 
     /**
      * Database version. If you change the database schema, you must increment the database version.
@@ -33,6 +33,15 @@ public class NoteDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        // Create a String that contains the SQL statement to create the pets table
+        String SQL_CREATE_NOTES_TABLE = "CREATE TABLE " + NoteContract.NoteEntry.TABLE_NAME + " ("
+                + NoteContract.NoteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + NoteContract.NoteEntry.COLUMN_NOTE_TITLE+ " TEXT, "
+                + NoteContract.NoteEntry.COLUMN_NOTE_BODY + " TEXT, "
+                + NoteContract.NoteEntry.COLUMN_NOTE_TIME + " INTEGER NOT NULL;) "
+               ;
+
+        db.execSQL(SQL_CREATE_NOTES_TABLE);
 
     }
 
