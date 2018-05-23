@@ -68,12 +68,20 @@ public class NoteContract {
          * Type: TEXT
          */
         public final static String COLUMN_NOTE_BODY = "body";
-          /**
+
+        /**           *
+         * color.
+         * <p>
+         * Type: INTEGER
+         */
+          public final static String  COLUMN_NOTE_COLOR = "color";
+
+        /**           *
          * time.
          * <p>
          * Type: INTEGER
          */
-        public final static String COLUMN_NOTE_TIME = "time";
+         public final static String COLUMN_NOTE_TIME = "time";
 
 
     }
