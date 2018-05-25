@@ -3,6 +3,7 @@ package com.batura.stas.notesaplication;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -42,7 +43,6 @@ public class MainActivity extends AppCompatActivity {
         mDbHelper = new NoteDbHelper(this);
         displayDatabaseInfo();
 
-
     }
 
     @Override
@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         * +
         */
         private void insertNote() {
+            SQLiteDatabase db = mDbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put(NoteContract.NoteEntry.COLUMN_NOTE_TITLE, "Test");
             values.put(NoteContract.NoteEntry.COLUMN_NOTE_BODY, "Test note");
@@ -88,7 +89,8 @@ public class MainActivity extends AppCompatActivity {
             // this is set to "null", then the framework will not insert a row when
             // there are no values).
             // The third argument is the ContentValues object containing the info for Toto.
-            //Uri newUri = getContentResolver().insert(PetContract.PetEntry.CONTENT_URI,values);
+            //Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI,values);
+            long newRowId = db.insert(NoteContract.NoteEntry.TABLE_NAME, null, values);
         }
 
     private void displayDatabaseInfo() {
