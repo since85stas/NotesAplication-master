@@ -38,7 +38,8 @@ public class NoteDbHelper extends SQLiteOpenHelper {
                 + NoteContract.NoteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + NoteContract.NoteEntry.COLUMN_NOTE_TITLE+ " TEXT, "
                 + NoteContract.NoteEntry.COLUMN_NOTE_BODY + " TEXT, "
-                + NoteContract.NoteEntry.COLUMN_NOTE_TIME + " INTEGER NOT NULL;) "
+                + NoteContract.NoteEntry.COLUMN_NOTE_COLOR + " INTEGER NOT NULL DEFAULT 0, "
+                + NoteContract.NoteEntry.COLUMN_NOTE_TIME +  " INTEGER NOT NULL DEFAULT 0);"
                ;
 
         db.execSQL(SQL_CREATE_NOTES_TABLE);
