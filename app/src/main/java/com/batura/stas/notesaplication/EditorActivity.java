@@ -1,10 +1,14 @@
 package com.batura.stas.notesaplication;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -18,7 +22,7 @@ import com.batura.stas.notesaplication.data.NoteContract;
  * Created by HOME on 18.05.2018.
  */
 
-public class EditorActivity extends AppCompatActivity {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private EditText mTitleTextView;
 
@@ -106,5 +110,54 @@ public class EditorActivity extends AppCompatActivity {
             // Otherwise, the insertion was successful and we can display a toast with the row ID.
             Toast.makeText(this, getString(R.string.editor_insert_pet_successful), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+        String[] projection = new String[]{
+                NoteContract.NoteEntry._ID,
+                NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
+                NoteContract.NoteEntry.COLUMN_NOTE_BODY,
+                NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
+                NoteContract.NoteEntry.COLUMN_NOTE_TIME
+        };
+        return new android.support.v4.content.CursorLoader(this,
+                mCurrentPetUri,
+                projection,
+                null,
+                null,
+                null);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        if (cursor.moveToFirst()) {
+            // Find the columns of pet attributes that we're interested in
+            int titleColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
+            int bodyColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
+            int colorColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
+            int timeColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
+
+            // Extract out the value from the Cursor for the given column index
+            String title = cursor.getString(titleColumnIndex);
+            String body = cursor.getString(bodyColumnIndex);
+            int gender = cursor.getInt(colorColumnIndex);
+            int weight = cursor.getInt(timeColumnIndex);
+
+            // Update the views on the screen with the values from the database
+            mTitleTextView.setText(title);
+            mBodyTextView.setText(body);
+            //mWeightEditText.setText(Integer.toString(weight));
+
+        }
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        // If the loader is invalidated, clear out all the data from the input fields.
+        mTitleTextView.setText("");
+        mBodyTextView.setText("");
     }
 }

@@ -1,7 +1,9 @@
 package com.batura.stas.notesaplication;
 
+import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -18,7 +20,7 @@ import android.widget.TextView;
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity   {
 
     private NoteDbHelper mDbHelper;
 
@@ -164,4 +166,5 @@ public class MainActivity extends AppCompatActivity {
             cursor.close();
         }
     }
+
 }
