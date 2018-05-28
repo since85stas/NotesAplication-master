@@ -5,4 +5,8 @@
 
     <string name="editorActivTitle">Add a note</string>
     <string name="noteHint">Text</string>
+
+    <string name="editor_insert_note_failed">Error with saving note </string>
+    <string name="editor_insert_pet_successful"> Note saved </string>
+
 </resources>

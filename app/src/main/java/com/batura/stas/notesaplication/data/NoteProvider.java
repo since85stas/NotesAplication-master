@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by seeyo on 21.05.2018.
@@ -91,16 +92,72 @@ public class NoteProvider extends ContentProvider {
         return cursor;
     }
 
-    @Nullable
+    /**
+     * Returns the MIME type of data for the content URI.
+     */
     @Override
-    public String getType(@NonNull Uri uri) {
-        return null;
+    public String getType(Uri uri) {
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case NOTES:
+                return NoteContract.NoteEntry.CONTENT_LIST_TYPE;
+            case NOTE_ID:
+                return NoteContract.NoteEntry.CONTENT_ITEM_TYPE;
+            default:
+                throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
+        }
     }
 
-    @Nullable
+    /**
+     * Insert new data into the provider with the given ContentValues.
+     */
     @Override
-    public Uri insert(@NonNull Uri uri, @Nullable ContentValues values) {
-        return null;
+    public Uri insert(Uri uri, ContentValues contentValues) {
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case NOTES:
+                return insertNote(uri, contentValues);
+            default:
+                throw new IllegalArgumentException("Insertion is not supported for " + uri);
+        }
+    }
+
+    /**
+     * Insert a pet into the database with the given content values. Return the new content URI
+     * for that specific row in the database.
+     */
+    private Uri insertNote(Uri uri, ContentValues values) {
+
+        // Check that the name is not null
+        String name = values.getAsString(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
+        if (name == null) {
+            throw new IllegalArgumentException("trying to add empty note");
+        }
+        Integer color = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
+        if (color == null ) {
+            throw new IllegalArgumentException("Wrong color for note");
+        }
+        // If the weight is provided, check that it's greater than or equal to 0 kg
+        Integer time = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
+        if (time != null && time < 0) {
+            throw new IllegalArgumentException("Wrong data for note");
+        }
+
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Insert the new pet with the given values
+        long id = database.insert(NoteContract.NoteEntry.TABLE_NAME, null, values);
+        // If the ID is -1, then the insertion failed. Log an error and return null.
+        if (id == -1) {
+            Log.e(LOG_TAG, "Failed to insert row for " + uri);
+            return null;
+        }
+        // Once we know the ID of the new row in the table,
+        // return the new URI with the ID appended to the end of it
+
+        getContext().getContentResolver().notifyChange(uri, null);
+
+        return ContentUris.withAppendedId(uri, id);
     }
 
     @Override
