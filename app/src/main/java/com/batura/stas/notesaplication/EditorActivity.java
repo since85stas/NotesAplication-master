@@ -32,12 +32,24 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private final int mTime = 0 ;
 
-    private Uri mCurrentPetUri;
+    private final static int NOTE_LOADER_EDITOR = 0;
+
+    private Uri mCurrentNoteUri;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        mCurrentNoteUri = getIntent().getData();
+        if (mCurrentNoteUri == null) {
+            setTitle("Add note");
+            invalidateOptionsMenu();
+        }
+        else {
+            setTitle("Edit note");
+            getSupportLoaderManager().initLoader(NOTE_LOADER_EDITOR ,null,this); //!!!! instead getLoaderManager
+        }
 
         mTitleTextView = (EditText)findViewById(R.id.noteTitleInput);
 
@@ -86,7 +98,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String colorString = Integer.toString( mColor);
         String timeString = Integer.toString( mTime);
 
-        if (mCurrentPetUri == null &&
+        if (mCurrentNoteUri == null &&
                 TextUtils.isEmpty(titleString) && TextUtils.isEmpty(bodyString) &&
                 TextUtils.isEmpty(colorString) && TextUtils.isEmpty(timeString) ) {return;}
 
@@ -123,7 +135,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 NoteContract.NoteEntry.COLUMN_NOTE_TIME
         };
         return new android.support.v4.content.CursorLoader(this,
-                mCurrentPetUri,
+                mCurrentNoteUri,
                 projection,
                 null,
                 null,
