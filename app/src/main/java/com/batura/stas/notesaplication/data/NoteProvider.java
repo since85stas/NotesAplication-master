@@ -139,7 +139,7 @@ public class NoteProvider extends ContentProvider {
             throw new IllegalArgumentException("Wrong color for note");
         }
         // If the weight is provided, check that it's greater than or equal to 0 kg
-        Integer time = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
+        Long time = values.getAsLong(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
         if (time != null && time < 0) {
             throw new IllegalArgumentException("Wrong data for note");
         }

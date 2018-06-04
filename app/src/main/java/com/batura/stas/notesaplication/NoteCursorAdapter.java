@@ -57,12 +57,15 @@ public class NoteCursorAdapter extends CursorAdapter {
 
         TextView titleTextView = (TextView)view.findViewById(R.id.titleItem);
         TextView bodyTextView = (TextView)view.findViewById(R.id.bodyItem);
+        TextView timeTextView = (TextView)view.findViewById(R.id.dateTextView);
 
         int titleColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
         int bodyColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
+        int dateColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
 
         String noteTitle = cursor.getString(titleColoumnIndex);
         String noteBody = cursor.getString(bodyColoumnIndex);
+        Long  noteTime = cursor.getLong(dateColoumnIndex);
 
         if (noteTitle.length() == 0 || noteTitle == null ) {
             titleTextView.setText("No title");
@@ -75,6 +78,12 @@ public class NoteCursorAdapter extends CursorAdapter {
         }
         else {
             bodyTextView.setText(noteBody);
+        }
+        if(noteTime< 0) {
+            timeTextView.setText("Wrong time");
+        }
+        else {
+            timeTextView.setText("time"+noteTime);
         }
 //        TextView nameTextView = (TextView)view.findViewById(R.id.name);
 //        TextView summaryTextView = (TextView)view.findViewById(R.id.summary);

@@ -5,6 +5,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:paddingLeft="@dimen/activity_margin"
+    android:paddingRight="@dimen/activity_margin"
     >
 
     <LinearLayout
@@ -12,7 +14,7 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/activity_margin">
+        android:padding="@dimen/list_item_margin">
         <TextView
             android:id="@+id/titleItem"
             android:layout_width="match_parent"
@@ -39,5 +41,7 @@
         android:id="@+id/dateTextView"
         android:layout_width="100dp"
         android:layout_height="match_parent"
+        android:text="today"
+        android:gravity="center"
         />
 </LinearLayout>

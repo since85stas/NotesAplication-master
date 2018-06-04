@@ -30,7 +30,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private final int mColor = 0;
 
-    private final int mTime = 0 ;
+    private long mTime = 0;
 
     private final static int NOTE_LOADER_EDITOR = 0;
 
@@ -56,6 +56,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mTitleTextView = (EditText)findViewById(R.id.noteTitleInput);
 
         mBodyTextView = (EditText) findViewById(R.id.noteTextInput);
+
+        mTime         =  System.currentTimeMillis();
 
     }
 
@@ -98,7 +100,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String titleString = mTitleTextView.getText().toString().trim();
         String bodyString = mBodyTextView.getText().toString().trim();
         String colorString = Integer.toString( mColor);
-        String timeString = Integer.toString( mTime);
+        String timeString = Long.toString( mTime);
 
         if (mCurrentNoteUri == null &&
                 TextUtils.isEmpty(titleString) && TextUtils.isEmpty(bodyString) &&

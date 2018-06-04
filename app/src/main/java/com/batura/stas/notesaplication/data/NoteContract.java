@@ -79,7 +79,7 @@ public class NoteContract {
         /**           *
          * time.
          * <p>
-         * Type: INTEGER
+         * Type: LONG
          */
          public final static String COLUMN_NOTE_TIME = "time";
 
