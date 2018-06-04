@@ -19,10 +19,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.batura.stas.notesaplication.data.NoteContract;
-import com.batura.stas.notesaplication.data.NoteCursorAdapter;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>  {
@@ -214,7 +212,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCursorAdapter.swapCursor(data);
-
     }
 
     @Override

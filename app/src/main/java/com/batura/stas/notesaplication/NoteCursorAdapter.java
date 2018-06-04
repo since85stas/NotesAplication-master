@@ -1,17 +1,14 @@
-package com.batura.stas.notesaplication.data;
+package com.batura.stas.notesaplication;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
-import com.batura.stas.notesaplication.R;
-
-import org.w3c.dom.Text;
+import com.batura.stas.notesaplication.data.NoteContract;
 
 /**
  * {@link NoteCursorAdapter} is an adapter for a list or grid view
