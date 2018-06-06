@@ -69,11 +69,12 @@ public class NoteCursorAdapter extends CursorAdapter {
         int titleColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
         int bodyColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
         int dateColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
-        int noteColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
+        int colorColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
 
         String noteTitle = cursor.getString(titleColoumnIndex);
         String noteBody = cursor.getString(bodyColoumnIndex);
         Long  noteTime = cursor.getLong(dateColoumnIndex);
+        int noteColor = cursor.getInt(colorColoumnIndex);
 
         if (noteTitle.length() == 0 || noteTitle == null ) {
             titleTextView.setText("No title");
@@ -102,8 +103,10 @@ public class NoteCursorAdapter extends CursorAdapter {
         }
 
         // set back ground for note list item
-        view.setBackgroundColor(ContextCompat.getColor(context, getBackColor(666)));
-
+        if (noteColor != NoteContract.NoteEntry.COLOR_DEFAULT ) {
+            int color = getBackColor(noteColor);
+            view.setBackgroundColor(ContextCompat.getColor(context, color));
+        }
 
     }
 

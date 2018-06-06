@@ -11,12 +11,18 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.batura.stas.notesaplication.data.NoteContract;
+import com.batura.stas.notesaplication.data.NoteProvider;
 
 /**
  * Created by HOME on 18.05.2018.
@@ -24,17 +30,21 @@ import com.batura.stas.notesaplication.data.NoteContract;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    public static final String LOG_TAG = EditorActivity.class.getSimpleName();
+
     private EditText mTitleTextView;
 
     private EditText mBodyTextView;
 
-    private final int mColor = 0;
+    private int mColor = 665;
 
     private long mTime = 0;
 
     private final static int NOTE_LOADER_EDITOR = 0;
 
     private Uri mCurrentNoteUri;
+
+    private Spinner mColorSpinner;
 
     private boolean mNoteHasChanged = false;
 
@@ -57,7 +67,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         mBodyTextView = (EditText) findViewById(R.id.noteTextInput);
 
+        mColorSpinner = (Spinner)findViewById(R.id.colorSpinner);
+
         mTime         =  System.currentTimeMillis();
+
+
+        setupSpinner();
 
     }
 
@@ -175,5 +190,57 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // If the loader is invalidated, clear out all the data from the input fields.
         mTitleTextView.setText("");
         mBodyTextView.setText("");
+    }
+
+
+    /**
+     * Setup the dropdown spinner that allows the user to select the gender of the pet.
+     */
+    private void setupSpinner() {
+        // Create adapter for spinner. The list options are from the String array it will use
+        // the spinner will use the default layout
+        ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
+                R.array.color_array_string, android.R.layout.simple_spinner_item);
+
+        // Specify dropdown layout style - simple list view with 1 item per line
+        genderSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+
+        // Apply the adapter to the spinner
+        mColorSpinner.setAdapter(genderSpinnerAdapter);
+
+        // Set the integer mSelected to the constant values
+        mColorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selection = (String) parent.getItemAtPosition(position);
+                if (!TextUtils.isEmpty(selection)) {
+                    if (selection.equals(getString(R.string.color_default))) {
+                        mColor = 665; // Male
+                    } else if (selection.equals(getString(R.string.color_red))) {
+                        mColor = NoteContract.NoteEntry.COLOR_RED; // Female
+                    } else if (selection.equals(getString(R.string.color_orange))) {
+                        mColor = NoteContract.NoteEntry.COLOR_ORANGE;
+                    } else if (selection.equals(getString(R.string.color_yellow))) {
+                        mColor = NoteContract.NoteEntry.COLOR_YELLOW;
+                    } else if (selection.equals(getString(R.string.color_green))) {
+                        mColor = NoteContract.NoteEntry.COLOR_GREEN;
+                    } else if (selection.equals(getString(R.string.color_blue))) {
+                        mColor = NoteContract.NoteEntry.COLOR_BLUE;
+                    } else if (selection.equals(getString(R.string.color_purple))) {
+                        mColor = NoteContract.NoteEntry.COLOR_PURPLE;
+                        ; // Unknown
+                    }
+                    else {
+                        Log.d(LOG_TAG,"Wrong color spinner value");
+                    }
+                }
+            }
+
+            // Because AdapterView is an abstract class, onNothingSelected must be defined
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                mColor = 665; // default
+            }
+        });
     }
 }

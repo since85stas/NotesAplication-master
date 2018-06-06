@@ -14,16 +14,22 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/noteTitle"
-            android:paddingLeft="16dp"/>
+            android:paddingLeft="@dimen/activity_margin"/>
         <EditText
             android:id="@+id/noteTitleInput"
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:paddingRight="16dp"
-            android:paddingTop="8dp"
-            android:focusableInTouchMode="true"
-            />
+
+            android:paddingTop="@dimen/list_item_margin"
+            android:focusableInTouchMode="true" />
+        <Spinner
+            android:id="@+id/colorSpinner"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:spinnerMode="dropdown"
+            android:paddingRight="@dimen/activity_margin"
+            > </Spinner>
     </LinearLayout>
 
     <EditText

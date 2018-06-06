@@ -83,6 +83,7 @@ public class NoteContract {
          */
          public final static String COLUMN_NOTE_TIME = "time";
 
+        public static final int COLOR_DEFAULT = 665;
 
          public static final int COLOR_RED = 666;
 
