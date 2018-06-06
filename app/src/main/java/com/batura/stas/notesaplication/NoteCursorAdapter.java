@@ -1,7 +1,9 @@
 package com.batura.stas.notesaplication;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
+import android.support.v4.content.ContextCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +11,10 @@ import android.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.batura.stas.notesaplication.data.NoteContract;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * {@link NoteCursorAdapter} is an adapter for a list or grid view
@@ -57,11 +63,13 @@ public class NoteCursorAdapter extends CursorAdapter {
 
         TextView titleTextView = (TextView)view.findViewById(R.id.titleItem);
         TextView bodyTextView = (TextView)view.findViewById(R.id.bodyItem);
-        TextView timeTextView = (TextView)view.findViewById(R.id.dateTextView);
+        TextView dateTextView = (TextView)view.findViewById(R.id.date);
+        TextView timeTextView = (TextView)view.findViewById(R.id.time);
 
         int titleColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
         int bodyColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
         int dateColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
+        int noteColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
 
         String noteTitle = cursor.getString(titleColoumnIndex);
         String noteBody = cursor.getString(bodyColoumnIndex);
@@ -79,27 +87,71 @@ public class NoteCursorAdapter extends CursorAdapter {
         else {
             bodyTextView.setText(noteBody);
         }
+
+
         if(noteTime< 0) {
-            timeTextView.setText("Wrong time");
+            dateTextView.setText("Wrong time");
         }
         else {
-            timeTextView.setText("time"+noteTime);
+
+            Date dateObject = new Date(noteTime);
+            String formattedDate = formatDate(dateObject);
+            String formattetTime = formatTime(dateObject);
+            dateTextView.setText(formattedDate);
+            timeTextView.setText(formattetTime);
         }
-//        TextView nameTextView = (TextView)view.findViewById(R.id.name);
-//        TextView summaryTextView = (TextView)view.findViewById(R.id.summary);
-//
-//        int nameColoumnIndex = cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_NAME);
-//        int summaryColoumnIndex = cursor.getColumnIndex(PetContract.PetEntry.COLUMN_PET_BREED);
-//
-//        String petName = cursor.getString(nameColoumnIndex);
-//        String petBreed = cursor.getString(summaryColoumnIndex);
-//
-//        nameTextView.setText(petName) ;
-//
-//        if (TextUtils.isEmpty(petBreed)) {
-//            petBreed = context.getString(R.string.unknown_breed);
-//        }
-//        summaryTextView.setText(petBreed);
+
+        // set back ground for note list item
+        view.setBackgroundColor(ContextCompat.getColor(context, getBackColor(666)));
+
 
     }
-}
+
+    /**
+     * Return the formatted date string (i.e. "Mar 3, 1984") from a Date object.
+     */
+    private String formatDate(Date dateObject) {
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("LLL dd, yyyy");
+
+//        SimpleDateFormat dateFormat = new SimpleDateFormat(dateObject);
+
+        return dateFormat.format(dateObject);
+    }
+
+    /**
+     * Return the formatted date string (i.e. "4:30 PM") from a Date object.
+     */
+    private String formatTime(Date dateObject) {
+        SimpleDateFormat timeFormat = new SimpleDateFormat("h:mm a");
+        return timeFormat.format(dateObject);
+    }
+
+
+    private int getBackColor (int colorId) {
+
+            int backColorResId = 0;
+            switch (colorId) {
+                case NoteContract.NoteEntry.COLOR_RED:
+                    backColorResId = R.color.redBack;
+                    break;
+                case NoteContract.NoteEntry.COLOR_ORANGE:
+                    backColorResId = R.color.orangeBack;
+                    break;
+                case NoteContract.NoteEntry.COLOR_YELLOW:
+                    backColorResId = R.color.yellowBack;
+                    break;
+                case NoteContract.NoteEntry.COLOR_GREEN:
+                    backColorResId = R.color.greenBack;
+                    break;
+                case NoteContract.NoteEntry.COLOR_BLUE:
+                    backColorResId = R.color.blueBack;
+                    break;
+                case NoteContract.NoteEntry.COLOR_PURPLE:
+                    backColorResId = R.color.purpleBack;
+                    break;
+            }
+            return  backColorResId;
+            }
+    }
+

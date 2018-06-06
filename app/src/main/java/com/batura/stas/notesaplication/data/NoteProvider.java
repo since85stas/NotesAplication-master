@@ -183,7 +183,7 @@ public class NoteProvider extends ContentProvider {
 
     private int updateNote(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 
-        // If the {@link PetEntry#COLUMN_PET_NAME} key is present,
+        // If the {@link NoteEntry.COLUMN_NOTE_BODY} key is present,
         // check that the name value is not null.
         if (values.containsKey(NoteContract.NoteEntry.COLUMN_NOTE_BODY)) {
             String name = values.getAsString(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
@@ -192,7 +192,7 @@ public class NoteProvider extends ContentProvider {
             }
         }
 
-        // If the {@link PetEntry#COLUMN_PET_GENDER} key is present,
+        // If the {@link NoteEntry.COLUMN_NOTE_COLOR} key is present,
         // check that the gender value is valid.
         if (values.containsKey(NoteContract.NoteEntry.COLUMN_NOTE_COLOR)) {
             Integer color = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
@@ -201,7 +201,7 @@ public class NoteProvider extends ContentProvider {
             }
         }
 
-        // If the {@link PetEntry#COLUMN_PET_WEIGHT} key is present,
+        // If the {@link NoteEntry.COLUMN_NOTE_TIME} key is present,
         // check that the weight value is valid.
         if (values.containsKey(NoteContract.NoteEntry.COLUMN_NOTE_TIME)) {
             // Check that the weight is greater than or equal to 0 kg
