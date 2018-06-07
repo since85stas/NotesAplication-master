@@ -24,6 +24,8 @@ import android.widget.Toast;
 
 import com.batura.stas.notesaplication.data.NoteContract;
 
+import java.lang.reflect.Array;
+
 /**
  * Created by HOME on 18.05.2018.
  */
@@ -221,12 +223,15 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
                 R.array.color_array_string, R.layout.color_spiner_item);
+        int[] colorId = {665,666,667,668,669,670,671};
+        SpinnerColorAdapter myAdapter = new  SpinnerColorAdapter (EditorActivity.this,
+                R.layout.color_dropdown_item , getResources().getStringArray(R.array.color_array_string),colorId);
 
         // Specify dropdown layout style - simple list view with 1 item per line
         genderSpinnerAdapter.setDropDownViewResource(R.layout.color_dropdown_item);
 
         // Apply the adapter to the spinner
-        mColorSpinner.setAdapter(genderSpinnerAdapter);
+        mColorSpinner.setAdapter(myAdapter);
 
         // Set the integer mSelected to the constant values
         mColorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

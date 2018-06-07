@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.TextView;
 
+import com.batura.stas.notesaplication.Static.NoteUtils;
 import com.batura.stas.notesaplication.data.NoteContract;
 
 import java.text.SimpleDateFormat;
@@ -45,7 +46,7 @@ public class NoteCursorAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         //return LayoutInflater.from(context).inflate(R.layout.);
-        return LayoutInflater.from(context).inflate(R.layout.note_list_item,parent,false);
+        return LayoutInflater.from(context).inflate(R.layout.note_list_item, parent, false);
     }
 
     /**
@@ -61,10 +62,10 @@ public class NoteCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
 
-        TextView titleTextView = (TextView)view.findViewById(R.id.titleItem);
-        TextView bodyTextView = (TextView)view.findViewById(R.id.bodyItem);
-        TextView dateTextView = (TextView)view.findViewById(R.id.date);
-        TextView timeTextView = (TextView)view.findViewById(R.id.time);
+        TextView titleTextView = (TextView) view.findViewById(R.id.titleItem);
+        TextView bodyTextView = (TextView) view.findViewById(R.id.bodyItem);
+        TextView dateTextView = (TextView) view.findViewById(R.id.date);
+        TextView timeTextView = (TextView) view.findViewById(R.id.time);
 
         int titleColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
         int bodyColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
@@ -73,27 +74,24 @@ public class NoteCursorAdapter extends CursorAdapter {
 
         String noteTitle = cursor.getString(titleColoumnIndex);
         String noteBody = cursor.getString(bodyColoumnIndex);
-        Long  noteTime = cursor.getLong(dateColoumnIndex);
+        Long noteTime = cursor.getLong(dateColoumnIndex);
         int noteColor = cursor.getInt(colorColoumnIndex);
 
-        if (noteTitle.length() == 0 || noteTitle == null ) {
+        if (noteTitle.length() == 0 || noteTitle == null) {
             titleTextView.setText("No title");
-        }
-        else {
+        } else {
             titleTextView.setText(noteTitle);
         }
-        if (noteBody.length() == 0 || noteBody == null ) {
+        if (noteBody.length() == 0 || noteBody == null) {
             bodyTextView.setText("No text");
-        }
-        else {
+        } else {
             bodyTextView.setText(noteBody);
         }
 
 
-        if(noteTime< 0) {
+        if (noteTime < 0) {
             dateTextView.setText("Wrong time");
-        }
-        else {
+        } else {
 
             Date dateObject = new Date(noteTime);
             String formattedDate = formatDate(dateObject);
@@ -103,8 +101,8 @@ public class NoteCursorAdapter extends CursorAdapter {
         }
 
         // set back ground for note list item
-        if (noteColor != NoteContract.NoteEntry.COLOR_DEFAULT ) {
-            int color = getBackColor(noteColor);
+        if (noteColor != NoteContract.NoteEntry.COLOR_DEFAULT) {
+            int color = NoteUtils.getBackColor(noteColor);
             view.setBackgroundColor(ContextCompat.getColor(context, color));
         }
 
@@ -132,30 +130,6 @@ public class NoteCursorAdapter extends CursorAdapter {
     }
 
 
-    private int getBackColor (int colorId) {
 
-            int backColorResId = 0;
-            switch (colorId) {
-                case NoteContract.NoteEntry.COLOR_RED:
-                    backColorResId = R.color.redBack;
-                    break;
-                case NoteContract.NoteEntry.COLOR_ORANGE:
-                    backColorResId = R.color.orangeBack;
-                    break;
-                case NoteContract.NoteEntry.COLOR_YELLOW:
-                    backColorResId = R.color.yellowBack;
-                    break;
-                case NoteContract.NoteEntry.COLOR_GREEN:
-                    backColorResId = R.color.greenBack;
-                    break;
-                case NoteContract.NoteEntry.COLOR_BLUE:
-                    backColorResId = R.color.blueBack;
-                    break;
-                case NoteContract.NoteEntry.COLOR_PURPLE:
-                    backColorResId = R.color.purpleBack;
-                    break;
-            }
-            return  backColorResId;
-            }
-    }
+}
 
