@@ -4,12 +4,12 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -19,10 +19,10 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batura.stas.notesaplication.data.NoteContract;
-import com.batura.stas.notesaplication.data.NoteProvider;
 
 /**
  * Created by HOME on 18.05.2018.
@@ -57,19 +57,18 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if (mCurrentNoteUri == null) {
             setTitle("Add note");
             invalidateOptionsMenu();
-        }
-        else {
+        } else {
             setTitle("Edit note");
-            getSupportLoaderManager().initLoader(NOTE_LOADER_EDITOR ,null,this); //!!!! instead getLoaderManager
+            getSupportLoaderManager().initLoader(NOTE_LOADER_EDITOR, null, this); //!!!! instead getLoaderManager
         }
 
-        mTitleTextView = (EditText)findViewById(R.id.noteTitleInput);
+        mTitleTextView = (EditText) findViewById(R.id.noteTitleInput);
 
         mBodyTextView = (EditText) findViewById(R.id.noteTextInput);
 
-        mColorSpinner = (Spinner)findViewById(R.id.colorSpinner);
+        mColorSpinner = (Spinner) findViewById(R.id.colorSpinner);
 
-        mTime         =  System.currentTimeMillis();
+        mTime = System.currentTimeMillis();
 
 
         setupSpinner();
@@ -92,7 +91,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         switch (item.getItemId()) {
             // Respond to a click on the "Save" menu option
             case R.id.action_save:
-                insertNote();
+                saveNote();
                 finish();
                 return true;
             // Respond to a click on the "Delete" menu option
@@ -109,17 +108,20 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
 
-    private void insertNote() {
+    private void saveNote() {
         // Read from input fields
         // Use trim to eliminate leading or trailing white space
         String titleString = mTitleTextView.getText().toString().trim();
         String bodyString = mBodyTextView.getText().toString().trim();
-        String colorString = Integer.toString( mColor);
-        String timeString = Long.toString( mTime);
+        String colorString = Integer.toString(mColor);
+        String timeString = Long.toString(mTime);
 
         if (mCurrentNoteUri == null &&
                 TextUtils.isEmpty(titleString) && TextUtils.isEmpty(bodyString) &&
-                TextUtils.isEmpty(colorString) && TextUtils.isEmpty(timeString) ) {return;}
+                TextUtils.isEmpty(colorString) && TextUtils.isEmpty(timeString)) {
+            return;
+        }
+
 
         // Create a ContentValues object where column names are the keys,
         // and pet attributes from the editor are the values.
@@ -129,19 +131,34 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_COLOR, mColor);
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_TIME, mTime);
 
-        // Insert a new row for pet in the database, returning the ID of that new row.
-        // Insert a new pet into the provider, returning the content URI for the new pet.
-        Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI, values);
+        if (mCurrentNoteUri == null) {
 
-        // Show a toast message depending on whether or not the insertion was successful
-        if (newUri == null) {
-            // If the row ID is -1, then there was an error with insertion.
-            Toast.makeText(this, getString(R.string.editor_insert_note_failed), Toast.LENGTH_SHORT).show();
+            // Insert a new row for pet in the database, returning the ID of that new row.
+            // Insert a new pet into the provider, returning the content URI for the new pet.
+            Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI, values);
+
+            // Show a toast message depending on whether or not the insertion was successful
+            if (newUri == null) {
+                // If the row ID is -1, then there was an error with insertion.
+                Toast.makeText(this, getString(R.string.editor_insert_note_failed), Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the insertion was successful and we can display a toast with the row ID.
+                Toast.makeText(this, getString(R.string.editor_insert_pet_successful), Toast.LENGTH_SHORT).show();
+            }
         } else {
-            // Otherwise, the insertion was successful and we can display a toast with the row ID.
-            Toast.makeText(this, getString(R.string.editor_insert_pet_successful), Toast.LENGTH_SHORT).show();
+            int rowsAffected = getContentResolver().update(mCurrentNoteUri, values, null, null);
+            if (rowsAffected == 0) {
+                // If no rows were affected, then there was an error with the update.
+                Toast.makeText(this, getString(R.string.editor_insert_note_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the update was successful and we can display a toast.
+                Toast.makeText(this, getString(R.string.editor_insert_pet_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
     }
+
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -199,11 +216,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private void setupSpinner() {
         // Create adapter for spinner. The list options are from the String array it will use
         // the spinner will use the default layout
+
+        TextView spinnerDropdownTextView = (TextView)findViewById(R.id.color_spin_dropdown_item);
+
         ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
-                R.array.color_array_string, android.R.layout.simple_spinner_item);
+                R.array.color_array_string, R.layout.color_spiner_item);
 
         // Specify dropdown layout style - simple list view with 1 item per line
-        genderSpinnerAdapter.setDropDownViewResource(android.R.layout.simple_dropdown_item_1line);
+        genderSpinnerAdapter.setDropDownViewResource(R.layout.color_dropdown_item);
 
         // Apply the adapter to the spinner
         mColorSpinner.setAdapter(genderSpinnerAdapter);
@@ -229,9 +249,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     } else if (selection.equals(getString(R.string.color_purple))) {
                         mColor = NoteContract.NoteEntry.COLOR_PURPLE;
                         ; // Unknown
-                    }
-                    else {
-                        Log.d(LOG_TAG,"Wrong color spinner value");
+                    } else {
+                        Log.d(LOG_TAG, "Wrong color spinner value");
                     }
                 }
             }

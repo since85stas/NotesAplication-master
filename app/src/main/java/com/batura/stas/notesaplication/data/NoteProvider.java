@@ -205,9 +205,9 @@ public class NoteProvider extends ContentProvider {
         // check that the weight value is valid.
         if (values.containsKey(NoteContract.NoteEntry.COLUMN_NOTE_TIME)) {
             // Check that the weight is greater than or equal to 0 kg
-            Integer time = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
-            if (time != null && time < 0) {
-                throw new IllegalArgumentException("Pet requires valid weight " + time );
+            Long time = values.getAsLong(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
+            if (time == null || time < 0) {
+                throw new IllegalArgumentException("Pet requires valid time " + time );
             }
         }
 

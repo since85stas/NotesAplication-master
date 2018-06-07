@@ -108,6 +108,7 @@ public class NoteCursorAdapter extends CursorAdapter {
             view.setBackgroundColor(ContextCompat.getColor(context, color));
         }
 
+
     }
 
     /**
