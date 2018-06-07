@@ -20,6 +20,7 @@ public class SpinnerColorAdapter extends ArrayAdapter<String> {
 
     private String [] objects;
     private int[]     colorId;
+    private boolean isDropdown;
 
     public SpinnerColorAdapter( Context context, int textViewResourceId, String[] objects, int[] colorId) {
         super(context, textViewResourceId, objects);
@@ -30,11 +31,14 @@ public class SpinnerColorAdapter extends ArrayAdapter<String> {
 
     @Override
     public View getDropDownView(int position, View convertView, ViewGroup parent) {
+        isDropdown = true;
         return getCustomView(position, convertView, parent);
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+        isDropdown = false;
+
         return getCustomView(position, convertView, parent);
     }
 
@@ -47,7 +51,12 @@ public class SpinnerColorAdapter extends ArrayAdapter<String> {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         View row = inflater.inflate(R.layout.color_dropdown_item, parent, false);
         TextView label = (TextView) row.findViewById(R.id.color_spin_dropdown_item);
-        label.setText(objects[position]);
+        if (isDropdown) {
+            label.setText(objects[position]);
+        }
+        else {
+            label.setText("Note color");
+        }
         int color = NoteUtils.getBackColor(colorId[position]);
         label.setBackgroundColor(ContextCompat.getColor(getContext(), color));
 

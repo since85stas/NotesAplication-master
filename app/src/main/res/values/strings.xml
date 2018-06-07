@@ -17,4 +17,7 @@
     <string name="color_green">Green</string>
     <string name="color_blue">Blue</string>
     <string name="color_purple">Purple</string>
+    <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
+    <string name="discard">Discard</string>
+    <string name="keep_editing">Keep editing</string>
 </resources>

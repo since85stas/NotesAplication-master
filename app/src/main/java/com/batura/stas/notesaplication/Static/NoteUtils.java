@@ -10,7 +10,6 @@ import com.batura.stas.notesaplication.data.NoteContract;
 public final class NoteUtils {
 
     private NoteUtils(){
-
     }
 
     public static int getBackColor(int colorId) {

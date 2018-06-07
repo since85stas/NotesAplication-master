@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
         /* +     * Temporary helper method to display information in the onscreen TextView about the state of
-        * +     * the pets database.
+        * +     * the note database.
         * +
         */
         private void insertNote() {

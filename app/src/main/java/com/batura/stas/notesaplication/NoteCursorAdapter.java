@@ -100,7 +100,7 @@ public class NoteCursorAdapter extends CursorAdapter {
             timeTextView.setText(formattetTime);
         }
 
-        // set back ground for note list item
+        // set back ground color for note list item
         if (noteColor != NoteContract.NoteEntry.COLOR_DEFAULT) {
             int color = NoteUtils.getBackColor(noteColor);
             view.setBackgroundColor(ContextCompat.getColor(context, color));
