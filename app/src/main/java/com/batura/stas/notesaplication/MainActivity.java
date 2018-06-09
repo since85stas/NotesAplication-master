@@ -1,8 +1,10 @@
 package com.batura.stas.notesaplication;
 
 import android.app.LoaderManager;
+import android.app.SearchManager;
 import android.content.ContentUris;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -12,6 +14,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -19,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.SearchView;
 
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
@@ -59,7 +63,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ListView noteListView = (ListView) findViewById(R.id.list);
 
         mCursorAdapter = new NoteCursorAdapter(this,null);
+
         noteListView.setAdapter(mCursorAdapter);
+        mCursorAdapter.notifyDataSetChanged();
 
         noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -73,6 +79,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         getLoaderManager().initLoader(NOTE_LOADER,null,this);
 
+
+
 //        mDbHelper = new NoteDbHelper(this);
 //        displayDatabaseInfo();
 
@@ -82,6 +90,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
+
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
         return true;
     }
 

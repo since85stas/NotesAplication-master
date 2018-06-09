@@ -20,4 +20,11 @@
     <string name="unsaved_changes_dialog_msg">Discard your changes and quit editing?</string>
     <string name="discard">Discard</string>
     <string name="keep_editing">Keep editing</string>
+    <string name="editor_delete_pet_failed">Error deleting note</string>
+    <string name="editor_delete_pet_successful">Delete note sucsessful</string>
+    <string name="delete_dialog_msg">Delete note?</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="menu_search">Search</string>
+    <string name="search_hint">Key word</string>
 </resources>

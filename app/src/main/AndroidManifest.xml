@@ -21,9 +21,11 @@
         <activity
             android:name=".EditorActivity"
             android:label="@string/editorActivTitle"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme"
+            android:parentActivityName=".MainActivity" >
 
         </activity>
+
         <provider
             android:name=".data.NoteProvider"
             android:authorities="com.batura.stas.notesaplication"
