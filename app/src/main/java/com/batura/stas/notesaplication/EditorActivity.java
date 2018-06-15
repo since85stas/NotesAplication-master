@@ -39,6 +39,7 @@ import java.lang.reflect.Array;
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+
     public static final String LOG_TAG = EditorActivity.class.getSimpleName();
 
     private EditText mTitleTextView;
