@@ -2,6 +2,7 @@ package com.batura.stas.notesaplication;
 
 import android.app.LoaderManager;
 import android.app.SearchManager;
+import android.app.SearchableInfo;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
@@ -27,6 +28,7 @@ import android.widget.SearchView;
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
 
+import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>  {
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private NoteDbHelper mDbHelper;
 
     private NoteCursorAdapter mCursorAdapter;
+
+    private SearchView mSearchView;
 
     private static final int NOTE_LOADER = 0;
 
@@ -79,6 +83,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         getLoaderManager().initLoader(NOTE_LOADER,null,this);
 
+        Intent intent = getIntent();
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            //doMySearch(query);
+        }
+
 
 
 //        mDbHelper = new NoteDbHelper(this);
@@ -91,14 +101,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
+
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
+
+        setupSearchResult(searchMenuItem);
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(getComponentName()));
+        return true;
+    }
+
+    private void setupSearchResult (MenuItem searchItem ) {
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(getComponentName()));
-        return true;
+        if (searchManager != null) {
+            List<SearchableInfo> searchables = searchManager.getSearchablesInGlobalSearch();
+        }
     }
 
     @Override
@@ -223,12 +241,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
                 NoteContract.NoteEntry.COLUMN_NOTE_TIME
         };
+
+        String constraint = "ч";
+        String selection = NoteContract.NoteEntry.COLUMN_NOTE_BODY + " LIKE '%"
+                + constraint + "%'"
+                + " OR " + NoteContract.NoteEntry.COLUMN_NOTE_TITLE + " LIKE '%"
+                + constraint + "%'"
+                ;
+
         return new CursorLoader( this,
                 NoteContract.NoteEntry.CONTENT_URI,
                 projection,
+                selection,
                 null,
-                null,
-                null);
+                NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
     }
 
 
