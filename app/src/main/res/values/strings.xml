@@ -27,4 +27,11 @@
     <string name="cancel">Cancel</string>
     <string name="menu_search">Search</string>
     <string name="search_hint">Key word</string>
+
+    // order by spinner
+    <string name="order_by">Order by</string>
+    <string name="order_date">date</string>
+    <string name="order_number">number</string>
+    <string name="order_color">color</string>
+    <string name="order_alphavite">alphabet</string>
 </resources>

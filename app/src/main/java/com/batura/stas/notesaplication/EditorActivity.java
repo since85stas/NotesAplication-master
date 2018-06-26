@@ -358,16 +358,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Create adapter for spinner. The list options are from the String array it will use
         // the spinner will use the default layout
 
-        TextView spinnerDropdownTextView = (TextView)findViewById(R.id.color_spin_dropdown_item);
-
-        ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
-                R.array.color_array_string, R.layout.color_spiner_item);
+//        ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
+//                R.array.color_array_string, R.layout.color_spiner_item);
         int[] colorId = {665,666,667,668,669,670,671};
         SpinnerColorAdapter myAdapter = new  SpinnerColorAdapter (EditorActivity.this,
                 R.layout.color_dropdown_item , getResources().getStringArray(R.array.color_array_string),colorId);
 
         // Specify dropdown layout style - simple list view with 1 item per line
-        genderSpinnerAdapter.setDropDownViewResource(R.layout.color_dropdown_item);
+//        genderSpinnerAdapter.setDropDownViewResource(R.layout.color_dropdown_item);
 
         // Apply the adapter to the spinner
         mColorSpinner.setAdapter(myAdapter);
@@ -379,9 +377,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 String selection = (String) parent.getItemAtPosition(position);
                 if (!TextUtils.isEmpty(selection)) {
                     if (selection.equals(getString(R.string.color_default))) {
-                        mColor = 665; // Male
+                        mColor = 665;
                     } else if (selection.equals(getString(R.string.color_red))) {
-                        mColor = NoteContract.NoteEntry.COLOR_RED; // Female
+                        mColor = NoteContract.NoteEntry.COLOR_RED;
                     } else if (selection.equals(getString(R.string.color_orange))) {
                         mColor = NoteContract.NoteEntry.COLOR_ORANGE;
                     } else if (selection.equals(getString(R.string.color_yellow))) {

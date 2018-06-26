@@ -10,5 +10,11 @@
         <item>@string/color_blue</item>
         <item>@string/color_purple</item>
     </string-array>
-    
+
+    <string-array name="order_by_string_drop">
+        <item>@string/order_date</item>
+        <item>@string/order_color</item>
+        <item>@string/order_alphavite</item>
+        <item>@string/order_number</item>
+    </string-array>
 </resources>

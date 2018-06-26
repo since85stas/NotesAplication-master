@@ -22,8 +22,10 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
+import android.widget.Spinner;
 
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
@@ -36,9 +38,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private NoteCursorAdapter mCursorAdapter;
 
+    private Spinner mOrderBySpinner;
+
     private SearchView mSearchView;
 
     private String mSearchString = null; // search request
+
+    private String mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME;
 
     private static final int NOTE_LOADER = 0;
 
@@ -59,6 +65,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
+        setupOrderSpinner();
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -166,7 +175,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<Cursor>  onCreateLoader(int id, Bundle args) {
 
-
         String[] projection = new String[]{
                 NoteContract.NoteEntry._ID,
                 NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
@@ -176,14 +184,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         };
 
         String selection = setupSelectionString();
+        //String orderBy   = setupOrderByString();
 
         return new CursorLoader( this,
                 NoteContract.NoteEntry.CONTENT_URI,
                 projection,
                 selection,
                 null,
-                NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
+                mOrderByLoaderString);
     }
+
+//    private String setupOrderByString() {
+//    }
 
     private String setupSelectionString() {
         String selection = null;
@@ -205,5 +217,33 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mCursorAdapter.swapCursor(null);
+    }
+
+    private void setupOrderSpinner ( ) {
+        //TextView spinnerDropdownTextView = (TextView)findViewById(R.id.color_spin_dropdown_item);
+        ArrayAdapter<?> adapter =
+                ArrayAdapter.createFromResource(this, R.array.order_by_string_drop, R.layout.order_spinner_item);
+        adapter.setDropDownViewResource(R.layout.order_spinner_dropdown_item);
+
+        // Вызываем адаптер
+        mOrderBySpinner.setAdapter(adapter);
+
+        mOrderBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int selectedItemPosition, long selectedId) {
+                if (selectedItemPosition == 0) {
+                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME;
+                }
+                if (selectedItemPosition == 1) {
+                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_COLOR;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
     }
 }
