@@ -88,7 +88,6 @@ public class NoteCursorAdapter extends CursorAdapter {
             bodyTextView.setText(noteBody);
         }
 
-
         if (noteTime < 0) {
             dateTextView.setText("Wrong time");
         } else {
@@ -101,10 +100,9 @@ public class NoteCursorAdapter extends CursorAdapter {
         }
 
         // set back ground color for note list item
-        if (noteColor != NoteContract.NoteEntry.COLOR_DEFAULT) {
-            int color = NoteUtils.getBackColor(noteColor);
-            view.setBackgroundColor(ContextCompat.getColor(context, color));
-        }
+        int color = NoteUtils.getBackColor(noteColor);
+        view.setBackgroundColor(ContextCompat.getColor(context, color));
+
 
 
     }

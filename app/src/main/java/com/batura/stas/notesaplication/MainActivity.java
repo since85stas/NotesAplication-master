@@ -116,12 +116,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
-
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
         mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
 
         setupSearchResult(searchMenuItem);
-
         return true;
     }
 
@@ -184,7 +182,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         };
 
         String selection = setupSelectionString();
-        //String orderBy   = setupOrderByString();
+        ///String orderBy   = setupOrderByString();
 
         return new CursorLoader( this,
                 NoteContract.NoteEntry.CONTENT_URI,
@@ -237,11 +235,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 if (selectedItemPosition == 1) {
                     mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_COLOR;
                 }
+                mCursorAdapter.notifyDataSetChanged();
+                getLoaderManager().initLoader(NOTE_LOADER,null,MainActivity.this);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-
+                mCursorAdapter.notifyDataSetChanged();
             }
         });
 
