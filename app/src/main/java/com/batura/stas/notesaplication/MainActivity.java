@@ -230,18 +230,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int selectedItemPosition, long selectedId) {
                 if (selectedItemPosition == 0) {
-                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME;
+                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME + " DESC";
                 }
                 if (selectedItemPosition == 1) {
-                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_COLOR;
+                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_COLOR + " DESC";
                 }
-                mCursorAdapter.notifyDataSetChanged();
-                getLoaderManager().initLoader(NOTE_LOADER,null,MainActivity.this);
+                getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                mCursorAdapter.notifyDataSetChanged();
+
             }
         });
 
