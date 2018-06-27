@@ -178,6 +178,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
                 NoteContract.NoteEntry.COLUMN_NOTE_BODY,
                 NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
+                NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE,
+                NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD,
+                NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD_HASH,
+                NoteContract.NoteEntry.COLUMN_NOTE_IMAGE,
+                NoteContract.NoteEntry.COLUMN_NOTE_WIDGET,
                 NoteContract.NoteEntry.COLUMN_NOTE_TIME
         };
 
@@ -234,6 +239,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
                 if (selectedItemPosition == 1) {
                     mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_COLOR + " DESC";
+                }
+                if (selectedItemPosition == 2) {
+                    mOrderByLoaderString = NoteContract.NoteEntry._ID + " DESC";
+                }
+                if (selectedItemPosition == 3) {
+                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TITLE + " DESC";
+                }
+                if (selectedItemPosition == 4) {
+                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_BODY + " DESC";
+                }
+                if (selectedItemPosition == 5) {
+                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE+ " DESC";
                 }
                 getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
             }

@@ -57,13 +57,15 @@ public class NoteContract {
          * Type: INTEGER
          */
         public final static String _ID = BaseColumns._ID;
+
         /**
-         * Name of the pet.
+         * Title of the pet.
          * <p>
          * Type: TEXT
          */
         public final static String COLUMN_NOTE_TITLE = "title";
-        /**
+
+        /**Body
          * <p>
          * Type: TEXT
          */
@@ -82,6 +84,45 @@ public class NoteContract {
          * Type: LONG
          */
          public final static String COLUMN_NOTE_TIME = "time";
+
+        /**           *
+         * Favorite.
+         * <p>
+         * Type: INTEGER
+         */
+        public final static String COLUMN_NOTE_FAVOURITE = "favourite";
+        public final static  int NOTE_IS_FAV = 1;
+        public final static  int NOTE_IS_NOT_FAV = 0;
+        /**           *
+         * Password.
+         * <p>
+         * Type: INTEGER
+         */
+        public final static String COLUMN_NOTE_PASSWORD = "password";
+        public final static  int NOTE_HAS_PASS = 1;
+        public final static  int NOTE_HAS_NOT_PASS = 0;
+
+        /**           *
+         * Password hash code.
+         * <p>
+         * Type: INTEGER
+         */
+        public final static String COLUMN_NOTE_PASSWORD_HASH = "passwordHash";
+
+        /**           *
+         * Image id.
+         * <p>
+         * Type: INTEGER
+         */
+        public final static String COLUMN_NOTE_IMAGE = "imageId";
+
+        /**           *
+         * Widget.
+         * <p>
+         * Type: INTEGER
+         */
+        public final static String COLUMN_NOTE_WIDGET = "widget";
+
 
          public static final int COLOR_DEFAULT = 665;
 

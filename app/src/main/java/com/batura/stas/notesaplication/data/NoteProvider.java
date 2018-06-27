@@ -134,11 +134,39 @@ public class NoteProvider extends ContentProvider {
         if (name == null) {
             throw new IllegalArgumentException("trying to add empty note");
         }
+
         Integer color = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
         if (color == null ) {
             throw new IllegalArgumentException("Wrong color for note");
         }
-        // If the weight is provided, check that it's greater than or equal to 0 kg
+
+        Integer favoutite = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
+        if ( favoutite != NoteContract.NoteEntry.NOTE_IS_FAV && favoutite != NoteContract.NoteEntry.NOTE_IS_NOT_FAV ) {
+            throw new IllegalArgumentException("Wrong favorite id for note");
+        }
+
+        Integer pass = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD);
+        if ( pass != NoteContract.NoteEntry.NOTE_HAS_PASS && pass != NoteContract.NoteEntry.NOTE_HAS_NOT_PASS ) {
+            throw new IllegalArgumentException("Wrong favorite id for note");
+        }
+        else {
+            if (pass == NoteContract.NoteEntry.NOTE_HAS_PASS ) {
+                //TODO проверяем хэш код праоля доделать потом
+            }
+
+        }
+
+        Integer image = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_IMAGE);
+        if ( image == null ) {
+            throw new IllegalArgumentException("Wrong image id for note");
+        }
+
+        Integer widget = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET);
+        if ( widget == null ) {
+            throw new IllegalArgumentException("Wrong widget id for note");
+        }
+
+
         Long time = values.getAsLong(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
         if (time != null && time < 0) {
             throw new IllegalArgumentException("Wrong data for note");
@@ -196,10 +224,12 @@ public class NoteProvider extends ContentProvider {
         // check that the gender value is valid.
         if (values.containsKey(NoteContract.NoteEntry.COLUMN_NOTE_COLOR)) {
             Integer color = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
-            if (color == null ){//|| !PetContract.PetEntry.isValidGender(gender)) {
+            if (color == null ){
                 throw new IllegalArgumentException("Note requires valid color " + color);
             }
         }
+
+
 
         // If the {@link NoteEntry.COLUMN_NOTE_TIME} key is present,
         // check that the weight value is valid.
@@ -207,7 +237,7 @@ public class NoteProvider extends ContentProvider {
             // Check that the weight is greater than or equal to 0 kg
             Long time = values.getAsLong(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
             if (time == null || time < 0) {
-                throw new IllegalArgumentException("Pet requires valid time " + time );
+                throw new IllegalArgumentException("Note requires valid time " + time );
             }
         }
 

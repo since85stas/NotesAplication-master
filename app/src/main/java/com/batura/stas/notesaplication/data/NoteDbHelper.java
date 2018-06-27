@@ -20,7 +20,7 @@ public class NoteDbHelper extends SQLiteOpenHelper {
     /**
      * Database version. If you change the database schema, you must increment the database version.
      */
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     /**
      * Constructs a new instance of {@link NoteDbHelper}.
@@ -39,6 +39,11 @@ public class NoteDbHelper extends SQLiteOpenHelper {
                 + NoteContract.NoteEntry.COLUMN_NOTE_TITLE+ " TEXT, "
                 + NoteContract.NoteEntry.COLUMN_NOTE_BODY + " TEXT, "
                 + NoteContract.NoteEntry.COLUMN_NOTE_COLOR + " INTEGER NOT NULL DEFAULT 0, "
+                + NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE + " INTEGER NOT NULL DEFAULT 0, "
+                + NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD + " INTEGER NOT NULL DEFAULT 0, "
+                + NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD_HASH + " INTEGER NOT NULL DEFAULT 0, "
+                + NoteContract.NoteEntry.COLUMN_NOTE_IMAGE + " INTEGER NOT NULL DEFAULT 0, "
+                + NoteContract.NoteEntry.COLUMN_NOTE_WIDGET + " INTEGER NOT NULL DEFAULT 0, "
                 + NoteContract.NoteEntry.COLUMN_NOTE_TIME +  " INTEGER NOT NULL DEFAULT 0);"
                ;
         db.execSQL(SQL_CREATE_NOTES_TABLE);

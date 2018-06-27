@@ -50,6 +50,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private long mTime = 0;
 
+    private int mFav   = 0;
+
+    //private int m
+
     private final static int NOTE_LOADER_EDITOR = 0;
 
     private Uri mCurrentNoteUri;
@@ -245,6 +249,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_TITLE, titleString);
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_BODY, bodyString);
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_COLOR, mColor);
+
+        values.put(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE, mFav);
+        // constant values
+        values.put(NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD, 0);
+        values.put(NoteContract.NoteEntry.COLUMN_NOTE_IMAGE, 0);
+        values.put(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET, 0);
+        //
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_TIME, mTime);
 
         if (mCurrentNoteUri == null) {

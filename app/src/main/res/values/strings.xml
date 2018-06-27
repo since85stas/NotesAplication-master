@@ -33,5 +33,8 @@
     <string name="order_date">date</string>
     <string name="order_number">number</string>
     <string name="order_color">color</string>
-    <string name="order_alphavite">alphabet</string>
+    <string name="order_favourite">favorite</string>
+    <string name="order_title">title</string>
+    <string name="order_note">alphabet</string>
+
 </resources>
