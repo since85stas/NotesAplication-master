@@ -24,6 +24,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.ImageSwitcher;
 import android.widget.SearchView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -60,6 +61,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private Spinner mColorSpinner;
 
+    private ImageSwitcher mImageSwitcher;
+
+    private int[] favImgId = {R.drawable.outline_grade_black_24,R.drawable.baseline_grade_black_24};
+
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
@@ -91,6 +96,17 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mColorSpinner = (Spinner) findViewById(R.id.colorSpinner);
 
         mTime = System.currentTimeMillis();
+
+        mImageSwitcher = (ImageSwitcher) findViewById(R.id.imageSwitcherFav);
+        //mImageSwitcher.chil
+
+        mImageSwitcher.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mImageSwitcher.showNext();
+                int imageId = mImageSwitcher.getCurrentView().getId();
+            }
+        });
 
         mTitleTextView.setOnTouchListener(mTouchListener);
         mBodyTextView.setOnTouchListener(mTouchListener);

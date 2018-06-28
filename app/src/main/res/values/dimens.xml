@@ -10,4 +10,6 @@
 
     <dimen name="noteBodyWidthVertical">200dp</dimen>
 
+    <dimen name="noteTitleHeight">50dp</dimen>
+
 </resources>
