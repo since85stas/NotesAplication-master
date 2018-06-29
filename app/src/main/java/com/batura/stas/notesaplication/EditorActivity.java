@@ -63,7 +63,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private ImageSwitcher mImageSwitcher;
 
-    private int[] favImgId = {R.drawable.outline_grade_black_24,R.drawable.baseline_grade_black_24};
+    private int[] favDrawId = {R.drawable.outline_grade_black_24,R.drawable.baseline_grade_black_24};
+
+    private final int[] mFavImagId = {R.id.imageStarOut,R.id.imageStarFill};
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -98,6 +100,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mTime = System.currentTimeMillis();
 
         mImageSwitcher = (ImageSwitcher) findViewById(R.id.imageSwitcherFav);
+
+        //mImageSwitcher.setImageResource(mFavImagId[mFav]);
         //mImageSwitcher.chil
 
         mImageSwitcher.setOnClickListener(new View.OnClickListener() {
@@ -105,8 +109,15 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             public void onClick(View v) {
                 mImageSwitcher.showNext();
                 int imageId = mImageSwitcher.getCurrentView().getId();
-            }
-        });
+                if ( imageId == mFavImagId[0]) {
+                    mFav = 0;
+                } if ( imageId == mFavImagId[1]) {
+                    mFav = 1;
+                }else {
+                }
+                }
+
+            });
 
         mTitleTextView.setOnTouchListener(mTouchListener);
         mBodyTextView.setOnTouchListener(mTouchListener);
@@ -194,9 +205,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Inflate the menu options from the res/menu/menu_editor.xml file.
         // This adds menu items to the app bar.
         getMenuInflater().inflate(R.menu.menu_editor, menu);
-
-
-
         return true;
     }
 
@@ -222,7 +230,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     NavUtils.navigateUpFromSameTask(EditorActivity.this);
                     return true;
                 }
-
                 // Otherwise if there are unsaved changes, setup a dialog to warn the user.
                 // Create a click listener to handle the user confirming that
                 // changes should be discarded.
@@ -258,14 +265,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             return;
         }
 
-
         // Create a ContentValues object where column names are the keys,
         // and pet attributes from the editor are the values.
         ContentValues values = new ContentValues();
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_TITLE, titleString);
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_BODY, bodyString);
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_COLOR, mColor);
-
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE, mFav);
         // constant values
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD, 0);
@@ -336,6 +341,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
                 NoteContract.NoteEntry.COLUMN_NOTE_BODY,
                 NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
+                NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE,
                 NoteContract.NoteEntry.COLUMN_NOTE_TIME
         };
         return new android.support.v4.content.CursorLoader(this,
@@ -346,6 +352,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 null);
     }
 
+
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         if (cursor.moveToFirst()) {
@@ -354,20 +361,26 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             int bodyColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
             int colorColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
             int timeColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
+            int favColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
 
             // Extract out the value from the Cursor for the given column index
             String title = cursor.getString(titleColumnIndex);
             String body = cursor.getString(bodyColumnIndex);
             int gender = cursor.getInt(colorColumnIndex);
             int weight = cursor.getInt(timeColumnIndex);
+            mFav = cursor.getInt(favColumnIndex);
+
+
 
             // Update the views on the screen with the values from the database
+            if (mFav == 1) {
+                mImageSwitcher.showNext();
+            }
             mTitleTextView.setText(title);
             mBodyTextView.setText(body);
             //mWeightEditText.setText(Integer.toString(weight));
 
         }
-
     }
 
     @Override

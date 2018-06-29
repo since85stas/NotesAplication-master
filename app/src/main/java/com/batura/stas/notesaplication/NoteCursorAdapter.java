@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.batura.stas.notesaplication.Static.NoteUtils;
@@ -66,16 +67,19 @@ public class NoteCursorAdapter extends CursorAdapter {
         TextView bodyTextView = (TextView) view.findViewById(R.id.bodyItem);
         TextView dateTextView = (TextView) view.findViewById(R.id.date);
         TextView timeTextView = (TextView) view.findViewById(R.id.time);
+        ImageView favorImageView =(ImageView) view.findViewById(R.id.favNoteImag);
 
         int titleColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
         int bodyColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
         int dateColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
         int colorColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
+        int favColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
 
         String noteTitle = cursor.getString(titleColoumnIndex);
         String noteBody = cursor.getString(bodyColoumnIndex);
         Long noteTime = cursor.getLong(dateColoumnIndex);
         int noteColor = cursor.getInt(colorColoumnIndex);
+        int noteIsFavor = cursor.getInt(favColoumnIndex);
 
         if (noteTitle.length() == 0 || noteTitle == null) {
             titleTextView.setText("No title");
@@ -103,6 +107,10 @@ public class NoteCursorAdapter extends CursorAdapter {
         int color = NoteUtils.getBackColor(noteColor);
         view.setBackgroundColor(ContextCompat.getColor(context, color));
 
+        // favorite
+        if (noteIsFavor != 1) {
+            favorImageView.setVisibility(View.INVISIBLE);
+        }
 
 
     }
