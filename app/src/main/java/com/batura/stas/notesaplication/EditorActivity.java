@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
@@ -30,6 +31,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.batura.stas.notesaplication.Static.NoteUtils;
 import com.batura.stas.notesaplication.data.NoteContract;
 
 import java.lang.reflect.Array;
@@ -366,7 +368,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // Extract out the value from the Cursor for the given column index
             String title = cursor.getString(titleColumnIndex);
             String body = cursor.getString(bodyColumnIndex);
-            int gender = cursor.getInt(colorColumnIndex);
+            int colorId = cursor.getInt(colorColumnIndex);
             int weight = cursor.getInt(timeColumnIndex);
             mFav = cursor.getInt(favColumnIndex);
 
@@ -378,7 +380,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
             mTitleTextView.setText(title);
             mBodyTextView.setText(body);
+
+            int color = NoteUtils.getBackColorLight(colorId);
+            mBodyTextView.setBackgroundColor(ContextCompat.getColor(getBaseContext(), color));
             //mWeightEditText.setText(Integer.toString(weight));
+            mColorSpinner.setSelection(NoteUtils.getColorPosisById(colorId));
 
         }
     }
@@ -388,6 +394,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // If the loader is invalidated, clear out all the data from the input fields.
         mTitleTextView.setText("");
         mBodyTextView.setText("");
+
     }
 
 

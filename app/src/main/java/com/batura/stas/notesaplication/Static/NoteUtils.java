@@ -40,4 +40,61 @@ public final class NoteUtils {
         }
         return backColorResId;
     }
+
+    public static int getBackColorLight(int colorId) {
+
+        int backColorResId = 0;
+        switch (colorId) {
+            case NoteContract.NoteEntry.COLOR_DEFAULT:
+                backColorResId = R.color.defaultBackLight;
+                break;
+            case NoteContract.NoteEntry.COLOR_RED:
+                backColorResId = R.color.redBackLight;
+                break;
+            case NoteContract.NoteEntry.COLOR_ORANGE:
+                backColorResId = R.color.orangeBackLight;
+                break;
+            case NoteContract.NoteEntry.COLOR_YELLOW:
+                backColorResId = R.color.yellowBackLight;
+                break;
+            case NoteContract.NoteEntry.COLOR_GREEN:
+                backColorResId = R.color.greenBackLight;
+                break;
+            case NoteContract.NoteEntry.COLOR_BLUE:
+                backColorResId = R.color.blueBackLight;
+                break;
+            case NoteContract.NoteEntry.COLOR_PURPLE:
+                backColorResId = R.color.purpleBackLight;
+                break;
+        }
+        return backColorResId;
+    }
+
+    public static int getColorPosisById (int colorId) {
+        int position = 0;
+        switch (colorId) {
+            case NoteContract.NoteEntry.COLOR_DEFAULT:
+                position = 0;
+                break;
+            case NoteContract.NoteEntry.COLOR_RED:
+                position = 1;
+                break;
+            case NoteContract.NoteEntry.COLOR_ORANGE:
+                position = 2;
+                break;
+            case NoteContract.NoteEntry.COLOR_YELLOW:
+                position = 3;
+                break;
+            case NoteContract.NoteEntry.COLOR_GREEN:
+                position = 4;
+                break;
+            case NoteContract.NoteEntry.COLOR_BLUE:
+                position = 5;
+                break;
+            case NoteContract.NoteEntry.COLOR_PURPLE:
+                position = 6;
+                break;
+        }
+        return position;
+    }
 }

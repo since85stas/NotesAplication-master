@@ -50,7 +50,7 @@
         </Spinner>
     </LinearLayout>
 
-    <EditText
+    <com.batura.stas.notesaplication.LinedEditText
         android:id="@+id/noteTextInput"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

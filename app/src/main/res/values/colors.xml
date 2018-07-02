@@ -12,23 +12,30 @@
     <!--  colors for different backgrounds-->
     <color name="defaultBack">#EEEEEE</color>
     <color name="defaultBackAccent">#EEEEEE</color>
+    <color name="defaultBackLight">#EEEEEE</color>
 
     <color name="blueBack">#90CAF9</color>
     <color name="blueBackAccent">#42A5F5</color>
+    <color name="blueBackLight">#BBDEFB</color>
 
     <color name="yellowBack">#FFF59D</color>
     <color name="yellowBackAccent">#FFEE58</color>
+    <color name="yellowBackLight">#FFF9C4</color>
 
     <color name="orangeBack">#FFCC80</color>
     <color name="orangeBackAccent">#FFA726</color>
+    <color name="orangeBackLight">#FFE0B2</color>
 
     <color name="redBack">#FFAB91</color>
     <color name="redBackAccent">#FF7043</color>
+    <color name="redBackLight">#ffcdd2</color>
 
     <color name="greenBack">#C5E1A5</color>
     <color name="greenBackAccent">#9CCC65</color>
+    <color name="greenBackLight">#C8E6C9</color>
 
     <color name="purpleBack">#CE93D8</color>
     <color name="purpleBackAccent">#AB47BC</color>
+    <color name="purpleBackLight">#E1BEE7</color>
 
 </resources>

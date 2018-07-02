@@ -11,6 +11,17 @@
         <item>@string/color_purple</item>
     </string-array>
 
+    // array for notes back color light
+    <string-array name="color_array_string_light">
+        <item>@string/color_default</item>
+        <item>@string/color_red</item>
+        <item>@string/color_orange</item>
+        <item>@string/color_yellow</item>
+        <item>@string/color_green</item>
+        <item>@string/color_blue</item>
+        <item>@string/color_purple</item>
+    </string-array>
+
     <string-array name="order_by_string_drop">
         <item>@string/order_date</item>
         <item>@string/order_color</item>
