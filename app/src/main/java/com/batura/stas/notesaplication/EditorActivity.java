@@ -4,6 +4,7 @@ import android.app.SearchManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,9 +13,11 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
+import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ShareActionProvider;
 import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
@@ -64,6 +67,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private Spinner mColorSpinner;
 
     private ImageSwitcher mImageSwitcher;
+
+    private ShareActionProvider mShareActionProvider ;
 
     private final int[] mFavImagId = {R.id.imageStarOut,R.id.imageStarFill};
 
@@ -143,7 +148,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 }
             }
         });
-
         // Create and show the AlertDialog
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
@@ -170,7 +174,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 }
             }
         });
-
         // Create and show the AlertDialog
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
@@ -184,7 +187,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             super.onBackPressed();
             return;
         }
-
         // Otherwise if there are unsaved changes, setup a dialog to warn the user.
         // Create a click listener to handle the user confirming that changes should be discarded.
         DialogInterface.OnClickListener discardButtonClickListener =
@@ -195,7 +197,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                         finish();
                     }
                 };
-
         // Show dialog that there are unsaved changes
         showUnsavedChangesDialog(discardButtonClickListener);
     }
@@ -206,8 +207,28 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Inflate the menu options from the res/menu/menu_editor.xml file.
         // This adds menu items to the app bar.
         getMenuInflater().inflate(R.menu.menu_editor, menu);
+
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+        //mShareActionProvider =  menuItem.getActionProvider();
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+
+        mShareActionProvider
+                .setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
+        mShareActionProvider.setShareIntent(createShareIntent());
         return true;
     }
+
+
+    private Intent createShareIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("text/plain");
+        String msg = mBodyTextView.getText().toString();
+        shareIntent.putExtra(Intent.EXTRA_TEXT,
+                msg);
+        return shareIntent;
+    }
+
+
 
 
     @Override
@@ -246,8 +267,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 // Show a dialog that notifies the user they have unsaved changes
                 showUnsavedChangesDialog(discardButtonClickListener);
                 return true;
-
-        }
+         }
         return super.onOptionsItemSelected(item);
     }
 

@@ -26,6 +26,9 @@
             android:label="@string/editorActivTitle"
             android:theme="@style/AppTheme"
             android:parentActivityName=".MainActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+            </intent-filter>
 
         </activity>
 
