@@ -8,11 +8,14 @@
     <!-- Text color for the primary text-->
     <color name="textColorPrimary">#2B3D4D</color>
 
+    <color name="backMainDefaultColor">#BDBDBD</color>
 
-    <!--  colors for different backgrounds-->
+
+
+    <!--  colors for different backgrounds item list view-->
     <color name="defaultBack">#EEEEEE</color>
     <color name="defaultBackAccent">#EEEEEE</color>
-    <color name="defaultBackLight">#EEEEEE</color>
+    <color name="defaultBackLight">#EEEEFE</color>
 
     <color name="blueBack">#90CAF9</color>
     <color name="blueBackAccent">#42A5F5</color>

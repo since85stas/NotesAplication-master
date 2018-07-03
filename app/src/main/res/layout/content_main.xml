@@ -7,18 +7,23 @@
     android:orientation="vertical"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.batura.stas.notesaplication.MainActivity"
-    tools:showIn="@layout/activity_main">
+    tools:showIn="@layout/activity_main"
+    android:background="@color/backMainDefaultColor">
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_gravity="center"
-        android:gravity="center">
+        android:gravity="center"
+        android:layout_margin="8dp"
+        android:padding="8dp"
+        android:background="@color/colorPrimary">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/order_by"
-            style="?android:attr/spinnerItemStyle"/>
+            style="?android:attr/spinnerItemStyle"
+        />
         <Spinner
             android:id="@+id/orderBySpinner"
             android:layout_width="wrap_content"
@@ -32,6 +37,8 @@
         android:layout_height="match_parent"
         android:padding="@dimen/activity_margin"
         android:text="Hello World!"
+        android:divider="@color/backMainDefaultColor"
+        android:dividerHeight="4dp"
  />
 
 </LinearLayout>

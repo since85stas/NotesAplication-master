@@ -47,7 +47,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     private EditText mTitleTextView;
 
-    private EditText mBodyTextView;
+    private LinedEditText mBodyTextView;
 
     private int mColor = 665;
 
@@ -64,8 +64,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private Spinner mColorSpinner;
 
     private ImageSwitcher mImageSwitcher;
-
-    private int[] favDrawId = {R.drawable.outline_grade_black_24,R.drawable.baseline_grade_black_24};
 
     private final int[] mFavImagId = {R.id.imageStarOut,R.id.imageStarFill};
 
@@ -95,7 +93,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         mTitleTextView = (EditText) findViewById(R.id.noteTitleInput);
 
-        mBodyTextView = (EditText) findViewById(R.id.noteTextInput);
+        mBodyTextView = findViewById(R.id.noteTextInput);
+        //mBodyTextView = new LinedEditText(this,null,19);
 
         mColorSpinner = (Spinner) findViewById(R.id.colorSpinner);
 
@@ -372,8 +371,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             int weight = cursor.getInt(timeColumnIndex);
             mFav = cursor.getInt(favColumnIndex);
 
-
-
             // Update the views on the screen with the values from the database
             if (mFav == 1) {
                 mImageSwitcher.showNext();
@@ -381,10 +378,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             mTitleTextView.setText(title);
             mBodyTextView.setText(body);
 
-            int color = NoteUtils.getBackColorLight(colorId);
-            mBodyTextView.setBackgroundColor(ContextCompat.getColor(getBaseContext(), color));
+            int colorBackLight = NoteUtils.getBackColorLight(colorId);
+            mBodyTextView.setBackgroundColor(ContextCompat.getColor(getBaseContext(), colorBackLight));
             //mWeightEditText.setText(Integer.toString(weight));
             mColorSpinner.setSelection(NoteUtils.getColorPosisById(colorId));
+            mBodyTextView.setColorId(colorId);
 
         }
     }

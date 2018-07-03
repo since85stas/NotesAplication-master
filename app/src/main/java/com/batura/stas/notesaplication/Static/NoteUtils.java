@@ -70,6 +70,36 @@ public final class NoteUtils {
         return backColorResId;
     }
 
+
+    public static int getBackColorAccent(int colorId) {
+
+        int backColorResId = 0;
+        switch (colorId) {
+            case NoteContract.NoteEntry.COLOR_DEFAULT:
+                backColorResId = R.color.defaultBackAccent;
+                break;
+            case NoteContract.NoteEntry.COLOR_RED:
+                backColorResId = R.color.redBackAccent;
+                break;
+            case NoteContract.NoteEntry.COLOR_ORANGE:
+                backColorResId = R.color.orangeBackAccent;
+                break;
+            case NoteContract.NoteEntry.COLOR_YELLOW:
+                backColorResId = R.color.yellowBackAccent;
+                break;
+            case NoteContract.NoteEntry.COLOR_GREEN:
+                backColorResId = R.color.greenBackAccent;
+                break;
+            case NoteContract.NoteEntry.COLOR_BLUE:
+                backColorResId = R.color.blueBackAccent;
+                break;
+            case NoteContract.NoteEntry.COLOR_PURPLE:
+                backColorResId = R.color.purpleBackAccent;
+                break;
+        }
+        return backColorResId;
+    }
+
     public static int getColorPosisById (int colorId) {
         int position = 0;
         switch (colorId) {
