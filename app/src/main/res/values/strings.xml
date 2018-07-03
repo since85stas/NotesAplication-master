@@ -36,5 +36,7 @@
     <string name="order_favourite">favorite</string>
     <string name="order_title">title</string>
     <string name="order_note">alphabet</string>
+    <string name="set_time">Set time</string>
+    <string name="cancel_alarm">Cancel alarm</string>
 
 </resources>

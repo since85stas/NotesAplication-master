@@ -215,6 +215,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mShareActionProvider
                 .setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
         mShareActionProvider.setShareIntent(createShareIntent());
+
+        //TODO: решить проблему с невозможностью поделиться новой записью
+
         return true;
     }
 
@@ -267,6 +270,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 // Show a dialog that notifies the user they have unsaved changes
                 showUnsavedChangesDialog(discardButtonClickListener);
                 return true;
+            case R.id.action_share:
+                //Log.v(LOG_TAG,"12121212");
+                return true;
+
          }
         return super.onOptionsItemSelected(item);
     }
