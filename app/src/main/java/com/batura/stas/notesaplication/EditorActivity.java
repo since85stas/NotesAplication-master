@@ -34,6 +34,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.batura.stas.notesaplication.AlarmFuncs.AlarmSetActivity;
 import com.batura.stas.notesaplication.Static.NoteUtils;
 import com.batura.stas.notesaplication.data.NoteContract;
 
@@ -272,6 +273,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 return true;
             case R.id.action_share:
                 //Log.v(LOG_TAG,"12121212");
+                return true;
+            case R.id.action_alarm:
+                Intent alarmIntent = new Intent(getBaseContext(), AlarmSetActivity.class);
+                alarmIntent.putExtra(AlarmSetActivity.NOTE_BODY,mBodyTextView.getText().toString());
+                startActivity(alarmIntent);
                 return true;
 
          }

@@ -5,10 +5,32 @@
     android:orientation="vertical" >
 
     <Button
-        android:id="@+id/butttonShowDialog"
+        android:id="@+id/buttonShowDatePickDialog"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/set_date" />
+
+    <TextView
+        android:id="@+id/textViewSetDate"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/buttonShowTimePickDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/set_time" />
+
+    <TextView
+        android:id="@+id/textViewSetTime"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/buttonSetAlarm"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/set_notification"/>
 
     <Button
         android:id="@+id/buttonCancel"
