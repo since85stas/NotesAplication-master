@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,8 @@ import java.util.Locale;
  * how to create list items for each row of pet data in the {@link Cursor}.
  */
 public class NoteCursorAdapter extends CursorAdapter {
+
+    public static final String TAG = NoteCursorAdapter.class.getSimpleName();
 
     /**
      * Constructs a new {@link NoteCursorAdapter}.
@@ -51,8 +54,8 @@ public class NoteCursorAdapter extends CursorAdapter {
     }
 
     /**
-     * This method binds the pet data (in the current row pointed to by cursor) to the given
-     * list item layout. For example, the name for the current pet can be set on the name TextView
+     * This method binds the note data (in the current row pointed to by cursor) to the given
+     * list item layout. For example, the name for the current note can be set on the name TextView
      * in the list item layout.
      *
      * @param view    Existing view, returned earlier by newView() method
@@ -68,18 +71,26 @@ public class NoteCursorAdapter extends CursorAdapter {
         TextView dateTextView = (TextView) view.findViewById(R.id.date);
         TextView timeTextView = (TextView) view.findViewById(R.id.time);
         ImageView favorImageView =(ImageView) view.findViewById(R.id.favNoteImag);
+        ImageView notifImageView = (ImageView)view.findViewById(R.id.notificNoteImag);
 
         int titleColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
         int bodyColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
         int dateColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
         int colorColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
         int favColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
+        int notifColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET);
 
         String noteTitle = cursor.getString(titleColoumnIndex);
         String noteBody = cursor.getString(bodyColoumnIndex);
         Long noteTime = cursor.getLong(dateColoumnIndex);
         int noteColor = cursor.getInt(colorColoumnIndex);
         int noteIsFavor = cursor.getInt(favColoumnIndex);
+        int noteNotifIsOn = cursor.getInt(notifColoumnIndex);
+
+        Log.i(TAG, "bindView: noteBody " + noteBody );
+        Log.i(TAG, "bindView: noteColor " + noteColor );
+        Log.i(TAG, "bindView: noteIsFavor " + noteIsFavor );
+        Log.i(TAG, "bindView: noteNotifIsOn " + noteNotifIsOn );
 
         if (noteTitle.length() == 0 || noteTitle == null) {
             titleTextView.setText("No title");
@@ -106,11 +117,17 @@ public class NoteCursorAdapter extends CursorAdapter {
         // set back ground color for note list item
         int color = NoteUtils.getBackColor(noteColor);
         view.setBackgroundColor(ContextCompat.getColor(context, color));
-
         // favorite
         if (noteIsFavor != 1) {
             favorImageView.setVisibility(View.INVISIBLE);
         }
+        //notif
+        if (noteNotifIsOn == 1) {
+            //notifImageView.setVisibility(View.INVISIBLE);
+        }
+//        else {
+//            notifImageView.setImageResource(R.drawable.baseline_grade_black_18);
+//        }
 
 
     }
@@ -119,11 +136,8 @@ public class NoteCursorAdapter extends CursorAdapter {
      * Return the formatted date string (i.e. "Mar 3, 1984") from a Date object.
      */
     private String formatDate(Date dateObject) {
-
         SimpleDateFormat dateFormat = new SimpleDateFormat("LLL dd, yyyy");
-
 //        SimpleDateFormat dateFormat = new SimpleDateFormat(dateObject);
-
         return dateFormat.format(dateObject);
     }
 

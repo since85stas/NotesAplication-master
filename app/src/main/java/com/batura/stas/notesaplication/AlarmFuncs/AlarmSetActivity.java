@@ -32,6 +32,8 @@ public class AlarmSetActivity extends AppCompatActivity {
 
     public final static String NOTE_BODY =  AlarmSetActivity.class.getPackage() + ".NOTE_BODY";
 
+    public final static String NOTIF_IS_ON =  AlarmSetActivity.class.getPackage() + ".NOTIF_IS_ON";
+
     String notificationText;
 
     final static int RQS_TIME = 1;
@@ -107,7 +109,14 @@ public class AlarmSetActivity extends AppCompatActivity {
         setButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent answIntent = new Intent();
+
+                answIntent.putExtra(NOTIF_IS_ON, true);
+                setResult(RESULT_OK, answIntent); // отвечаем что напоминание установлено
+
                 setAlarm(calSet);
+
+                finish();
             }
         });
 
@@ -157,7 +166,6 @@ public class AlarmSetActivity extends AppCompatActivity {
 
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 getApplicationContext(), RQS_TIME, intent, 0);
-
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         alarmManager.set(AlarmManager.RTC_WAKEUP, targetCal.getTimeInMillis(),

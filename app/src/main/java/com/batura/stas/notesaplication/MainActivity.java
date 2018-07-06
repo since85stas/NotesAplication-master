@@ -34,6 +34,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>  {
 
+    public static final String TAG = MainActivity.class.getSimpleName();
+
     private NoteDbHelper mDbHelper;
 
     private NoteCursorAdapter mCursorAdapter;
@@ -52,6 +54,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public boolean onSearchRequested(SearchEvent searchEvent) {
 
         return super.onSearchRequested(searchEvent);
+    }
+
+    @Override
+    public void onContentChanged() {
+        super.onContentChanged();
     }
 
     @Override
@@ -103,13 +110,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             //System.out.println(query);
         }
         getLoaderManager().initLoader(NOTE_LOADER,null,this);
-
-
-
-//        mDbHelper = new NoteDbHelper(this);
-//        displayDatabaseInfo();
-
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -118,10 +120,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         MenuItem searchMenuItem = menu.findItem(R.id.action_search);
         mSearchView = (SearchView) MenuItemCompat.getActionView(searchMenuItem);
-
         setupSearchResult(searchMenuItem);
         return true;
     }
+
 
     private void setupSearchResult (MenuItem searchItem ) {
         SearchManager searchManager =
@@ -129,6 +131,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mSearchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
     }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -141,10 +144,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (id == R.id.action_settings) {
             return true;
         }
-        if(id == R.id.add_dummy_data) {
-            insertNote();
-            //displayDatabaseInfo();
-        }
+//        if(id == R.id.add_dummy_data) {
+//            insertNote();
+//            //displayDatabaseInfo();
+//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -153,22 +156,22 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         * +     * the note database.
         * +
         */
-        private void insertNote() {
-            SQLiteDatabase db = mDbHelper.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(NoteContract.NoteEntry.COLUMN_NOTE_TITLE, "Test");
-            values.put(NoteContract.NoteEntry.COLUMN_NOTE_BODY, "Test note");
-            values.put(NoteContract.NoteEntry.COLUMN_NOTE_COLOR, 1);
-            values.put(NoteContract.NoteEntry.COLUMN_NOTE_TIME, 7);
-            // Insert a new row for Toto in the database, returning the ID of that new row.
-            // The first argument for db.insert() is the pets table name.
-            // The second argument provides the name of a column in which the framework
-            // can insert NULL in the event that the ContentValues is empty (if
-            // this is set to "null", then the framework will not insert a row when
-            // there are no values).
-            //Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI,values);
-            long newRowId = db.insert(NoteContract.NoteEntry.TABLE_NAME, null, values);
-        }
+//        private void insertNote() {
+//            SQLiteDatabase db = mDbHelper.getWritableDatabase();
+//            ContentValues values = new ContentValues();
+//            values.put(NoteContract.NoteEntry.COLUMN_NOTE_TITLE, "Test");
+//            values.put(NoteContract.NoteEntry.COLUMN_NOTE_BODY, "Test note");
+//            values.put(NoteContract.NoteEntry.COLUMN_NOTE_COLOR, 1);
+//            values.put(NoteContract.NoteEntry.COLUMN_NOTE_TIME, 7);
+//            // Insert a new row for Toto in the database, returning the ID of that new row.
+//            // The first argument for db.insert() is the pets table name.
+//            // The second argument provides the name of a column in which the framework
+//            // can insert NULL in the event that the ContentValues is empty (if
+//            // this is set to "null", then the framework will not insert a row when
+//            // there are no values).
+//            //Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI,values);
+//            long newRowId = db.insert(NoteContract.NoteEntry.TABLE_NAME, null, values);
+//        }
 
     @Override
     public Loader<Cursor>  onCreateLoader(int id, Bundle args) {

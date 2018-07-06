@@ -1,8 +1,6 @@
 package com.batura.stas.notesaplication;
 
-import android.app.SearchManager;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,12 +11,10 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
-import android.support.v4.view.ActionProvider;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
-import android.text.Layout;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Menu;
@@ -26,19 +22,14 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageSwitcher;
-import android.widget.SearchView;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batura.stas.notesaplication.AlarmFuncs.AlarmSetActivity;
 import com.batura.stas.notesaplication.Static.NoteUtils;
 import com.batura.stas.notesaplication.data.NoteContract;
-
-import java.lang.reflect.Array;
 
 /**
  * Created by HOME on 18.05.2018.
@@ -47,7 +38,7 @@ import java.lang.reflect.Array;
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
 
-    public static final String LOG_TAG = EditorActivity.class.getSimpleName();
+    public static final String TAG = EditorActivity.class.getSimpleName();
 
     private EditText mTitleTextView;
 
@@ -62,6 +53,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     //private int m
 
     private final static int NOTE_LOADER_EDITOR = 0;
+
+    private final static int NOTIFIC_ANSWER = 0;
+
+    private boolean mNotificIsOn = false;
 
     private Uri mCurrentNoteUri;
 
@@ -277,11 +272,28 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             case R.id.action_alarm:
                 Intent alarmIntent = new Intent(getBaseContext(), AlarmSetActivity.class);
                 alarmIntent.putExtra(AlarmSetActivity.NOTE_BODY,mBodyTextView.getText().toString());
-                startActivity(alarmIntent);
+                startActivityForResult(alarmIntent,NOTIFIC_ANSWER);
                 return true;
 
          }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        //TextView infoTextView = (TextView) findViewById(R.id.textViewInfo);
+
+        if (requestCode == NOTIFIC_ANSWER) {
+            if (resultCode == RESULT_OK) {
+                mNotificIsOn = data.getBooleanExtra(AlarmSetActivity.NOTIF_IS_ON,false);
+                //infoTextView.setText(thiefname);
+            }else {
+                //infoTextView.setText(""); // стираем текст
+            }
+        }
     }
 
 
@@ -309,7 +321,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // constant values
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD, 0);
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_IMAGE, 0);
-        values.put(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET, 0);
+
+        if (mNotificIsOn) {
+            values.put(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET, 1);
+        } else {
+            values.put(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET, 0);
+        }
         //
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_TIME, mTime);
 
@@ -470,7 +487,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                         mColor = NoteContract.NoteEntry.COLOR_PURPLE;
                         ; // Unknown
                     } else {
-                        Log.d(LOG_TAG, "Wrong color spinner value");
+                        Log.e(TAG, "Wrong color spinner value");
                     }
                 }
             }
