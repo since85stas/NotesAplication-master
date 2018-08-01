@@ -23,9 +23,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
     //TODO добавить звуковой сигнал на напоминание
 
-
+    //ключ с текстом напоминания
     public final static String NOTIF_TEXT =  AlarmSetActivity.class.getPackage() + ".NOTIF_TEXT";
 
+    //  текст напоминания
     private String notifText;
 
     @Override
@@ -33,10 +34,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         notifText = intent.getExtras().getString(NOTIF_TEXT);
         //().getExtras().getString(NOTE_BODY); // получаем текст для напоминания
-
         Toast.makeText(context, "Notification from " + R.string.app_name,
                 Toast.LENGTH_LONG).show();
-
         buildNotification(context);
     }
 

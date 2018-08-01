@@ -1,3 +1,11 @@
+/*
+* MainActivity.java
+*
+* version 1.1
+*
+* Автор Батура Стас 10.07.2018
+*/
+
 package com.batura.stas.notesaplication;
 
 import android.app.LoaderManager;
@@ -26,33 +34,24 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
-
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
-
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>  {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String TAG = MainActivity.class.getSimpleName();
+    private static final int NOTE_LOADER = 0;
 
     private NoteDbHelper mDbHelper;
-
     private NoteCursorAdapter mCursorAdapter;
-
     private Spinner mOrderBySpinner;
-
     private SearchView mSearchView;
-
     private String mSearchString = null; // search request
-
-    private String mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME;
-
-    private static final int NOTE_LOADER = 0;
+    private String mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME; // по какому столбцу упорядочивание списка
 
     @Override
     public boolean onSearchRequested(SearchEvent searchEvent) {
-
         return super.onSearchRequested(searchEvent);
     }
 
@@ -61,18 +60,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onContentChanged();
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        Locale locale = new Locale("en");
+        Locale locale = new Locale("en"); // задаем локаль, пока принудительно
         Locale.setDefault(locale);
 
-        setContentView(R.layout.activity_main);
+        // определям action bar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        // определяем спинер для упорядочивания заметок
         mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
         setupOrderSpinner();
 
@@ -82,34 +83,38 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onClick(View view) {
                 Snackbar.make(view, "Add a note", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                Intent intent = new Intent(MainActivity.this,EditorActivity.class) ;
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
                 startActivity(intent);
             }
         });
 
+        /* задаем listView для списка заметок
+         * проверяем изменолись ли данные
+         * при нажатии на заметку вызывается редактирование заметки класс EditorAcrtivity
+         */
         ListView noteListView = (ListView) findViewById(R.id.list);
-
-        mCursorAdapter = new NoteCursorAdapter(this,null);
-
+        mCursorAdapter = new NoteCursorAdapter(this, null);
         noteListView.setAdapter(mCursorAdapter);
         mCursorAdapter.notifyDataSetChanged();
-
         noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI,id);
+                Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, id);
                 intent.setData(currentPetUri);
                 startActivity(intent);
             }
         });
 
+        // вызываем намерение на поиск выражения в тексте заметки
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
             mSearchString = intent.getStringExtra(SearchManager.QUERY);
             //System.out.println(query);
         }
-        getLoaderManager().initLoader(NOTE_LOADER,null,this);
+
+
+        getLoaderManager().initLoader(NOTE_LOADER, null, this);
     }
 
 
@@ -125,7 +130,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
 
-    private void setupSearchResult (MenuItem searchItem ) {
+    private void setupSearchResult(MenuItem searchItem) {
         SearchManager searchManager =
                 (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         mSearchView.setSearchableInfo(
@@ -148,14 +153,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //            insertNote();
 //            //displayDatabaseInfo();
 //        }
-
         return super.onOptionsItemSelected(item);
     }
 
-        /* +     * Temporary helper method to display information in the onscreen TextView about the state of
-        * +     * the note database.
-        * +
-        */
 //        private void insertNote() {
 //            SQLiteDatabase db = mDbHelper.getWritableDatabase();
 //            ContentValues values = new ContentValues();
@@ -174,8 +174,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //        }
 
     @Override
-    public Loader<Cursor>  onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
+        // задаем проекцию по которой будет происходить считывние из БД
         String[] projection = new String[]{
                 NoteContract.NoteEntry._ID,
                 NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
@@ -189,10 +190,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 NoteContract.NoteEntry.COLUMN_NOTE_TIME
         };
 
+        // задается условия для поиска ключ слов в БД
         String selection = setupSelectionString();
         ///String orderBy   = setupOrderByString();
 
-        return new CursorLoader( this,
+        return new CursorLoader(this,
                 NoteContract.NoteEntry.CONTENT_URI,
                 projection,
                 selection,
@@ -200,9 +202,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 mOrderByLoaderString);
     }
 
-//    private String setupOrderByString() {
-//    }
-
+    /*
+       Функция создает строчку для запроса поиска из БД. Если пользователь ввел чтото в строку
+       поиска. Пока поиск происходит в двух колонках COLUMN_NOTE_BODY и COLUMN_NOTE_TITLE.
+       В дальнейшем возможно будет добавлен поиск по друг колонкам.
+     */
     private String setupSelectionString() {
         String selection = null;
         if (mSearchString != null) {
@@ -225,7 +229,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mCursorAdapter.swapCursor(null);
     }
 
-    private void setupOrderSpinner ( ) {
+    /*
+     * Задается переменная по которой идет упорядочивание списка заметок. По дефолту установлена
+     * переменная COLUMN_NOTE_TIME идет по уменьнению переменной.
+     */
+    private void setupOrderSpinner() {
         //TextView spinnerDropdownTextView = (TextView)findViewById(R.id.color_spin_dropdown_item);
         ArrayAdapter<?> adapter =
                 ArrayAdapter.createFromResource(this, R.array.order_by_string_drop, R.layout.order_spinner_item);
@@ -239,23 +247,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             public void onItemSelected(AdapterView<?> parent, View view, int selectedItemPosition, long selectedId) {
                 if (selectedItemPosition == 0) {
                     mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME + " DESC";
-                }
-                if (selectedItemPosition == 1) {
+                } else if (selectedItemPosition == 1) {
                     mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_COLOR + " DESC";
-                }
-                if (selectedItemPosition == 2) {
+                } else if (selectedItemPosition == 2) {
                     mOrderByLoaderString = NoteContract.NoteEntry._ID + " DESC";
-                }
-                if (selectedItemPosition == 3) {
+                } else if (selectedItemPosition == 3) {
                     mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TITLE + " DESC";
-                }
-                if (selectedItemPosition == 4) {
+                } else if (selectedItemPosition == 4) {
                     mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_BODY + " DESC";
+                } else if (selectedItemPosition == 5) {
+                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE + " DESC";
                 }
-                if (selectedItemPosition == 5) {
-                    mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE+ " DESC";
-                }
-                getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
+                getLoaderManager().restartLoader(NOTE_LOADER, null, MainActivity.this);
             }
 
             @Override

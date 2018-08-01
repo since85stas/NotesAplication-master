@@ -53,7 +53,8 @@
     <com.batura.stas.notesaplication.LinedEditText
         android:id="@+id/noteTextInput"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="400dp"
+
         android:layout_gravity="top"
         android:gravity="top"
         android:hint="@string/noteHint"
@@ -63,5 +64,22 @@
         android:paddingTop="8dp"
         android:focusableInTouchMode="true"
         android:focusable="true"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:id="@+id/imageViewTest1"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="100dp" />
+        <TextView
+            android:id="@+id/textViewTest1"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="100dp" />
+    </LinearLayout>
 
 </LinearLayout>

@@ -4,8 +4,10 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
@@ -24,49 +26,44 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageSwitcher;
+import android.widget.ImageView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batura.stas.notesaplication.AlarmFuncs.AlarmSetActivity;
 import com.batura.stas.notesaplication.Static.NoteUtils;
 import com.batura.stas.notesaplication.data.NoteContract;
 
+import org.w3c.dom.Text;
+
+import java.io.IOException;
+
 /**
- * Created by HOME on 18.05.2018.
+ * Created by Batura Stas on 18.05.2018.
  */
 
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-
+    private final static int NOTE_LOADER_EDITOR = 0;
+    private final static int NOTIFIC_ANSWER = 0;
+    private static final int REQUEST_GALLERY = 100; // запрос для галереи
     public static final String TAG = EditorActivity.class.getSimpleName();
 
     private EditText mTitleTextView;
-
     private LinedEditText mBodyTextView;
-
     private int mColor = 665;
-
     private long mTime = 0;
-
     private int mFav   = 0;
-
-    //private int m
-
-    private final static int NOTE_LOADER_EDITOR = 0;
-
-    private final static int NOTIFIC_ANSWER = 0;
-
     private boolean mNotificIsOn = false;
-
     private Uri mCurrentNoteUri;
-
     private Spinner mColorSpinner;
-
     private ImageSwitcher mImageSwitcher;
-
     private ShareActionProvider mShareActionProvider ;
-
     private final int[] mFavImagId = {R.id.imageStarOut,R.id.imageStarFill};
+    private boolean mNoteHasChanged = false;
+    private ImageView mImageView;
+    private TextView  mTargetUriTextView;
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -76,7 +73,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
     };
 
-    private boolean mNoteHasChanged = false;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -228,8 +225,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
 
-
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // User clicked on a menu option in the app bar overflow menu
@@ -274,6 +269,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 alarmIntent.putExtra(AlarmSetActivity.NOTE_BODY,mBodyTextView.getText().toString());
                 startActivityForResult(alarmIntent,NOTIFIC_ANSWER);
                 return true;
+            case R.id.action_add_image:
+                // запускаем Галерею
+                Intent intent = new Intent(Intent.ACTION_PICK,
+                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                startActivityForResult(intent, REQUEST_GALLERY);
+                return true;
 
          }
         return super.onOptionsItemSelected(item);
@@ -284,14 +285,27 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        //TextView infoTextView = (TextView) findViewById(R.id.textViewInfo);
-
+        Bitmap galleryBitmap = null;
+        mImageView = findViewById(R.id.imageViewTest1);
+        mTargetUriTextView = findViewById(R.id.textViewTest1);
         if (requestCode == NOTIFIC_ANSWER) {
             if (resultCode == RESULT_OK) {
                 mNotificIsOn = data.getBooleanExtra(AlarmSetActivity.NOTIF_IS_ON,false);
                 //infoTextView.setText(thiefname);
             }else {
                 //infoTextView.setText(""); // стираем текст
+            }
+        } else if (requestCode == REQUEST_GALLERY) {
+            if (resultCode == RESULT_OK) {
+                Uri selectedImageUri = data.getData();
+                try {
+                    galleryBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),
+                            selectedImageUri);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mImageView.setImageBitmap(galleryBitmap);
+                mTargetUriTextView.setText(selectedImageUri.toString());
             }
         }
     }
@@ -304,7 +318,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String bodyString = mBodyTextView.getText().toString().trim();
         String colorString = Integer.toString(mColor);
         String timeString = Long.toString(mTime);
-
         if (mCurrentNoteUri == null &&
                 TextUtils.isEmpty(titleString) && TextUtils.isEmpty(bodyString) &&
                 TextUtils.isEmpty(colorString) && TextUtils.isEmpty(timeString)) {
@@ -321,7 +334,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // constant values
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD, 0);
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_IMAGE, 0);
-
         if (mNotificIsOn) {
             values.put(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET, 1);
         } else {
@@ -360,7 +372,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
 
     /**
-     * Perform the deletion of the pet in the database.
+     * Perform the deletion of the note in the database.
      */
     private void deletePet() {
         // Only perform the delete if this is an existing pet.
@@ -453,14 +465,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Create adapter for spinner. The list options are from the String array it will use
         // the spinner will use the default layout
 
-//        ArrayAdapter genderSpinnerAdapter = ArrayAdapter.createFromResource(this,
-//                R.array.color_array_string, R.layout.color_spiner_item);
         int[] colorId = {665,666,667,668,669,670,671};
         SpinnerColorAdapter myAdapter = new  SpinnerColorAdapter (EditorActivity.this,
                 R.layout.color_dropdown_item , getResources().getStringArray(R.array.color_array_string),colorId);
-
-        // Specify dropdown layout style - simple list view with 1 item per line
-//        genderSpinnerAdapter.setDropDownViewResource(R.layout.color_dropdown_item);
 
         // Apply the adapter to the spinner
         mColorSpinner.setAdapter(myAdapter);
@@ -485,7 +492,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                         mColor = NoteContract.NoteEntry.COLOR_BLUE;
                     } else if (selection.equals(getString(R.string.color_purple))) {
                         mColor = NoteContract.NoteEntry.COLOR_PURPLE;
-                        ; // Unknown
                     } else {
                         Log.e(TAG, "Wrong color spinner value");
                     }

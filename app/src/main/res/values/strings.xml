@@ -41,6 +41,8 @@
     <string name="alarm_on">Alarm is on</string>
     <string name="set_notification">Set notification</string>
     <string name="set_date">Set date</string>
+    <string name="action_delete">delete</string>
+    <string name="action_add_image">Add image</string>
 
 
 </resources>

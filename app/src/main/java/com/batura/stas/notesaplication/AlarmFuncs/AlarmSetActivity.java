@@ -29,7 +29,6 @@ public class AlarmSetActivity extends AppCompatActivity {
 
     Context mContext ;
 
-
     public final static String NOTE_BODY =  AlarmSetActivity.class.getPackage() + ".NOTE_BODY";
 
     public final static String NOTIF_IS_ON =  AlarmSetActivity.class.getPackage() + ".NOTIF_IS_ON";
