@@ -1,8 +1,14 @@
 package com.batura.stas.notesaplication.ImageFuncs;
 
+import android.app.Activity;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.support.v4.content.ContextCompat;
+import android.util.Log;
+
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -13,18 +19,27 @@ import java.io.FileOutputStream;
  *
  */
 
-public class ImageStorage {
+public final class ImageStorage extends Activity {
 
     private static String IMAGE_DIR_NAME = ".notes_images_dir";
 
-    public static String saveToSdCard(Bitmap bitmap, String filename) {
+    public static  String saveToSdCard(Bitmap bitmap, String filename) {
 
         String stored = null;
 
-        File sdcard = Environment.getExternalStorageDirectory() ;
+        //ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
+
+        //File file = wrapper.getDir(IMAGE_DIR_NAME,MODE_PRIVATE);        //File file = wrap.getDir("Images",MODE_PRIVATE);
+
+        //File file = getFilesDir();
+        //Log.i("File", file.toString());
+        File sdcard = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) ;
+        boolean temp = sdcard.mkdirs();
+        //String yes = Environment.getExternalStorageState(Environment.DIRECTORY_PICTURES);
+        File internal = Environment.getRootDirectory();
 
         File folder = new File(sdcard.getAbsoluteFile(), IMAGE_DIR_NAME);//the dot makes this directory hidden to the user
-        folder.mkdir();
+        boolean success  = folder.mkdir();
         File file = new File(folder.getAbsoluteFile(), filename + ".jpg") ;
         if (file.exists())
             return stored ;

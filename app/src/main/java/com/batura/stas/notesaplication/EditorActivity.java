@@ -32,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batura.stas.notesaplication.AlarmFuncs.AlarmSetActivity;
+import com.batura.stas.notesaplication.ImageFuncs.ImageStorage;
 import com.batura.stas.notesaplication.Static.NoteUtils;
 import com.batura.stas.notesaplication.data.NoteContract;
 
@@ -286,6 +287,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         super.onActivityResult(requestCode, resultCode, data);
 
         Bitmap galleryBitmap = null;
+        //ImageStorage imageStorage = new ImageStorage();
         mImageView = findViewById(R.id.imageViewTest1);
         mTargetUriTextView = findViewById(R.id.textViewTest1);
         if (requestCode == NOTIFIC_ANSWER) {
@@ -304,6 +306,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+                ImageStorage.saveToSdCard(galleryBitmap,"firstFile");
                 mImageView.setImageBitmap(galleryBitmap);
                 mTargetUriTextView.setText(selectedImageUri.toString());
             }
