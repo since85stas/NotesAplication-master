@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -303,12 +304,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 try {
                     galleryBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),
                             selectedImageUri);
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 ImageStorage.saveToSdCard(galleryBitmap,"firstFile");
+                galleryBitmap = ImageStorage.getImageBitmap("firstFile");
                 mImageView.setImageBitmap(galleryBitmap);
-                mTargetUriTextView.setText(selectedImageUri.toString());
+                //mTargetUriTextView.setText(selectedImageUri.toString());
             }
         }
     }

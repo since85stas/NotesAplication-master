@@ -6,9 +6,13 @@ import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.widget.Toast;
 
+
+import com.batura.stas.notesaplication.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -19,27 +23,23 @@ import java.io.FileOutputStream;
  *
  */
 
-public final class ImageStorage extends Activity {
+public class ImageStorage extends Activity {
 
     private static String IMAGE_DIR_NAME = ".notes_images_dir";
 
-    public static  String saveToSdCard(Bitmap bitmap, String filename) {
+    public static String saveToSdCard(Bitmap bitmap, String filename) {
 
         String stored = null;
 
-        //ContextWrapper wrapper = new ContextWrapper(getApplicationContext());
-
-        //File file = wrapper.getDir(IMAGE_DIR_NAME,MODE_PRIVATE);        //File file = wrap.getDir("Images",MODE_PRIVATE);
-
-        //File file = getFilesDir();
-        //Log.i("File", file.toString());
-        File sdcard = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES) ;
-        boolean temp = sdcard.mkdirs();
-        //String yes = Environment.getExternalStorageState(Environment.DIRECTORY_PICTURES);
-        File internal = Environment.getRootDirectory();
+        File sdcard = Environment.getExternalStorageDirectory() ;
 
         File folder = new File(sdcard.getAbsoluteFile(), IMAGE_DIR_NAME);//the dot makes this directory hidden to the user
-        boolean success  = folder.mkdir();
+        boolean isWrite = isExternalStorageWritable();
+        boolean fold = folder.isDirectory();
+        if (!fold) {
+            boolean yes = folder.mkdirs();
+        }
+        //File file = new File(folder.getAbsoluteFile(), filename + ".jpg") ;
         File file = new File(folder.getAbsoluteFile(), filename + ".jpg") ;
         if (file.exists())
             return stored ;
@@ -50,11 +50,14 @@ public final class ImageStorage extends Activity {
             out.flush();
             out.close();
             stored = "success";
+            //Toast.makeText(this, getString(R.string.editor_insert_note_failed), Toast.LENGTH_SHORT).show();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return stored;
     }
+
 
     public static File getImage(String imagename) {
 
@@ -65,17 +68,17 @@ public final class ImageStorage extends Activity {
             if (!myDir.exists())
                 return null;
 
-            mediaImage = new File(myDir.getPath() + "/" + IMAGE_DIR_NAME + imagename);
+            mediaImage = new File(myDir.getPath() + "/" + IMAGE_DIR_NAME +"/"+ imagename + ".jpg");
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
         return mediaImage;
     }
-    public static boolean checkifImageExists(String imagename)
-    {
+
+    public static Bitmap getImageBitmap (String imagename) {
         Bitmap b = null ;
-        File file = ImageStorage.getImage("/"+imagename+".jpg");
+        File file = ImageStorage.getImage(imagename);
         String path = file.getAbsolutePath();
 
         if (path != null)
@@ -83,8 +86,18 @@ public final class ImageStorage extends Activity {
 
         if(b == null ||  b.equals(""))
         {
-            return false ;
+            return b ;
         }
-        return true ;
+
+        return b;
+    }
+
+    /* Checks if external storage is available for read and write */
+    public static boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        if (Environment.MEDIA_MOUNTED.equals(state)) {
+            return true;
+        }
+        return false;
     }
 }
