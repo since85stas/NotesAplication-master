@@ -73,6 +73,7 @@ public class NoteCursorAdapter extends CursorAdapter {
         ImageView favorImageView =(ImageView) view.findViewById(R.id.favNoteImag);
         ImageView notifImageView = (ImageView)view.findViewById(R.id.notificNoteImag);
 
+        int idIColoumnIndex  =  cursor.getColumnIndex(NoteContract.NoteEntry._ID);
         int titleColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
         int bodyColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
         int dateColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
@@ -83,14 +84,16 @@ public class NoteCursorAdapter extends CursorAdapter {
         String noteTitle = cursor.getString(titleColoumnIndex);
         String noteBody = cursor.getString(bodyColoumnIndex);
         Long noteTime = cursor.getLong(dateColoumnIndex);
+        int noteId = cursor.getInt(idIColoumnIndex);
         int noteColor = cursor.getInt(colorColoumnIndex);
         int noteIsFavor = cursor.getInt(favColoumnIndex);
         int noteNotifIsOn = cursor.getInt(notifColoumnIndex);
 
-        Log.i(TAG, "bindView: noteBody " + noteBody );
-        Log.i(TAG, "bindView: noteColor " + noteColor );
-        Log.i(TAG, "bindView: noteIsFavor " + noteIsFavor );
-        Log.i(TAG, "bindView: noteNotifIsOn " + noteNotifIsOn );
+        Log.i(TAG, "bindView: _id " + noteId  );
+//        Log.i(TAG, "bindView: noteBody " + noteBody );
+//        Log.i(TAG, "bindView: noteColor " + noteColor );
+//        Log.i(TAG, "bindView: noteIsFavor " + noteIsFavor );
+//        Log.i(TAG, "bindView: noteNotifIsOn " + noteNotifIsOn );
 
         if (noteTitle.length() == 0 || noteTitle == null) {
             titleTextView.setText("No title");

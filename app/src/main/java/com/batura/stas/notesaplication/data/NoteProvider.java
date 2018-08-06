@@ -18,7 +18,7 @@ import android.util.Log;
 public class NoteProvider extends ContentProvider {
 
     /** Tag for the log messages */
-    public static final String LOG_TAG = NoteProvider.class.getSimpleName();
+    public static final String LOG = NoteProvider.class.getSimpleName();
     private NoteDbHelper mDbHelper;
 
     /** URI matcher code for the content URI for the pets table */
@@ -178,7 +178,7 @@ public class NoteProvider extends ContentProvider {
         long id = database.insert(NoteContract.NoteEntry.TABLE_NAME, null, values);
         // If the ID is -1, then the insertion failed. Log an error and return null.
         if (id == -1) {
-            Log.e(LOG_TAG, "Failed to insert row for " + uri);
+            Log.e(LOG, "Failed to insert row for " + uri);
             return null;
         }
         // Once we know the ID of the new row in the table,
