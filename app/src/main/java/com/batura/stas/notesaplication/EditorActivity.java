@@ -40,6 +40,7 @@ import com.batura.stas.notesaplication.data.NoteContract;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.net.URL;
 
 /**
  * Created by Batura Stas on 18.05.2018.
@@ -301,10 +302,21 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         } else if (requestCode == REQUEST_GALLERY) {
             if (resultCode == RESULT_OK) {
                 Uri selectedImageUri = data.getData();
+
                 try {
                     galleryBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),
                             selectedImageUri);
+                    Cursor cursor = null;
+                    cursor = getContentResolver().query(selectedImageUri, new String[]{
+                            MediaStore.Images.ImageColumns.DISPLAY_NAME
+                    }, null, null, null);
 
+                    if (cursor != null && cursor.moveToFirst()) {
+                        String name = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+                        Log.d(TAG, "name is " + name);
+                    }
+                    String s = MediaStore.Images.ImageColumns.DISPLAY_NAME;
+                    Log.i(TAG, "onActivityResult: "+ s);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
