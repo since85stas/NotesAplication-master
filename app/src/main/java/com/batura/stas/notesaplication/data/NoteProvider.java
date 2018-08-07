@@ -119,6 +119,8 @@ public class NoteProvider extends ContentProvider {
                 return NoteContract.NoteEntry.CONTENT_LIST_TYPE;
             case NOTE_ID:
                 return NoteContract.NoteEntry.CONTENT_ITEM_TYPE;
+            case NOTE_IMAGES:
+                return NoteContract.NoteEntry.CONTENT_ITEM_TYPE;
             default:
                 throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
         }
@@ -133,6 +135,8 @@ public class NoteProvider extends ContentProvider {
         switch (match) {
             case NOTES:
                 return insertNote(uri, contentValues);
+            case NOTE_IMAGES:
+         //       return insertImage()
             default:
                 throw new IllegalArgumentException("Insertion is not supported for " + uri);
         }

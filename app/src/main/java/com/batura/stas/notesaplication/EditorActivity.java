@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -36,6 +37,7 @@ import com.batura.stas.notesaplication.AlarmFuncs.AlarmSetActivity;
 import com.batura.stas.notesaplication.ImageFuncs.ImageStorage;
 import com.batura.stas.notesaplication.Static.NoteUtils;
 import com.batura.stas.notesaplication.data.NoteContract;
+import com.batura.stas.notesaplication.data.NoteDbHelper;
 
 import org.w3c.dom.Text;
 
@@ -67,6 +69,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private boolean mNoteHasChanged = false;
     private ImageView mImageView;
     private TextView  mTargetUriTextView;
+    private NoteDbHelper mDbHelper;
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -278,10 +281,30 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                         android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
                 startActivityForResult(intent, REQUEST_GALLERY);
                 return true;
+            case R.id.action_add_image_database:
+                insertImageDb();
+                return true;
 
          }
         return super.onOptionsItemSelected(item);
     }
+
+        private void insertImageDb() {
+            SQLiteDatabase db = mDbHelper.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(NoteContract.NoteEntry.NOTE_ID, 1);
+            values.put(NoteContract.NoteEntry.IMAGE_NAME_01, "Test image 1");
+            values.put(NoteContract.NoteEntry.IMAGE_NAME_02, "Test image 1");
+            values.put(NoteContract.NoteEntry.IMAGE_NAME_03, "Test image 1");
+            // Insert a new row for Toto in the database, returning the ID of that new row.
+            // The first argument for db.insert() is the pets table name.
+            // The second argument provides the name of a column in which the framework
+            // can insert NULL in the event that the ContentValues is empty (if
+            // this is set to "null", then the framework will not insert a row when
+            // there are no values).
+            //Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI,values);
+            long newRowId = db.insert(NoteContract.NoteEntry.IMAGE_TABLE_NAME, null, values);
+        }
 
 
     @Override
