@@ -21,6 +21,8 @@ public class NoteContract {
      */
     public static final String PATH_NOTES = "notes";
 
+    public static final String PATH_IMAGES = "images";
+
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor.
     private NoteContract() {
@@ -49,7 +51,12 @@ public class NoteContract {
         /**
          * Name of database table for notes
          */
-        public final static String TABLE_NAME = "notes";
+        public final static String NOTES_TABLE_NAME = "notes";
+
+        /**
+         * Name of database table for images
+         */
+        public final static String IMAGE_TABLE_NAME = "images";
 
         /**
          * Unique ID number for the note (only for use in the database table).
@@ -137,6 +144,29 @@ public class NoteContract {
          public static final int COLOR_BLUE = 670;
 
          public static final int COLOR_PURPLE = 671;
+
+        /**
+         * Unique ID number for the image DB link to the Note NOTE_ID  (only for use in the database table).
+         * <p>
+         * Type: INTEGER
+         */
+        public final static String NOTE_ID = BaseColumns._ID;
+
+        /**
+         * Name of the image. Max 10 images manes _0X (X : 1,2,3...10)
+         * <p>
+         * Type: TEXT
+         */
+        public final static String IMAGE_NAME_01 = "name_01";
+        public final static String IMAGE_NAME_02 = "name_02";
+        public final static String IMAGE_NAME_03 = "name_03";
+        public final static String IMAGE_NAME_04 = "name_04";
+        public final static String IMAGE_NAME_05 = "name_05";
+        public final static String IMAGE_NAME_06 = "name_06";
+        public final static String IMAGE_NAME_07 = "name_07";
+        public final static String IMAGE_NAME_08 = "name_08";
+        public final static String IMAGE_NAME_09 = "name_09";
+        public final static String IMAGE_NAME_10 = "name_10";
 
 
     }

@@ -20,7 +20,7 @@ public class NoteDbHelper extends SQLiteOpenHelper {
     /**
      * Database version. If you change the database schema, you must increment the database version.
      */
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
 
     /**
      * Constructs a new instance of {@link NoteDbHelper}.
@@ -34,7 +34,7 @@ public class NoteDbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         // Create a String that contains the SQL statement to create the pets table
-        String SQL_CREATE_NOTES_TABLE = "CREATE TABLE " + NoteContract.NoteEntry.TABLE_NAME + " ("
+        String SQL_CREATE_NOTES_TABLE = "CREATE TABLE " + NoteContract.NoteEntry.NOTES_TABLE_NAME + " ("
                 + NoteContract.NoteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + NoteContract.NoteEntry.COLUMN_NOTE_TITLE+ " TEXT, "
                 + NoteContract.NoteEntry.COLUMN_NOTE_BODY + " TEXT, "
@@ -46,7 +46,26 @@ public class NoteDbHelper extends SQLiteOpenHelper {
                 + NoteContract.NoteEntry.COLUMN_NOTE_WIDGET + " INTEGER NOT NULL DEFAULT 0, "
                 + NoteContract.NoteEntry.COLUMN_NOTE_TIME +  " INTEGER NOT NULL DEFAULT 0);"
                ;
+
+        // Create a String that contains the SQL statement to create the images table
+        String SQL_CREATE_IMAGES_TABLE = "CREATE TABLE " + NoteContract.NoteEntry.IMAGE_TABLE_NAME + " ("
+                + NoteContract.NoteEntry.NOTE_ID + " INTEGER PRIMARY KEY, "
+                + NoteContract.NoteEntry.IMAGE_NAME_01+ " TEXT, "
+                + NoteContract.NoteEntry.IMAGE_NAME_02+ " TEXT, "
+                + NoteContract.NoteEntry.IMAGE_NAME_03+ " TEXT, "
+
+                + "FOREIGN KEY (" + NoteContract.NoteEntry.NOTE_ID + ") REFERENCES "
+                + NoteContract.NoteEntry.NOTES_TABLE_NAME
+                + "(" + NoteContract.NoteEntry._ID + ")); ";
+
+//                + NoteContract.NoteEntry.IMAGE_NAME_01+ " TEXT, "
+//                + NoteContract.NoteEntry.IMAGE_NAME_02+ " TEXT, "
+//                + NoteContract.NoteEntry.IMAGE_NAME_03+ " TEXT);"
+//
+//                ;
+        db.execSQL(SQL_CREATE_IMAGES_TABLE);
         db.execSQL(SQL_CREATE_NOTES_TABLE);
+
 
     }
 

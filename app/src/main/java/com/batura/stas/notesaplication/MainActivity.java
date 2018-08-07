@@ -170,7 +170,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 //            // this is set to "null", then the framework will not insert a row when
 //            // there are no values).
 //            //Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI,values);
-//            long newRowId = db.insert(NoteContract.NoteEntry.TABLE_NAME, null, values);
+//            long newRowId = db.insert(NoteContract.NoteEntry.IMAGE_TABLE_NAME, null, values);
 //        }
 
     @Override

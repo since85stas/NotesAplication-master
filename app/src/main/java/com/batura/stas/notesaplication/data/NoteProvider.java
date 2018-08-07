@@ -7,8 +7,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 /**
@@ -27,6 +25,9 @@ public class NoteProvider extends ContentProvider {
     /** URI matcher code for the content URI for a single pet in the pets table */
     private static final int NOTE_ID = 665;
 
+    /** URI matcher code for the content URI for the images   */
+    private static final int NOTE_IMAGES = 667;
+
     /**
      * UriMatcher object to match a content URI to a corresponding code.
      * The input passed into the constructor represents the code to return for the root URI.
@@ -41,6 +42,7 @@ public class NoteProvider extends ContentProvider {
         // when a match is found.
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES,NOTES);
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES + "/#",NOTE_ID);
+        sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_IMAGES,NOTE_IMAGES);
     }
 
 
@@ -66,7 +68,7 @@ public class NoteProvider extends ContentProvider {
                 // For the PETS code, query the pets table directly with the given
                 // projection, selection, selection arguments, and sort order. The cursor
                 // could contain multiple rows of the pets table.
-                cursor = database.query(NoteContract.NoteEntry.TABLE_NAME, projection, selection, selectionArgs,
+                cursor = database.query(NoteContract.NoteEntry.NOTES_TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
             case NOTE_ID:
@@ -83,9 +85,22 @@ public class NoteProvider extends ContentProvider {
 
                 // This will perform a query on the pets table where the _id equals 3 to return a
                 // Cursor containing that row of the table.
-                cursor = database.query(NoteContract.NoteEntry.TABLE_NAME, projection, selection, selectionArgs,
+                cursor = database.query(NoteContract.NoteEntry.NOTES_TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
+            case NOTE_IMAGES:
+                // For the current NOTE_ID, _ID get Images from Images Table
+                //
+                // For every "?" in the selection, we need to have an element in the selection
+                // arguments that will fill in the "?". Since we have 1 question mark in the
+                // selection, we have 1 String in the selection arguments' String array.
+                selection = NoteContract.NoteEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+
+                // This will perform a query on the images table where the _id equals 3 to return a
+                // Cursor containing that row of the table.
+                cursor = database.query(NoteContract.NoteEntry.IMAGE_TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
             default:
                 throw new IllegalArgumentException("Cannot query unknown URI " + uri);
         }
@@ -175,7 +190,7 @@ public class NoteProvider extends ContentProvider {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Insert the new pet with the given values
-        long id = database.insert(NoteContract.NoteEntry.TABLE_NAME, null, values);
+        long id = database.insert(NoteContract.NoteEntry.NOTES_TABLE_NAME, null, values);
         // If the ID is -1, then the insertion failed. Log an error and return null.
         if (id == -1) {
             Log.e(LOG, "Failed to insert row for " + uri);
@@ -249,10 +264,10 @@ public class NoteProvider extends ContentProvider {
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Returns the number of database rows affected by the update statement
-        //return database.update(PetContract.PetEntry.TABLE_NAME, values, selection, selectionArgs);
+        //return database.update(PetContract.PetEntry.IMAGE_TABLE_NAME, values, selection, selectionArgs);
 
         // Perform the update on the database and get the number of rows affected
-        int rowsUpdated = database.update(NoteContract.NoteEntry.TABLE_NAME, values, selection, selectionArgs);
+        int rowsUpdated = database.update(NoteContract.NoteEntry.NOTES_TABLE_NAME, values, selection, selectionArgs);
 
         // If 1 or more rows were updated, then notify all listeners that the data at the
         // given URI has changed
@@ -275,16 +290,16 @@ public class NoteProvider extends ContentProvider {
         switch (match) {
             case NOTES:
                 // Delete all rows that match the selection and selection args
-                //    return database.delete(PetContract.PetEntry.TABLE_NAME, selection, selectionArgs);
-                rowsDeleted = database.delete(NoteContract.NoteEntry.TABLE_NAME, selection, selectionArgs);
+                //    return database.delete(PetContract.PetEntry.IMAGE_TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(NoteContract.NoteEntry.NOTES_TABLE_NAME, selection, selectionArgs);
                 break;
             case NOTE_ID:
                 // Delete a single row given by the ID in the URI
                 selection = NoteContract.NoteEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                rowsDeleted = database.delete(NoteContract.NoteEntry.TABLE_NAME, selection, selectionArgs);
+                rowsDeleted = database.delete(NoteContract.NoteEntry.NOTES_TABLE_NAME, selection, selectionArgs);
                 break;
-            //return database.delete(PetContract.PetEntry.TABLE_NAME, selection, selectionArgs);
+            //return database.delete(PetContract.PetEntry.IMAGE_TABLE_NAME, selection, selectionArgs);
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
         }
