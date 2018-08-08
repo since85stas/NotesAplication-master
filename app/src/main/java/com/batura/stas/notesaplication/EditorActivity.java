@@ -29,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -70,6 +71,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private ImageView mImageView;
     private TextView  mTargetUriTextView;
     private NoteDbHelper mDbHelper;
+    SQLiteDatabase mImageDb;
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -290,12 +292,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
         private void insertImageDb() {
-            SQLiteDatabase db = mDbHelper.getWritableDatabase();
+            mDbHelper = new NoteDbHelper(this);
+             mImageDb = mDbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
-            values.put(NoteContract.NoteEntry.NOTE_ID, 1);
+            //values.put(NoteContract.NoteEntry.NOTE_ID, 1);
             values.put(NoteContract.NoteEntry.IMAGE_NAME_01, "Test image 1");
-            values.put(NoteContract.NoteEntry.IMAGE_NAME_02, "Test image 1");
-            values.put(NoteContract.NoteEntry.IMAGE_NAME_03, "Test image 1");
+            values.put(NoteContract.NoteEntry.IMAGE_NAME_02, "Test image 2");
+            values.put(NoteContract.NoteEntry.IMAGE_NAME_03, "Test image 3");
             // Insert a new row for Toto in the database, returning the ID of that new row.
             // The first argument for db.insert() is the pets table name.
             // The second argument provides the name of a column in which the framework
@@ -303,7 +306,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // this is set to "null", then the framework will not insert a row when
             // there are no values).
             //Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI,values);
-            long newRowId = db.insert(NoteContract.NoteEntry.IMAGE_TABLE_NAME, null, values);
+            long newRowId = mImageDb.insert(NoteContract.NoteEntry.IMAGE_TABLE_NAME, null, values);
+            displayDatabaseInfo();
         }
 
 
@@ -545,5 +549,75 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 mColor = 665; // default
             }
         });
+    }
+
+
+    /**
+     * +     * Temporary helper method to display information in the onscreen TextView about the state of
+     * +     * the pets database.
+     * +
+     */
+    private void displayDatabaseInfo() {
+        // To access our database, we instantiate our subclass of SQLiteOpenHelper
+        // and pass the context, which is the current activity.
+        // Create and/or open a database to read from it
+
+        // Perform this raw SQL query "SELECT * FROM pets"
+        // to get a Cursor that contains all rows from the pets table.
+        Cursor cursor = mImageDb.rawQuery("SELECT * FROM " + NoteContract.NoteEntry.IMAGE_TABLE_NAME, null);
+
+//        String[] projection = new String[]{
+//                NoteContract.NoteEntry.NOTE_ID,
+//                NoteContract.NoteEntry.IMAGE_NAME_01,
+//                NoteContract.NoteEntry.IMAGE_NAME_02,
+//                NoteContract.NoteEntry.IMAGE_NAME_03,
+//                };
+        //Cursor cursor = getContentResolver().query(NoteContract.NoteEntry.CONTENT_URI,projection,null,null,null);
+
+//        ListView petsListView = (ListView)findViewById(R.id.list);
+
+
+//        PetCursorAdapter petAdapter =new PetCursorAdapter(this,cursor);
+//        petsListView.setAdapter(petAdapter);
+
+        try {
+            // Display the number of rows in the Cursor (which reflects the number of rows in the
+            // pets table in the database).
+            // Create a header in the Text View that looks like this:
+            //
+            // The pets table contains <number of rows in Cursor> pets.
+            // _id - name - breed - gender - weight
+            //
+            // In the while loop below, iterate through the rows of the cursor and display
+            // the information from each column in this order.
+            TextView displayView = findViewById(R.id.textViewTest1);
+            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
+            displayView.append(NoteContract.NoteEntry.NOTE_ID + " - " +
+                    NoteContract.NoteEntry.IMAGE_NAME_01 + " - " +
+                    NoteContract.NoteEntry.IMAGE_NAME_02 + " - " +
+                    NoteContract.NoteEntry.IMAGE_NAME_03 + " - " +
+                     "\n");
+
+            // Figure out the index of each column
+            int idColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.NOTE_ID);
+            int image1NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_01);
+            int image2NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_02);
+            int image3NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_03);
+
+            // Iterate through all the returned rows in the cursor
+            while (cursor.moveToNext()) {
+                // Use that index to extract the String or Int value of the word
+                // at the current row the cursor is on.
+                int currentID = cursor.getInt(idColumnIndex);
+                String currentName1 = cursor.getString(image1NameColumnIndex);
+                String currentName2 = cursor.getString(image2NameColumnIndex);
+                String currentName3 = cursor.getString(image3NameColumnIndex);
+
+            }
+        } finally {
+            // Always close the cursor when you're done reading from it. This releases all its
+            // resources and makes it invalid.
+            cursor.close();
+        }
     }
 }

@@ -136,7 +136,7 @@ public class NoteProvider extends ContentProvider {
             case NOTES:
                 return insertNote(uri, contentValues);
             case NOTE_IMAGES:
-         //       return insertImage()
+                return insertImages(uri, contentValues);
             default:
                 throw new IllegalArgumentException("Insertion is not supported for " + uri);
         }
@@ -195,6 +195,46 @@ public class NoteProvider extends ContentProvider {
 
         // Insert the new pet with the given values
         long id = database.insert(NoteContract.NoteEntry.NOTES_TABLE_NAME, null, values);
+        // If the ID is -1, then the insertion failed. Log an error and return null.
+        if (id == -1) {
+            Log.e(LOG, "Failed to insert row for " + uri);
+            return null;
+        }
+        // Once we know the ID of the new row in the table,
+        // return the new URI with the ID appended to the end of it
+
+        getContext().getContentResolver().notifyChange(uri, null);
+
+        return ContentUris.withAppendedId(uri, id);
+    }
+
+
+    /**
+     * Insert a pet into the database with the given content values. Return the new content URI
+     * for that specific row in the database.
+     */
+    private Uri insertImages(Uri uri, ContentValues values) {
+
+//        // Check that the name is not null
+//        String name = values.getAsString(NoteContract.NoteEntry.NOTE_ID);
+//        if (name == null) {
+//            throw new IllegalArgumentException("trying to add empty note");
+//        }
+//
+//        Integer color = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
+//        if (color == null ) {
+//            throw new IllegalArgumentException("Wrong color for note");
+//        }
+//
+//        Integer favoutite = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
+//        if ( favoutite != NoteContract.NoteEntry.NOTE_IS_FAV && favoutite != NoteContract.NoteEntry.NOTE_IS_NOT_FAV ) {
+//            throw new IllegalArgumentException("Wrong favorite id for note");
+//        }
+
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Insert the new pet with the given values
+        long id = database.insert(NoteContract.NoteEntry.IMAGE_TABLE_NAME, null, values);
         // If the ID is -1, then the insertion failed. Log an error and return null.
         if (id == -1) {
             Log.e(LOG, "Failed to insert row for " + uri);
