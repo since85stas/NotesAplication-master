@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
@@ -29,7 +28,6 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,10 +38,7 @@ import com.batura.stas.notesaplication.Static.NoteUtils;
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
 
-import org.w3c.dom.Text;
-
 import java.io.IOException;
-import java.net.URL;
 
 /**
  * Created by Batura Stas on 18.05.2018.
@@ -52,6 +47,7 @@ import java.net.URL;
 public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final static int NOTE_LOADER_EDITOR = 0;
+    private final static int NOTE_LOADER_IMAGES = 11;
     private final static int NOTIFIC_ANSWER = 0;
     private static final int REQUEST_GALLERY = 100; // запрос для галереи
     public static final String TAG = EditorActivity.class.getSimpleName();
@@ -63,6 +59,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private int mFav   = 0;
     private boolean mNotificIsOn = false;
     private Uri mCurrentNoteUri;
+    private Uri mCurrentNoteImagesUri;
     private Spinner mColorSpinner;
     private ImageSwitcher mImageSwitcher;
     private ShareActionProvider mShareActionProvider ;
@@ -71,7 +68,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private ImageView mImageView;
     private TextView  mTargetUriTextView;
     private NoteDbHelper mDbHelper;
-    SQLiteDatabase mImageDb;
+    private SQLiteDatabase mImageDb;
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -89,12 +86,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         setContentView(R.layout.activity_editor);
 
         mCurrentNoteUri = getIntent().getData();
+        mCurrentNoteImagesUri = NoteContract.NoteEntry.CONTENT_URI_IMAGES;
         if (mCurrentNoteUri == null) {
             setTitle("Add note");
             invalidateOptionsMenu();
         } else {
             setTitle("Edit note");
             getSupportLoaderManager().initLoader(NOTE_LOADER_EDITOR, null, this); //!!!! instead getLoaderManager
+            getSupportLoaderManager().initLoader(NOTE_LOADER_IMAGES,null,this);
         }
 
         mTitleTextView = (EditText) findViewById(R.id.noteTitleInput);
@@ -293,9 +292,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         private void insertImageDb() {
             mDbHelper = new NoteDbHelper(this);
-             mImageDb = mDbHelper.getWritableDatabase();
+            mImageDb = mDbHelper.getWritableDatabase();
             ContentValues values = new ContentValues();
-            //values.put(NoteContract.NoteEntry.NOTE_ID, 1);
+            values.put(NoteContract.NoteEntry.NOTE_ID, 2);
             values.put(NoteContract.NoteEntry.IMAGE_NAME_01, "Test image 1");
             values.put(NoteContract.NoteEntry.IMAGE_NAME_02, "Test image 2");
             values.put(NoteContract.NoteEntry.IMAGE_NAME_03, "Test image 3");
@@ -322,14 +321,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         if (requestCode == NOTIFIC_ANSWER) {
             if (resultCode == RESULT_OK) {
                 mNotificIsOn = data.getBooleanExtra(AlarmSetActivity.NOTIF_IS_ON,false);
-                //infoTextView.setText(thiefname);
             }else {
                 //infoTextView.setText(""); // стираем текст
             }
         } else if (requestCode == REQUEST_GALLERY) {
             if (resultCode == RESULT_OK) {
                 Uri selectedImageUri = data.getData();
-
                 try {
                     galleryBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),
                             selectedImageUri);
@@ -444,54 +441,91 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        String[] projection = new String[]{
-                NoteContract.NoteEntry._ID,
-                NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
-                NoteContract.NoteEntry.COLUMN_NOTE_BODY,
-                NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
-                NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE,
-                NoteContract.NoteEntry.COLUMN_NOTE_TIME
-        };
-        return new android.support.v4.content.CursorLoader(this,
-                mCurrentNoteUri,
-                projection,
-                null,
-                null,
-                null);
+        if (id == NOTE_LOADER_EDITOR) {
+            String[] projection = new String[]{
+                    NoteContract.NoteEntry._ID,
+                    NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
+                    NoteContract.NoteEntry.COLUMN_NOTE_BODY,
+                    NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
+                    NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE,
+                    NoteContract.NoteEntry.COLUMN_NOTE_TIME
+            };
+            return new android.support.v4.content.CursorLoader(this,
+                    mCurrentNoteUri,
+                    projection,
+                    null,
+                    null,
+                    null);
+        } else if (id == NOTE_LOADER_IMAGES) {
+            String[] projection = new String[]{
+                    NoteContract.NoteEntry.IMAGE_NAME_01,
+                    NoteContract.NoteEntry.IMAGE_NAME_02,
+                    NoteContract.NoteEntry.IMAGE_NAME_03,
+                    NoteContract.NoteEntry.NOTE_ID
+            };
+            return new android.support.v4.content.CursorLoader(this,
+                    mCurrentNoteImagesUri,
+                    //null,
+                    projection,
+                    null,
+                    null,
+                    null);
+        } else {
+            return null;
+        }
     }
 
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        if (cursor.moveToFirst()) {
-            // Find the columns of pet attributes that we're interested in
-            int titleColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
-            int bodyColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
-            int colorColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
-            int timeColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
-            int favColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
+        switch (loader.getId()) {
+            case (NOTE_LOADER_EDITOR):
+                if (cursor.moveToFirst()) {
+                    // Find the columns of pet attributes that we're interested in
+                    int titleColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
+                    int bodyColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY);
+                    int colorColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
+                    int timeColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
+                    int favColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
 
-            // Extract out the value from the Cursor for the given column index
-            String title = cursor.getString(titleColumnIndex);
-            String body = cursor.getString(bodyColumnIndex);
-            int colorId = cursor.getInt(colorColumnIndex);
-            int weight = cursor.getInt(timeColumnIndex);
-            mFav = cursor.getInt(favColumnIndex);
+                    // Extract out the value from the Cursor for the given column index
+                    String title = cursor.getString(titleColumnIndex);
+                    String body = cursor.getString(bodyColumnIndex);
+                    int colorId = cursor.getInt(colorColumnIndex);
+                    int weight = cursor.getInt(timeColumnIndex);
+                    mFav = cursor.getInt(favColumnIndex);
 
-            // Update the views on the screen with the values from the database
-            if (mFav == 1) {
-                mImageSwitcher.showNext();
-            }
-            mTitleTextView.setText(title);
-            mBodyTextView.setText(body);
+                    // Update the views on the screen with the values from the database
+                    if (mFav == 1) {
+                        mImageSwitcher.showNext();
+                    }
+                    mTitleTextView.setText(title);
+                    mBodyTextView.setText(body);
 
-            int colorBackLight = NoteUtils.getBackColorLight(colorId);
-            mBodyTextView.setBackgroundColor(ContextCompat.getColor(getBaseContext(), colorBackLight));
-            //mWeightEditText.setText(Integer.toString(weight));
-            mColorSpinner.setSelection(NoteUtils.getColorPosisById(colorId));
-            mBodyTextView.setColorId(colorId);
+                    int colorBackLight = NoteUtils.getBackColorLight(colorId);
+                    mBodyTextView.setBackgroundColor(ContextCompat.getColor(getBaseContext(), colorBackLight));
+                    //mWeightEditText.setText(Integer.toString(weight));
+                    mColorSpinner.setSelection(NoteUtils.getColorPosisById(colorId));
+                    mBodyTextView.setColorId(colorId);
+                }
+                break;
+            case (NOTE_LOADER_IMAGES):
+                if (cursor.moveToFirst()) {
+                    int image01colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_01);
+                    int image02colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_02);
+                    int image03colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_03);
+                    int noteIdColomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.NOTE_ID);
 
+                    String image01 = cursor.getString(image01colomnIndex);
+                    String image02 = cursor.getString(image02colomnIndex);
+                    String image03 = cursor.getString(image03colomnIndex);
+                    int noteId = cursor.getInt(noteIdColomnIndex);
+
+                    Log.i(TAG, "onLoadFinished: " + cursor.toString());
+                }
+                break;
         }
+
     }
 
     @Override

@@ -46,8 +46,17 @@ public class NoteContract {
         public static final String CONTENT_ITEM_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_NOTES;
 
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a notes images.
+         */
+        public static final String CONTENT_IMAGE_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_IMAGES;
+
         /** The content URI to access the pet data in the provider */
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_NOTES);
+
+        /** The content URI to access the pet data in the provider */
+        public static final Uri CONTENT_URI_IMAGES = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_IMAGES);
         /**
          * Name of database table for notes
          */
@@ -150,7 +159,7 @@ public class NoteContract {
          * <p>
          * Type: INTEGER
          */
-        public final static String NOTE_ID = BaseColumns._ID;
+        public final static String NOTE_ID = "note_id";
 
         /**
          * Name of the image. Max 10 images manes _0X (X : 1,2,3...10)

@@ -20,7 +20,7 @@ public class NoteDbHelper extends SQLiteOpenHelper {
     /**
      * Database version. If you change the database schema, you must increment the database version.
      */
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
 
     /**
      * Constructs a new instance of {@link NoteDbHelper}.
@@ -49,7 +49,8 @@ public class NoteDbHelper extends SQLiteOpenHelper {
 
         // Create a String that contains the SQL statement to create the images table
         String SQL_CREATE_IMAGES_TABLE = "CREATE TABLE " + NoteContract.NoteEntry.IMAGE_TABLE_NAME + " ("
-                + NoteContract.NoteEntry.NOTE_ID + " INTEGER PRIMARY KEY, "
+                + NoteContract.NoteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + NoteContract.NoteEntry.NOTE_ID + " INTEGER, "
                 + NoteContract.NoteEntry.IMAGE_NAME_01+ " TEXT, "
                 + NoteContract.NoteEntry.IMAGE_NAME_02+ " TEXT, "
                 + NoteContract.NoteEntry.IMAGE_NAME_03+ " TEXT, "

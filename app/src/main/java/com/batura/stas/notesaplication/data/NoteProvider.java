@@ -94,15 +94,17 @@ public class NoteProvider extends ContentProvider {
                 // For every "?" in the selection, we need to have an element in the selection
                 // arguments that will fill in the "?". Since we have 1 question mark in the
                 // selection, we have 1 String in the selection arguments' String array.
-                selection = NoteContract.NoteEntry._ID + "=?";
-                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                //selection = NoteContract.NoteEntry._ID + "=?";
+                //selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 // This will perform a query on the images table where the _id equals 3 to return a
                 // Cursor containing that row of the table.
                 cursor = database.query(NoteContract.NoteEntry.IMAGE_TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
+                break;
             default:
-                throw new IllegalArgumentException("Cannot query unknown URI " + uri);
+                throw new IllegalArgumentException( "Cannot query unknown URI " + uri);
+                //throw new IllegalArgumentException("sss",new Throwable t);
         }
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
         return cursor;
@@ -120,7 +122,7 @@ public class NoteProvider extends ContentProvider {
             case NOTE_ID:
                 return NoteContract.NoteEntry.CONTENT_ITEM_TYPE;
             case NOTE_IMAGES:
-                return NoteContract.NoteEntry.CONTENT_ITEM_TYPE;
+                return NoteContract.NoteEntry.CONTENT_IMAGE_TYPE;
             default:
                 throw new IllegalStateException("Unknown URI " + uri + " with match " + match);
         }
@@ -215,22 +217,7 @@ public class NoteProvider extends ContentProvider {
      */
     private Uri insertImages(Uri uri, ContentValues values) {
 
-//        // Check that the name is not null
-//        String name = values.getAsString(NoteContract.NoteEntry.NOTE_ID);
-//        if (name == null) {
-//            throw new IllegalArgumentException("trying to add empty note");
 //        }
-//
-//        Integer color = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
-//        if (color == null ) {
-//            throw new IllegalArgumentException("Wrong color for note");
-//        }
-//
-//        Integer favoutite = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
-//        if ( favoutite != NoteContract.NoteEntry.NOTE_IS_FAV && favoutite != NoteContract.NoteEntry.NOTE_IS_NOT_FAV ) {
-//            throw new IllegalArgumentException("Wrong favorite id for note");
-//        }
-
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Insert the new pet with the given values
