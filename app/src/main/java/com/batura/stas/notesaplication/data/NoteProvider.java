@@ -16,7 +16,7 @@ import android.util.Log;
 public class NoteProvider extends ContentProvider {
 
     /** Tag for the log messages */
-    public static final String LOG = NoteProvider.class.getSimpleName();
+    public static final String TAG = NoteProvider.class.getSimpleName();
     private NoteDbHelper mDbHelper;
 
     /** URI matcher code for the content URI for the pets table */
@@ -27,6 +27,9 @@ public class NoteProvider extends ContentProvider {
 
     /** URI matcher code for the content URI for the images   */
     private static final int NOTE_IMAGES = 667;
+
+    /** URI matcher code for the content URI for the images of current ID   */
+    private static final int NOTE_IMAGES_ID = 667;
 
     /**
      * UriMatcher object to match a content URI to a corresponding code.
@@ -43,6 +46,7 @@ public class NoteProvider extends ContentProvider {
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES,NOTES);
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES + "/#",NOTE_ID);
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_IMAGES,NOTE_IMAGES);
+        sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_IMAGES + "/#",NOTE_IMAGES_ID);
     }
 
 
@@ -155,17 +159,14 @@ public class NoteProvider extends ContentProvider {
         if (name == null) {
             throw new IllegalArgumentException("trying to add empty note");
         }
-
         Integer color = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
         if (color == null ) {
             throw new IllegalArgumentException("Wrong color for note");
         }
-
         Integer favoutite = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
         if ( favoutite != NoteContract.NoteEntry.NOTE_IS_FAV && favoutite != NoteContract.NoteEntry.NOTE_IS_NOT_FAV ) {
             throw new IllegalArgumentException("Wrong favorite id for note");
         }
-
         Integer pass = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD);
         if ( pass != NoteContract.NoteEntry.NOTE_HAS_PASS && pass != NoteContract.NoteEntry.NOTE_HAS_NOT_PASS ) {
             throw new IllegalArgumentException("Wrong favorite id for note");
@@ -176,18 +177,14 @@ public class NoteProvider extends ContentProvider {
             }
 
         }
-
         Integer image = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_IMAGE);
         if ( image == null ) {
             throw new IllegalArgumentException("Wrong image id for note");
         }
-
         Integer widget = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET);
         if ( widget == null ) {
             throw new IllegalArgumentException("Wrong widget id for note");
         }
-
-
         Long time = values.getAsLong(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
         if (time != null && time < 0) {
             throw new IllegalArgumentException("Wrong data for note");
@@ -199,7 +196,7 @@ public class NoteProvider extends ContentProvider {
         long id = database.insert(NoteContract.NoteEntry.NOTES_TABLE_NAME, null, values);
         // If the ID is -1, then the insertion failed. Log an error and return null.
         if (id == -1) {
-            Log.e(LOG, "Failed to insert row for " + uri);
+            Log.e(TAG, "Failed to insert row for " + uri);
             return null;
         }
         // Once we know the ID of the new row in the table,
@@ -217,6 +214,25 @@ public class NoteProvider extends ContentProvider {
      */
     private Uri insertImages(Uri uri, ContentValues values) {
 
+
+        int noteId = values.getAsInteger(NoteContract.NoteEntry.NOTE_ID);
+        if (noteId < 0 ) {
+            throw new IllegalArgumentException("trying to add invalid note name");
+        }
+        String imageName01 = values.getAsString(NoteContract.NoteEntry.IMAGE_NAME_01);
+        if (imageName01 == null) {
+            throw new IllegalArgumentException("trying to add null image name");
+        }
+        String imageName02 = values.getAsString(NoteContract.NoteEntry.IMAGE_NAME_01);
+        if (imageName02 == null) {
+            throw new IllegalArgumentException("trying to add null image name");
+        }
+        String imageName03 = values.getAsString(NoteContract.NoteEntry.IMAGE_NAME_01);
+        if (imageName03 == null) {
+            throw new IllegalArgumentException("trying to add null image name");
+        }
+
+        Log.i(TAG, "insertImages: " + noteId + imageName01 + imageName02 + imageName03);
 //        }
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
@@ -224,7 +240,7 @@ public class NoteProvider extends ContentProvider {
         long id = database.insert(NoteContract.NoteEntry.IMAGE_TABLE_NAME, null, values);
         // If the ID is -1, then the insertion failed. Log an error and return null.
         if (id == -1) {
-            Log.e(LOG, "Failed to insert row for " + uri);
+            Log.e(TAG, "Failed to insert row for " + uri);
             return null;
         }
         // Once we know the ID of the new row in the table,
@@ -250,6 +266,14 @@ public class NoteProvider extends ContentProvider {
                 selection = NoteContract.NoteEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
                 return updateNote(uri, contentValues, selection, selectionArgs);
+            case NOTE_IMAGES:
+                // For the PET_ID code, extract out the ID from the URI,
+                // so we know which row to update. Selection will be "_id=?" and selection
+                // arguments will be a String array containing the actual ID.
+                selection = NoteContract.NoteEntry.NOTE_ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                return updateImages(uri, contentValues, selection, selectionArgs);
+
             default:
                 throw new IllegalArgumentException("Update is not supported for " + uri);
         }
@@ -275,8 +299,6 @@ public class NoteProvider extends ContentProvider {
             }
         }
 
-
-
         // If the {@link NoteEntry.COLUMN_NOTE_TIME} key is present,
         // check that the weight value is valid.
         if (values.containsKey(NoteContract.NoteEntry.COLUMN_NOTE_TIME)) {
@@ -285,6 +307,28 @@ public class NoteProvider extends ContentProvider {
             if (time == null || time < 0) {
                 throw new IllegalArgumentException("Note requires valid time " + time );
             }
+        }
+        Integer favoutite = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
+        if ( favoutite != NoteContract.NoteEntry.NOTE_IS_FAV && favoutite != NoteContract.NoteEntry.NOTE_IS_NOT_FAV ) {
+            throw new IllegalArgumentException("Wrong favorite id for note");
+        }
+        Integer pass = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD);
+        if ( pass != NoteContract.NoteEntry.NOTE_HAS_PASS && pass != NoteContract.NoteEntry.NOTE_HAS_NOT_PASS ) {
+            throw new IllegalArgumentException("Wrong favorite id for note");
+        }
+        else {
+            if (pass == NoteContract.NoteEntry.NOTE_HAS_PASS ) {
+                //TODO проверяем хэш код праоля доделать потом
+            }
+
+        }
+        Integer image = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_IMAGE);
+        if ( image == null ) {
+            throw new IllegalArgumentException("Wrong image id for note");
+        }
+        Integer widget = values.getAsInteger(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET);
+        if ( widget == null ) {
+            throw new IllegalArgumentException("Wrong widget id for note");
         }
 
         // If there are no values to update, then don't try to update the database
@@ -299,6 +343,54 @@ public class NoteProvider extends ContentProvider {
 
         // Perform the update on the database and get the number of rows affected
         int rowsUpdated = database.update(NoteContract.NoteEntry.NOTES_TABLE_NAME, values, selection, selectionArgs);
+
+        // If 1 or more rows were updated, then notify all listeners that the data at the
+        // given URI has changed
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
+    }
+
+
+    private int updateImages(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+
+        // If the {@link NoteEntry.COLUMN_NOTE_BODY} key is present,
+        // check that the name value is not null.
+        if (values.containsKey(NoteContract.NoteEntry.IMAGE_NAME_01)) {
+            String name = values.getAsString(NoteContract.NoteEntry.IMAGE_NAME_01);
+            if (name == null) {
+                throw new IllegalArgumentException("Wrong title body " + name);
+            }
+        }
+        // If the {@link NoteEntry.COLUMN_NOTE_COLOR} key is present,
+        // check that the gender value is valid.
+        if (values.containsKey(NoteContract.NoteEntry.IMAGE_NAME_02)) {
+            String name = values.getAsString(NoteContract.NoteEntry.IMAGE_NAME_01);
+            if (name == null) {
+                throw new IllegalArgumentException("Wrong title body " + name);
+            }
+        }
+        // If the {@link NoteEntry.COLUMN_NOTE_TIME} key is present,
+        // check that the weight value is valid.
+        if (values.containsKey(NoteContract.NoteEntry.IMAGE_NAME_03)) {
+            String name = values.getAsString(NoteContract.NoteEntry.IMAGE_NAME_01);
+            if (name == null) {
+                throw new IllegalArgumentException("Wrong title body " + name);
+            }
+        }
+        // If there are no values to update, then don't try to update the database
+        if (values.size() == 0) {
+            return 0;
+        }
+
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Returns the number of database rows affected by the update statement
+        //return database.update(PetContract.PetEntry.IMAGE_TABLE_NAME, values, selection, selectionArgs);
+
+        // Perform the update on the database and get the number of rows affected
+        int rowsUpdated = database.update(NoteContract.NoteEntry.IMAGE_TABLE_NAME, values, selection, selectionArgs);
 
         // If 1 or more rows were updated, then notify all listeners that the data at the
         // given URI has changed
