@@ -1,5 +1,6 @@
 package com.batura.stas.notesaplication.ImageFuncs;
 
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 
 import java.io.Serializable;
@@ -7,10 +8,12 @@ import java.io.Serializable;
 public class ImageMy implements Serializable {
     private String mName;
     private Drawable mDrawable;
+    private Bitmap mBitmap;
 
-    ImageMy(String name, Drawable drawable) {
+    public ImageMy(String name, Bitmap bitmap) {
         this.mName = name;
-        this.mDrawable=drawable;
+        //this.mDrawable=drawable;
+        this.mBitmap = bitmap;
     }
 
     public String getName() {
@@ -19,6 +22,8 @@ public class ImageMy implements Serializable {
 
     public Drawable getDraw() {return (mDrawable);
     }
+
+    public Bitmap getBitmap() {return (mBitmap);}
 
 
 }

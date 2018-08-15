@@ -58,14 +58,13 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.MyViewHold
         return new MyViewHolder(itemView);
     }
 
-
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         ImageMy image  = images.get(position);
 
         // displaying text view data
         holder.name.setText(image.getName());
-        holder.imageV.setImageDrawable(image.getDraw());
+        holder.imageV.setImageBitmap(image.getBitmap());
 
         // change the row state to activated
         holder.itemView.setActivated(selectedItems.get(position, false));
@@ -91,16 +90,11 @@ public class ImagesAdapter extends RecyclerView.Adapter<ImagesAdapter.MyViewHold
         });
     }
 
-
     // проверка щелчков
     public interface ImageAdapterListener {
         void onImageClicked(int position);
 
         void onButtonClicked(int position);
-
-//        void onMessageRowClicked(int position);
-//
-//        void onRowLongClicked(int position);
     }
 
     @Override

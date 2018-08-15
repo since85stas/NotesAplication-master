@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -15,8 +16,12 @@ import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.TextUtils;
 import android.util.Log;
@@ -33,18 +38,24 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batura.stas.notesaplication.AlarmFuncs.AlarmSetActivity;
+import com.batura.stas.notesaplication.ImageFuncs.DividerItemDecoration;
+import com.batura.stas.notesaplication.ImageFuncs.ImageMy;
 import com.batura.stas.notesaplication.ImageFuncs.ImageStorage;
+import com.batura.stas.notesaplication.ImageFuncs.ImagesAdapter;
 import com.batura.stas.notesaplication.Static.NoteUtils;
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Batura Stas on 18.05.2018.
  */
 
-public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> , ImagesAdapter.ImageAdapterListener{
 
     private final static int NOTE_LOADER_EDITOR = 0;
     private final static int NOTE_LOADER_IMAGES = 11;
@@ -69,6 +80,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private TextView  mTargetUriTextView;
     private NoteDbHelper mDbHelper;
     private SQLiteDatabase mImageDb;
+
+    private List<ImageMy> images = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private ImagesAdapter mImagesAdapter;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -97,14 +113,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
 
         mTitleTextView = (EditText) findViewById(R.id.noteTitleInput);
-
         mBodyTextView = findViewById(R.id.noteTextInput);
         //mBodyTextView = new LinedEditText(this,null,19);
-
         mColorSpinner = (Spinner) findViewById(R.id.colorSpinner);
-
         mTime = System.currentTimeMillis();
-
         mImageSwitcher = (ImageSwitcher) findViewById(R.id.imageSwitcherFav);
 
         //mImageSwitcher.setImageResource(mFavImagId[mFav]);
@@ -129,6 +141,21 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mBodyTextView.setOnTouchListener(mTouchListener);
 
         setupSpinner();
+
+        //определяем recycle view для фото
+        recyclerView = findViewById(R.id.recycler_view);
+        mImagesAdapter = new ImagesAdapter(this,images,this);
+
+        RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,true);
+        recyclerView.setLayoutManager(mLayoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addItemDecoration(new DividerItemDecoration(this, LinearLayoutManager.HORIZONTAL));
+        recyclerView.setAdapter(mImagesAdapter);
+
+
+        mDbHelper = new NoteDbHelper(this);
+        mImageDb = mDbHelper.getReadableDatabase();
+        displayDatabaseInfo();
 
     }
 
@@ -211,7 +238,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         MenuItem menuItem = menu.findItem(R.id.action_share);
         //mShareActionProvider =  menuItem.getActionProvider();
         mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
-
         mShareActionProvider
                 .setShareHistoryFileName(ShareActionProvider.DEFAULT_SHARE_HISTORY_FILE_NAME);
         mShareActionProvider.setShareIntent(createShareIntent());
@@ -316,8 +342,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         Bitmap galleryBitmap = null;
         //ImageStorage imageStorage = new ImageStorage();
-        mImageView = findViewById(R.id.imageViewTest1);
-        mTargetUriTextView = findViewById(R.id.textViewTest1);
+        //mImageView = findViewById(R.id.imageViewTest1);
+        //mTargetUriTextView = findViewById(R.id.textViewTest1);
         if (requestCode == NOTIFIC_ANSWER) {
             if (resultCode == RESULT_OK) {
                 mNotificIsOn = data.getBooleanExtra(AlarmSetActivity.NOTIF_IS_ON,false);
@@ -326,6 +352,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
         } else if (requestCode == REQUEST_GALLERY) {
             if (resultCode == RESULT_OK) {
+                String fileName = null;
                 Uri selectedImageUri = data.getData();
                 try {
                     galleryBitmap = MediaStore.Images.Media.getBitmap(getContentResolver(),
@@ -336,17 +363,22 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     }, null, null, null);
 
                     if (cursor != null && cursor.moveToFirst()) {
-                        String name = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
-                        Log.d(TAG, "name is " + name);
+                        fileName = cursor.getString(cursor.getColumnIndex(MediaStore.Images.ImageColumns.DISPLAY_NAME));
+                        Log.d(TAG, "name is " + fileName);
                     }
                     String s = MediaStore.Images.ImageColumns.DISPLAY_NAME;
                     Log.i(TAG, "onActivityResult: "+ s);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                ImageStorage.saveToSdCard(galleryBitmap,"firstFile");
-                galleryBitmap = ImageStorage.getImageBitmap("firstFile");
-                mImageView.setImageBitmap(galleryBitmap);
+                String result = ImageStorage.saveToSdCard(galleryBitmap,fileName);
+
+                //String del = ImageStorage.deleteFromSd(fileName);
+                ImageMy imageMy = new ImageMy(fileName,galleryBitmap);
+                images.add(imageMy);
+                mImagesAdapter.notifyDataSetChanged();
+                //galleryBitmap = ImageStorage.getImageBitmap("firstFile");
+                //mImageView.setImageBitmap(galleryBitmap);
                 //mTargetUriTextView.setText(selectedImageUri.toString());
             }
         }
@@ -360,9 +392,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         String bodyString = mBodyTextView.getText().toString().trim();
         String colorString = Integer.toString(mColor);
         String timeString = Long.toString(mTime);
+
         if (mCurrentNoteUri == null &&
                 TextUtils.isEmpty(titleString) && TextUtils.isEmpty(bodyString) &&
-                TextUtils.isEmpty(colorString) && TextUtils.isEmpty(timeString)) {
+                TextUtils.isEmpty(colorString) && TextUtils.isEmpty(timeString) && images.isEmpty() ) {
             return;
         }
 
@@ -375,7 +408,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE, mFav);
         // constant values
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD, 0);
-        values.put(NoteContract.NoteEntry.COLUMN_NOTE_IMAGE, 0);
+
+        //вставляем колво изображений
+        values.put(NoteContract.NoteEntry.COLUMN_NOTE_IMAGE, images.size());
         if (mNotificIsOn) {
             values.put(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET, 1);
         } else {
@@ -383,15 +418,30 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
         //
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_TIME, mTime);
+        
+        //create content for images DB
+        ContentValues valuesImages = new ContentValues();
+        
+        // get all images names in one String
+        int numImages = images.size();
+
+        if (numImages != 0) {
+            String allImagesNames = "";
+            for (int i = 0; i < numImages; i++) {
+                String name = images.get(i).getName();
+                allImagesNames += name + " ";
+            }
+            valuesImages.put(NoteContract.NoteEntry.IMAGE_NAME_01,allImagesNames);
+        }
 
         if (mCurrentNoteUri == null) {
 
-            // Insert a new row for pet in the database, returning the ID of that new row.
+            // Insert a new row for note in the database, returning the ID of that new row.
             // Insert a new pet into the provider, returning the content URI for the new pet.
             Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI, values);
-
+            Uri imagesUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI_IMAGES,valuesImages);
             // Show a toast message depending on whether or not the insertion was successful
-            if (newUri == null) {
+            if (newUri == null || imagesUri == null) {
                 // If the row ID is -1, then there was an error with insertion.
                 Toast.makeText(this, getString(R.string.editor_insert_note_failed), Toast.LENGTH_SHORT).show();
             } else {
@@ -516,10 +566,16 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     int image03colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_03);
                     int noteIdColomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.NOTE_ID);
 
-                    String image01 = cursor.getString(image01colomnIndex);
-                    String image02 = cursor.getString(image02colomnIndex);
-                    String image03 = cursor.getString(image03colomnIndex);
+                    String imagesNames = cursor.getString(image01colomnIndex);
                     int noteId = cursor.getInt(noteIdColomnIndex);
+                    if(mCurrentNoteUri != null) {
+                        //загружаем изображения
+                        String [] imageNamesMassive = imagesNames.split(" ");
+                        for (int i = 0; i < imageNamesMassive.length ; i++) {
+                            ImageMy imageMy = new ImageMy(imageNamesMassive[i],ImageStorage.getImageBitmap(imageNamesMassive[i]));
+                            images.add(imageMy);
+                        }
+                    }
 
                     Log.i(TAG, "onLoadFinished: " + cursor.toString());
                 }
@@ -585,6 +641,27 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         });
     }
 
+    @Override
+    public void onImageClicked(int position) {
+//        Intent intent = new Intent(EditorActivity.this,ImageBigActivity.class);
+//        Drawable draw = images.get(position).getDraw();
+//        Bitmap bitmap = drawableToBitmap(draw);
+//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+//
+//        byte[] byteArray = stream.toByteArray();
+//        intent.putExtra(ImageMy.class.getSimpleName(),byteArray);
+//        startActivity(intent);
+    }
+
+    @Override
+    public void onButtonClicked(int position) {
+        String del = ImageStorage.deleteFromSd(images.get(position).getName());
+        mImagesAdapter.removeData(position);
+        Log.i(TAG, "onButtonClicked: " + del);
+        mImagesAdapter.notifyDataSetChanged();
+    }
+
 
     /**
      * +     * Temporary helper method to display information in the onscreen TextView about the state of
@@ -599,20 +676,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // Perform this raw SQL query "SELECT * FROM pets"
         // to get a Cursor that contains all rows from the pets table.
         Cursor cursor = mImageDb.rawQuery("SELECT * FROM " + NoteContract.NoteEntry.IMAGE_TABLE_NAME, null);
-
-//        String[] projection = new String[]{
-//                NoteContract.NoteEntry.NOTE_ID,
-//                NoteContract.NoteEntry.IMAGE_NAME_01,
-//                NoteContract.NoteEntry.IMAGE_NAME_02,
-//                NoteContract.NoteEntry.IMAGE_NAME_03,
-//                };
-        //Cursor cursor = getContentResolver().query(NoteContract.NoteEntry.CONTENT_URI,projection,null,null,null);
-
-//        ListView petsListView = (ListView)findViewById(R.id.list);
-
-
-//        PetCursorAdapter petAdapter =new PetCursorAdapter(this,cursor);
-//        petsListView.setAdapter(petAdapter);
 
         try {
             // Display the number of rows in the Cursor (which reflects the number of rows in the
@@ -633,6 +696,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                      "\n");
 
             // Figure out the index of each column
+            int _idColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
             int idColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.NOTE_ID);
             int image1NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_01);
             int image2NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_02);
@@ -642,11 +706,15 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             while (cursor.moveToNext()) {
                 // Use that index to extract the String or Int value of the word
                 // at the current row the cursor is on.
+                int current_ID = cursor.getInt(_idColumnIndex);
                 int currentID = cursor.getInt(idColumnIndex);
                 String currentName1 = cursor.getString(image1NameColumnIndex);
                 String currentName2 = cursor.getString(image2NameColumnIndex);
                 String currentName3 = cursor.getString(image3NameColumnIndex);
-
+                displayView.append(_idColumnIndex + " - " +
+                        currentName1 + " - " +
+                        + currentID +
+                        "\n");
             }
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its

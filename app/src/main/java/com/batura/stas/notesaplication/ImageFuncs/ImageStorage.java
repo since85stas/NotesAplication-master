@@ -16,6 +16,7 @@ import com.batura.stas.notesaplication.R;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.stream.Stream;
 
 /**
  * Created by seeyou on 01.08.2018.
@@ -30,9 +31,7 @@ public class ImageStorage extends Activity {
     public static String saveToSdCard(Bitmap bitmap, String filename) {
 
         String stored = null;
-
         File sdcard = Environment.getExternalStorageDirectory() ;
-
         File folder = new File(sdcard.getAbsoluteFile(), IMAGE_DIR_NAME);//the dot makes this directory hidden to the user
         boolean isWrite = isExternalStorageWritable();
         boolean fold = folder.isDirectory();
@@ -40,10 +39,9 @@ public class ImageStorage extends Activity {
             boolean yes = folder.mkdirs();
         }
         //File file = new File(folder.getAbsoluteFile(), filename + ".jpg") ;
-        File file = new File(folder.getAbsoluteFile(), filename + ".jpg") ;
+        File file = new File(folder.getAbsoluteFile(), filename ) ;
         if (file.exists())
             return stored ;
-
         try {
             FileOutputStream out = new FileOutputStream(file);
             bitmap.compress(Bitmap.CompressFormat.JPEG, 90, out);
@@ -51,11 +49,26 @@ public class ImageStorage extends Activity {
             out.close();
             stored = "success";
             //Toast.makeText(this, getString(R.string.editor_insert_note_failed), Toast.LENGTH_SHORT).show();
-
         } catch (Exception e) {
             e.printStackTrace();
         }
         return stored;
+    }
+
+    public static String deleteFromSd(String fileName) {
+        String delete = null;
+        File sdcard = Environment.getExternalStorageDirectory() ;
+        File folder = new File(sdcard.getAbsoluteFile(), IMAGE_DIR_NAME);//the dot makes this directory hidden to the user
+        boolean isWrite = isExternalStorageWritable();
+        boolean fold = folder.isDirectory();
+        File file = new File(folder.getAbsoluteFile(), fileName ) ;
+        boolean exist = file.exists();
+        if (exist) {
+            file.delete();
+            delete = "delete";
+        }
+
+        return delete;
     }
 
 
@@ -68,7 +81,7 @@ public class ImageStorage extends Activity {
             if (!myDir.exists())
                 return null;
 
-            mediaImage = new File(myDir.getPath() + "/" + IMAGE_DIR_NAME +"/"+ imagename + ".jpg");
+            mediaImage = new File(myDir.getPath() + "/" + IMAGE_DIR_NAME +"/"+ imagename );
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

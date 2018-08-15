@@ -50,21 +50,31 @@
         </Spinner>
     </LinearLayout>
 
-    <com.batura.stas.notesaplication.LinedEditText
-        android:id="@+id/noteTextInput"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="400dp"
+        android:layout_height="300dp"
+        android:orientation="vertical">
+        <com.batura.stas.notesaplication.LinedEditText
+            android:id="@+id/noteTextInput"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
 
-        android:layout_gravity="top"
-        android:gravity="top"
-        android:hint="@string/noteHint"
-        android:paddingBottom="8dp"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:paddingTop="8dp"
-        android:focusableInTouchMode="true"
-        android:focusable="true"/>
-
+            android:layout_gravity="top"
+            android:gravity="top"
+            android:hint="@string/noteHint"
+            android:paddingBottom="8dp"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingTop="8dp"
+            android:focusableInTouchMode="true"
+            android:focusable="true"/>
+        <TextView
+            android:id="@+id/textViewTest1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+    </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
@@ -87,23 +97,6 @@
                 />
         </android.support.v4.widget.SwipeRefreshLayout>
 
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="horizontal">
-
-        <ImageView
-            android:id="@+id/imageViewTest1"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="200dp" />
-        <TextView
-            android:id="@+id/textViewTest1"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="200dp" />
     </LinearLayout>
 
 </LinearLayout>
