@@ -8,6 +8,7 @@
 
 package com.batura.stas.notesaplication;
 
+import android.Manifest;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.ContentUris;
@@ -25,6 +26,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.SearchEvent;
 import android.view.View;
 import android.view.Menu;
@@ -34,9 +36,19 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
+import android.widget.Toast;
+
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
+import com.jakewharton.rxbinding2.view.RxView;
+import com.tbruyelle.rxpermissions2.Permission;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+
 import java.util.Locale;
+
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -49,6 +61,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private SearchView mSearchView;
     private String mSearchString = null; // search request
     private String mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME; // по какому столбцу упорядочивание списка
+    private Disposable disposable;
 
     @Override
     public boolean onSearchRequested(SearchEvent searchEvent) {
@@ -64,6 +77,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        RxPermissions rxPermissions = new RxPermissions(this);
+        rxPermissions.setLogging(true);
         setContentView(R.layout.activity_main);
 
         Locale locale = new Locale("en"); // задаем локаль, пока принудительно
@@ -77,16 +93,60 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
         setupOrderSpinner();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Add a note", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                startActivity(intent);
-            }
-        });
+        disposable = RxView.clicks(findViewById(R.id.fab))
+                .compose(rxPermissions.ensureEach(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                .subscribe(new Consumer<Permission>() {
+                               public void accept(Permission permission) {
+                                   Log.i(TAG, "Permission result " + permission);
+                                   if (permission.granted) {
+//                                       Snackbar.make(view, "Add a note", Snackbar.LENGTH_LONG)
+//                                               .setAction("Action", null).show();
+                                       Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                       startActivity(intent);
+                                       Log.i(TAG, "Permission for storage granted");
+
+                                   } else if (permission.shouldShowRequestPermissionRationale) {
+                                       // Denied permission without ask never again
+                                       Toast.makeText(MainActivity.this,
+                                               "Denied permission without ask never again",
+                                               Toast.LENGTH_SHORT).show();
+                                       Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                       startActivity(intent);
+                                   } else {
+                                       // Denied permission with ask never again
+                                       // Need to go to the settings
+                                       Toast.makeText(MainActivity.this,
+                                               "Permission denied, can't load images",
+                                               Toast.LENGTH_SHORT).show();
+                                       Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                       startActivity(intent);
+                                   }
+                               }
+
+                           },
+                        new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable t) {
+                                Log.e(TAG, "onError", t);
+                            }
+                        },
+                        new Action() {
+                            @Override
+                            public void run() {
+                                Log.i(TAG, "OnComplete");
+                            }
+                        });
+
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                Snackbar.make(view, "Add a note", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
+//                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+//                startActivity(intent);
+//            }
+//        });
 
         /* задаем listView для списка заметок
          * проверяем изменолись ли данные

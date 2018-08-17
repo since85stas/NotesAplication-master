@@ -97,7 +97,7 @@ public class ImageStorage extends Activity {
         if (path != null)
             b = BitmapFactory.decodeFile(path);
 
-        if(b == null ||  b.equals(""))
+        if(b == null )
         {
             return b ;
         }

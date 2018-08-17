@@ -68,6 +68,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private int mColor = 665;
     private long mTime = 0;
     private int mFav   = 0;
+    private int mReopenActivity = 0;
     private boolean mNotificIsOn = false;
     private Uri mCurrentNoteUri;
     private Uri mCurrentNoteImagesUri;
@@ -94,7 +95,25 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
     };
 
+    @Override
+    protected void onResume() {
+        Log.i(TAG, "onResume: ");
+        super.onResume();
+    }
 
+    @Override
+    protected void onPostResume() {
+        Log.i(TAG, "onPostResume: ");
+        super.onPostResume();
+    }
+
+    @Override
+    protected void onPause() {
+        Log.i(TAG, "onPause: ");
+        super.onPause();
+        mReopenActivity = 1;
+        getSupportLoaderManager().destroyLoader(NOTE_LOADER_IMAGES);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,8 +127,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             invalidateOptionsMenu();
         } else {
             setTitle("Edit note");
-            getSupportLoaderManager().initLoader(NOTE_LOADER_EDITOR, null, this); //!!!! instead getLoaderManager
-            getSupportLoaderManager().initLoader(NOTE_LOADER_IMAGES,null,this);
+            getSupportLoaderManager().initLoader(NOTE_LOADER_EDITOR, null, this);
+
+            //инициализируем только при первом открытии активности
+            if (mReopenActivity == 0) {
+                getSupportLoaderManager().initLoader(NOTE_LOADER_IMAGES, null, this);
+            }
         }
 
         mTitleTextView = (EditText) findViewById(R.id.noteTitleInput);
@@ -571,8 +594,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     if(mCurrentNoteUri != null) {
                         //загружаем изображения
                         String [] imageNamesMassive = imagesNames.split(" ");
-                        for (int i = 0; i < imageNamesMassive.length ; i++) {
-                            ImageMy imageMy = new ImageMy(imageNamesMassive[i],ImageStorage.getImageBitmap(imageNamesMassive[i]));
+                        for (String anImageNamesMassive : imageNamesMassive) {
+                            ImageMy imageMy = new ImageMy(anImageNamesMassive, ImageStorage.getImageBitmap(anImageNamesMassive));
                             images.add(imageMy);
                         }
                     }

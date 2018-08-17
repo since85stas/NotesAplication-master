@@ -233,6 +233,7 @@ public class NoteProvider extends ContentProvider {
         getContext().getContentResolver().notifyChange(uri, null);
 
         return ContentUris.withAppendedId(uri, id);
+
     }
 
 
@@ -274,8 +275,6 @@ public class NoteProvider extends ContentProvider {
                 throw new IllegalArgumentException("Note requires valid color " + color);
             }
         }
-
-
 
         // If the {@link NoteEntry.COLUMN_NOTE_TIME} key is present,
         // check that the weight value is valid.
