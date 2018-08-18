@@ -1,12 +1,12 @@
 package com.batura.stas.notesaplication;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -46,7 +46,6 @@ import com.batura.stas.notesaplication.Static.NoteUtils;
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -121,7 +120,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         setContentView(R.layout.activity_editor);
 
         mCurrentNoteUri = getIntent().getData();
-        mCurrentNoteImagesUri = NoteContract.NoteEntry.CONTENT_URI_IMAGES;
+        if (mCurrentNoteUri != null) {
+            mCurrentNoteImagesUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI_IMAGES,
+                    ContentUris.parseId(mCurrentNoteUri));
+        }
+
         if (mCurrentNoteUri == null) {
             setTitle("Add note");
             invalidateOptionsMenu();
@@ -178,7 +181,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         mDbHelper = new NoteDbHelper(this);
         mImageDb = mDbHelper.getReadableDatabase();
-        displayDatabaseInfo();
+        //displayDatabaseInfo();
 
     }
 
@@ -212,7 +215,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         builder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
                 // User clicked the "Delete" button, so delete the pet.
-                deletePet();
+                deleteNote();
             }
         });
         builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
@@ -355,7 +358,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // there are no values).
             //Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI,values);
             long newRowId = mImageDb.insert(NoteContract.NoteEntry.IMAGE_TABLE_NAME, null, values);
-            displayDatabaseInfo();
+            //displayDatabaseInfo();
         }
 
 
@@ -455,6 +458,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 allImagesNames += name + " ";
             }
             valuesImages.put(NoteContract.NoteEntry.IMAGE_NAME_01,allImagesNames);
+            //valuesImages.put(NoteContract.NoteEntry.NOTE_ID,);
         }
 
         if (mCurrentNoteUri == null) {
@@ -462,7 +466,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // Insert a new row for note in the database, returning the ID of that new row.
             // Insert a new pet into the provider, returning the content URI for the new pet.
             Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI, values);
-            Uri imagesUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI_IMAGES,valuesImages);
+
+            Uri imagesUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI_IMAGES,
+                    ContentUris.parseId(newUri));
+            getContentResolver().insert(imagesUri,valuesImages);
             // Show a toast message depending on whether or not the insertion was successful
             if (newUri == null || imagesUri == null) {
                 // If the row ID is -1, then there was an error with insertion.
@@ -473,6 +480,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
         } else {
             int rowsAffected = getContentResolver().update(mCurrentNoteUri, values, null, null);
+            Uri imagesUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI_IMAGES,
+                    ContentUris.parseId(mCurrentNoteUri));
+            getContentResolver().update(imagesUri,valuesImages, null, null);
             if (rowsAffected == 0) {
                 // If no rows were affected, then there was an error with the update.
                 Toast.makeText(this, getString(R.string.editor_insert_note_failed),
@@ -489,9 +499,15 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * Perform the deletion of the note in the database.
      */
-    private void deletePet() {
+    private void deleteNote() {
         // Only perform the delete if this is an existing pet.
         if (mCurrentNoteUri != null) {
+
+            for (int i = 0; i < images.size() ; i++) {
+                String res = ImageStorage.deleteFromSd(images.get(i).getName());
+                Log.i(TAG, "deleteNote: " + res + " " + i);
+            }
+
             // Call the ContentResolver to delete the pet at the given content URI.
             // Pass in null for the selection and selection args because the mCurrentPetUri
             // content URI already identifies the pet that we want.
@@ -534,7 +550,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     NoteContract.NoteEntry.IMAGE_NAME_01,
                     NoteContract.NoteEntry.IMAGE_NAME_02,
                     NoteContract.NoteEntry.IMAGE_NAME_03,
-                    NoteContract.NoteEntry.NOTE_ID
+                    NoteContract.NoteEntry._ID
             };
             return new android.support.v4.content.CursorLoader(this,
                     mCurrentNoteImagesUri,
@@ -587,7 +603,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     int image01colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_01);
                     int image02colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_02);
                     int image03colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_03);
-                    int noteIdColomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.NOTE_ID);
+                    int noteIdColomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
 
                     String imagesNames = cursor.getString(image01colomnIndex);
                     int noteId = cursor.getInt(noteIdColomnIndex);
@@ -599,7 +615,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                             images.add(imageMy);
                         }
                     }
-
                     Log.i(TAG, "onLoadFinished: " + cursor.toString());
                 }
                 break;
@@ -710,13 +725,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             //
             // In the while loop below, iterate through the rows of the cursor and display
             // the information from each column in this order.
-            TextView displayView = findViewById(R.id.textViewTest1);
-            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
-            displayView.append(NoteContract.NoteEntry.NOTE_ID + " - " +
-                    NoteContract.NoteEntry.IMAGE_NAME_01 + " - " +
-                    NoteContract.NoteEntry.IMAGE_NAME_02 + " - " +
-                    NoteContract.NoteEntry.IMAGE_NAME_03 + " - " +
-                     "\n");
+//            TextView displayView = findViewById(R.id.textViewTest1);
+//            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
+//            displayView.append(NoteContract.NoteEntry.NOTE_ID + " - " +
+//                    NoteContract.NoteEntry.IMAGE_NAME_01 + " - " +
+//                    NoteContract.NoteEntry.IMAGE_NAME_02 + " - " +
+//                    NoteContract.NoteEntry.IMAGE_NAME_03 + " - " +
+//                     "\n");
 
             // Figure out the index of each column
             int _idColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
@@ -734,10 +749,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 String currentName1 = cursor.getString(image1NameColumnIndex);
                 String currentName2 = cursor.getString(image2NameColumnIndex);
                 String currentName3 = cursor.getString(image3NameColumnIndex);
-                displayView.append(_idColumnIndex + " - " +
-                        currentName1 + " - " +
-                        + currentID +
-                        "\n");
+//                displayView.append(current_ID + " - " +
+//                        currentName1 + " - " +
+//                        + currentID +
+//                        "\n");
             }
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its

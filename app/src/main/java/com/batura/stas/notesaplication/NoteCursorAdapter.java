@@ -125,8 +125,8 @@ public class NoteCursorAdapter extends CursorAdapter {
             favorImageView.setVisibility(View.INVISIBLE);
         }
         //notif
-        if (noteNotifIsOn == 1) {
-            //notifImageView.setVisibility(View.INVISIBLE);
+        if (noteNotifIsOn != 1) {
+            notifImageView.setVisibility(View.INVISIBLE);
         }
 //        else {
 //            notifImageView.setImageResource(R.drawable.baseline_grade_black_18);

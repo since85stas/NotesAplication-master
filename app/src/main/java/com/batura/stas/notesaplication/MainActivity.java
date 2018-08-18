@@ -60,7 +60,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private Spinner mOrderBySpinner;
     private SearchView mSearchView;
     private String mSearchString = null; // search request
-    private String mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME; // по какому столбцу упорядочивание списка
+    // по какому столбцу упорядочивание списка
+    private String mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME;
     private Disposable disposable;
 
     @Override
@@ -122,7 +123,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                        startActivity(intent);
                                    }
                                }
-
                            },
                         new Consumer<Throwable>() {
                             @Override

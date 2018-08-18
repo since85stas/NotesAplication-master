@@ -42,7 +42,7 @@ public class NoteProvider extends ContentProvider {
         // when a match is found.
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES,NOTES);
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES + "/#",NOTE_ID);
-        sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_IMAGES,NOTE_IMAGES);
+        sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_IMAGES +"/#" ,NOTE_IMAGES);
     }
 
 
@@ -94,8 +94,8 @@ public class NoteProvider extends ContentProvider {
                 // For every "?" in the selection, we need to have an element in the selection
                 // arguments that will fill in the "?". Since we have 1 question mark in the
                 // selection, we have 1 String in the selection arguments' String array.
-                //selection = NoteContract.NoteEntry._ID + "=?";
-                //selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                selection = NoteContract.NoteEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
 
                 // This will perform a query on the images table where the _id equals 3 to return a
                 // Cursor containing that row of the table.
@@ -251,6 +251,14 @@ public class NoteProvider extends ContentProvider {
                 selection = NoteContract.NoteEntry._ID + "=?";
                 selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
                 return updateNote(uri, contentValues, selection, selectionArgs);
+            case NOTE_IMAGES:
+                // For the PET_ID code, extract out the ID from the URI,
+                // so we know which row to update. Selection will be "_id=?" and selection
+                // arguments will be a String array containing the actual ID.
+                selection = NoteContract.NoteEntry._ID + "=?";
+                selectionArgs = new String[] { String.valueOf(ContentUris.parseId(uri)) };
+                return updateNoteImages(uri, contentValues, selection, selectionArgs);
+
             default:
                 throw new IllegalArgumentException("Update is not supported for " + uri);
         }
@@ -266,7 +274,6 @@ public class NoteProvider extends ContentProvider {
                 throw new IllegalArgumentException("Wrong title body " + name);
             }
         }
-
         // If the {@link NoteEntry.COLUMN_NOTE_COLOR} key is present,
         // check that the gender value is valid.
         if (values.containsKey(NoteContract.NoteEntry.COLUMN_NOTE_COLOR)) {
@@ -275,7 +282,6 @@ public class NoteProvider extends ContentProvider {
                 throw new IllegalArgumentException("Note requires valid color " + color);
             }
         }
-
         // If the {@link NoteEntry.COLUMN_NOTE_TIME} key is present,
         // check that the weight value is valid.
         if (values.containsKey(NoteContract.NoteEntry.COLUMN_NOTE_TIME)) {
@@ -285,19 +291,33 @@ public class NoteProvider extends ContentProvider {
                 throw new IllegalArgumentException("Note requires valid time " + time );
             }
         }
+        // If there are no values to update, then don't try to update the database
+        if (values.size() == 0) {
+            return 0;
+        }
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+
+        // Perform the update on the database and get the number of rows affected
+        int rowsUpdated = database.update(NoteContract.NoteEntry.NOTES_TABLE_NAME, values, selection, selectionArgs);
+
+        // If 1 or more rows were updated, then notify all listeners that the data at the
+        // given URI has changed
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
+    }
+
+    private int updateNoteImages(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 
         // If there are no values to update, then don't try to update the database
         if (values.size() == 0) {
             return 0;
         }
-
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
-        // Returns the number of database rows affected by the update statement
-        //return database.update(PetContract.PetEntry.IMAGE_TABLE_NAME, values, selection, selectionArgs);
-
         // Perform the update on the database and get the number of rows affected
-        int rowsUpdated = database.update(NoteContract.NoteEntry.NOTES_TABLE_NAME, values, selection, selectionArgs);
+        int rowsUpdated = database.update(NoteContract.NoteEntry.IMAGE_TABLE_NAME, values, selection, selectionArgs);
 
         // If 1 or more rows were updated, then notify all listeners that the data at the
         // given URI has changed
@@ -328,6 +348,12 @@ public class NoteProvider extends ContentProvider {
                 selection = NoteContract.NoteEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
                 rowsDeleted = database.delete(NoteContract.NoteEntry.NOTES_TABLE_NAME, selection, selectionArgs);
+
+                //удаляем соотвествующие записи о фотографиях
+                selection = NoteContract.NoteEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                int rowsDeletedIm = database.delete(NoteContract.NoteEntry.IMAGE_TABLE_NAME, selection, selectionArgs);
+
                 break;
             //return database.delete(PetContract.PetEntry.IMAGE_TABLE_NAME, selection, selectionArgs);
             default:
