@@ -21,9 +21,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -33,9 +38,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.SearchView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batura.stas.notesaplication.data.NoteContract;
@@ -54,6 +61,28 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public static final String TAG = MainActivity.class.getSimpleName();
     private static final int NOTE_LOADER = 0;
+    // tags used to attach the fragments
+    private static final String TAG_HOME = "home";
+    private static final String TAG_PHOTOS = "photos";
+    private static final String TAG_MOVIES = "movies";
+    private static final String TAG_NOTIFICATIONS = "notifications";
+    private static final String TAG_SETTINGS = "settings";
+    public static String CURRENT_TAG = TAG_HOME;
+    // toolbar titles respected to selected nav menu item
+    private String[] activityTitles;
+    // index to identify current nav menu item
+    public static int navItemIndex = 0;
+
+    // flag to load home fragment when user presses back key
+    private boolean shouldLoadHomeFragOnBackPress = true;
+    private Handler mHandler;
+
+    private NavigationView navigationView;
+    private DrawerLayout drawer;
+    private View navHeader;
+    private ImageView imgNavHeaderBg, imgProfile;
+    private TextView txtName, txtWebsite;
+    Toolbar toolbar;
 
     private NoteDbHelper mDbHelper;
     private NoteCursorAdapter mCursorAdapter;
@@ -83,12 +112,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         rxPermissions.setLogging(true);
         setContentView(R.layout.activity_main);
 
+        setupNavigationDraver();
+
         Locale locale = new Locale("en"); // задаем локаль, пока принудительно
         Locale.setDefault(locale);
 
         // определям action bar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
         // определяем спинер для упорядочивания заметок
         mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
@@ -175,6 +206,148 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
         getLoaderManager().initLoader(NOTE_LOADER, null, this);
+    }
+
+    private void setupNavigationDraver() {
+
+        mHandler = new Handler();
+
+        drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        // Navigation view header
+        navHeader = navigationView.getHeaderView(0);
+        txtName = (TextView) navHeader.findViewById(R.id.name);
+        txtWebsite = (TextView) navHeader.findViewById(R.id.website);
+        imgNavHeaderBg = (ImageView) navHeader.findViewById(R.id.img_header_bg);
+        imgProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
+
+        // load toolbar titles from string resources
+        activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
+
+        // load nav menu header data
+        loadNavHeader();
+
+        // initializing navigation menu
+        setUpNavigationView();
+    }
+
+    /***
+     * Load navigation menu header information
+     * like background image, profile image
+     * name, website, notifications action view (dot)
+     */
+    private void loadNavHeader() {
+        // name, website
+        txtName.setText("Ravi Tamada");
+        txtWebsite.setText("www.androidhive.info");
+
+        // loading header background image
+//        Glide.with(this).load(urlNavHeaderBg)
+//                .crossFade()
+//                .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                .into(imgNavHeaderBg);
+//
+//        // Loading profile image
+//        Glide.with(this).load(urlProfileImg)
+//                .crossFade()
+//                .thumbnail(0.5f)
+//                .bitmapTransform(new CircleTransform(this))
+//                .diskCacheStrategy(DiskCacheStrategy.ALL)
+//                .into(imgProfile);
+
+        // showing dot next to notifications label
+        navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
+    }
+
+    private void setUpNavigationView() {
+        //Setting Navigation View Item Selected Listener to handle the item click of the navigation menu
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+
+            // This method will trigger on item Click of navigation menu
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+
+                //Check to see which item was being clicked and perform appropriate action
+                switch (menuItem.getItemId()) {
+                    //Replacing the main content with ContentFragment Which is our Inbox View;
+                    case R.id.nav_home:
+                        navItemIndex = 0;
+                        CURRENT_TAG = TAG_HOME;
+                        break;
+                    case R.id.nav_photos:
+                        navItemIndex = 1;
+                        CURRENT_TAG = TAG_PHOTOS;
+                        break;
+                    case R.id.nav_notifications:
+                        navItemIndex = 3;
+                        CURRENT_TAG = TAG_NOTIFICATIONS;
+                        break;
+                    case R.id.nav_settings:
+                        navItemIndex = 4;
+                        CURRENT_TAG = TAG_SETTINGS;
+                        break;
+                    case R.id.nav_about_us:
+                        // launch new intent instead of loading fragment
+                        //startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
+                        drawer.closeDrawers();
+                        return true;
+                    case R.id.nav_privacy_policy:
+                        // launch new intent instead of loading fragment
+                        //startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
+                        drawer.closeDrawers();
+                        return true;
+                    default:
+                        navItemIndex = 0;
+                }
+
+                //Checking if the item is in checked state or not, if not make it in checked state
+                if (menuItem.isChecked()) {
+                    menuItem.setChecked(false);
+                } else {
+                    menuItem.setChecked(true);
+                }
+                menuItem.setChecked(true);
+
+//                loadHomeFragment();
+
+                return true;
+            }
+        });
+
+
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                // Code here will be triggered once the drawer closes as we dont want anything to happen so we leave this blank
+                super.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
+                super.onDrawerOpened(drawerView);
+            }
+        };
+
+        //Setting the actionbarToggle to drawer layout
+        drawer.setDrawerListener(actionBarDrawerToggle);
+
+        //calling sync state is necessary or else your hamburger icon wont show up
+        actionBarDrawerToggle.syncState();
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawers();
+            return;
+        }
+        super.onBackPressed();
     }
 
 
