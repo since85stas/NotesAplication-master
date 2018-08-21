@@ -13,9 +13,9 @@
             android:title="@string/nav_photos" />
 
         <item
-            android:id="@+id/nav_notifications"
+            android:id="@+id/nav_set_pass"
             android:icon="@drawable/ic_notifications_black_24dp"
-            android:title="@string/nav_notifications" />
+            android:title="@string/nav_set_password" />
 
         <item
             android:id="@+id/nav_settings"

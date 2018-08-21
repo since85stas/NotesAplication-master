@@ -17,6 +17,7 @@ import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
@@ -45,6 +46,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.batura.stas.notesaplication.Other.Password;
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
 import com.jakewharton.rxbinding2.view.RxView;
@@ -61,6 +63,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public static final String TAG = MainActivity.class.getSimpleName();
     private static final int NOTE_LOADER = 0;
+    private static final int PASS_OK = 11;
+
+    //preferences keys
+    // Sharedpref file name
+    private static final String PREF_NAME = "NotesPref";
+    private static final String HAS_PASS = "hasPass";
+    public static final String PASSWORD = "password";
+    public static final String SORTED_BY = "sorted";
+
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
     private static final String TAG_PHOTOS = "photos";
@@ -93,6 +104,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private String mOrderByLoaderString = NoteContract.NoteEntry.COLUMN_NOTE_TIME;
     private Disposable disposable;
 
+    private SharedPreferences mSettings;
+    private boolean mHasPass;
+    private String  mPass = "";
+    private boolean mPasswordCorrect;
+    public final static String PASS_INTENT_TYPE = MainActivity.class.getPackage() + ".passIntentType";
+    public final static String TYPE_CHECK = "chek";
+    public final static String TYPE_SET = "set";
+    public final static String TYPE_DEL = "del";
+
     @Override
     public boolean onSearchRequested(SearchEvent searchEvent) {
         return super.onSearchRequested(searchEvent);
@@ -103,109 +123,146 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onContentChanged();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PASS_OK) {
+            if (resultCode == RESULT_OK) {
+                mPasswordCorrect = data.getBooleanExtra(Password.PASS_OK_INTENT,false);
+            } else {
+                finish();
+            }
+        }
+    }
+
+    private void saveSettings () {
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putBoolean(HAS_PASS,mHasPass);
+        editor.putString(PASSWORD,mPass);
+        editor.putString(SORTED_BY,mOrderByLoaderString);
+        editor.apply();
+    }
+
+    private void loadSettings() {
+        if (mSettings.contains(HAS_PASS)) {
+            mHasPass = mSettings.getBoolean(HAS_PASS,false);
+        }
+        if (mSettings.contains(PASSWORD) && mHasPass) {
+            mPass = mSettings.getString(PASSWORD,"1");
+        }
+        if (mSettings.contains(SORTED_BY) ) {
+            mOrderByLoaderString = mSettings.getString(SORTED_BY,NoteContract.NoteEntry.COLUMN_NOTE_TIME);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveSettings();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadSettings();
+        Log.i(TAG, "onResume: ");
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        RxPermissions rxPermissions = new RxPermissions(this);
-        rxPermissions.setLogging(true);
-        setContentView(R.layout.activity_main);
+        //mHasPass = true;
+        mSettings = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
+        loadSettings();
 
-        setupNavigationDraver();
+        if (mHasPass && !mPasswordCorrect) {
+            Intent intent = new Intent(MainActivity.this, Password.class);
+            //intent.putExtra(Password.PASS_OK_INTENT);
+            intent.putExtra(PASS_INTENT_TYPE,TYPE_CHECK);
+            startActivityForResult(intent,PASS_OK);
+        }
 
-        Locale locale = new Locale("en"); // задаем локаль, пока принудительно
-        Locale.setDefault(locale);
+            RxPermissions rxPermissions = new RxPermissions(this);
+            rxPermissions.setLogging(true);
+            setContentView(R.layout.activity_main);
 
-        // определям action bar
-//        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
+            setupNavigationDraver();
 
-        // определяем спинер для упорядочивания заметок
-        mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
-        setupOrderSpinner();
+            Locale locale = new Locale("en"); // задаем локаль, пока принудительно
+            Locale.setDefault(locale);
+            // определяем спинер для упорядочивания заметок
+            mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
+            setupOrderSpinner();
 
-        disposable = RxView.clicks(findViewById(R.id.fab))
-                .compose(rxPermissions.ensureEach(Manifest.permission.WRITE_EXTERNAL_STORAGE))
-                .subscribe(new Consumer<Permission>() {
-                               public void accept(Permission permission) {
-                                   Log.i(TAG, "Permission result " + permission);
-                                   if (permission.granted) {
-//                                       Snackbar.make(view, "Add a note", Snackbar.LENGTH_LONG)
-//                                               .setAction("Action", null).show();
-                                       Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                                       startActivity(intent);
-                                       Log.i(TAG, "Permission for storage granted");
+            disposable = RxView.clicks(findViewById(R.id.fab))
+                    .compose(rxPermissions.ensureEach(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                    .subscribe(new Consumer<Permission>() {
+                                   public void accept(Permission permission) {
+                                       Log.i(TAG, "Permission result " + permission);
+                                       if (permission.granted) {
+                                           Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                           startActivity(intent);
+                                           Log.i(TAG, "Permission for storage granted");
 
-                                   } else if (permission.shouldShowRequestPermissionRationale) {
-                                       // Denied permission without ask never again
-                                       Toast.makeText(MainActivity.this,
-                                               "Denied permission without ask never again",
-                                               Toast.LENGTH_SHORT).show();
-                                       Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                                       startActivity(intent);
-                                   } else {
-                                       // Denied permission with ask never again
-                                       // Need to go to the settings
-                                       Toast.makeText(MainActivity.this,
-                                               "Permission denied, can't load images",
-                                               Toast.LENGTH_SHORT).show();
-                                       Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                                       startActivity(intent);
+                                       } else if (permission.shouldShowRequestPermissionRationale) {
+                                           // Denied permission without ask never again
+                                           Toast.makeText(MainActivity.this,
+                                                   "Denied permission without ask never again",
+                                                   Toast.LENGTH_SHORT).show();
+                                           Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                           startActivity(intent);
+                                       } else {
+                                           // Denied permission with ask never again
+                                           // Need to go to the settings
+                                           Toast.makeText(MainActivity.this,
+                                                   "Permission denied, can't load images",
+                                                   Toast.LENGTH_SHORT).show();
+                                           Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                           startActivity(intent);
+                                       }
                                    }
-                               }
-                           },
-                        new Consumer<Throwable>() {
-                            @Override
-                            public void accept(Throwable t) {
-                                Log.e(TAG, "onError", t);
-                            }
-                        },
-                        new Action() {
-                            @Override
-                            public void run() {
-                                Log.i(TAG, "OnComplete");
-                            }
-                        });
-
-//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-//        fab.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                Snackbar.make(view, "Add a note", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-//                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-//                startActivity(intent);
-//            }
-//        });
+                               },
+                            new Consumer<Throwable>() {
+                                @Override
+                                public void accept(Throwable t) {
+                                    Log.e(TAG, "onError", t);
+                                }
+                            },
+                            new Action() {
+                                @Override
+                                public void run() {
+                                    Log.i(TAG, "OnComplete");
+                                }
+                            });
 
         /* задаем listView для списка заметок
          * проверяем изменолись ли данные
          * при нажатии на заметку вызывается редактирование заметки класс EditorAcrtivity
          */
-        ListView noteListView = (ListView) findViewById(R.id.list);
-        mCursorAdapter = new NoteCursorAdapter(this, null);
-        noteListView.setAdapter(mCursorAdapter);
-        mCursorAdapter.notifyDataSetChanged();
-        noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, id);
-                intent.setData(currentPetUri);
-                startActivity(intent);
+            ListView noteListView = (ListView) findViewById(R.id.list);
+            mCursorAdapter = new NoteCursorAdapter(this, null);
+            noteListView.setAdapter(mCursorAdapter);
+            mCursorAdapter.notifyDataSetChanged();
+            noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                    Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                    Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, id);
+                    intent.setData(currentPetUri);
+                    startActivity(intent);
+                }
+            });
+
+            // вызываем намерение на поиск выражения в тексте заметки
+            Intent intent = getIntent();
+            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+                mSearchString = intent.getStringExtra(SearchManager.QUERY);
+                //System.out.println(query);
             }
-        });
 
-        // вызываем намерение на поиск выражения в тексте заметки
-        Intent intent = getIntent();
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            mSearchString = intent.getStringExtra(SearchManager.QUERY);
-            //System.out.println(query);
-        }
-
-
-        getLoaderManager().initLoader(NOTE_LOADER, null, this);
+            getLoaderManager().initLoader(NOTE_LOADER, null, this);
+        
     }
 
     private void setupNavigationDraver() {
@@ -273,7 +330,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 //Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
-                    //Replacing the main content with ContentFragment Which is our Inbox View;
                     case R.id.nav_home:
                         navItemIndex = 0;
                         CURRENT_TAG = TAG_HOME;
@@ -282,9 +338,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_PHOTOS;
                         break;
-                    case R.id.nav_notifications:
+                    case R.id.nav_set_pass:
                         navItemIndex = 3;
-                        CURRENT_TAG = TAG_NOTIFICATIONS;
+                        if (!mHasPass) {
+                            Intent intent = new Intent(MainActivity.this, Password.class);
+                            intent.putExtra(PASS_INTENT_TYPE, TYPE_SET);
+                            startActivity(intent);
+                        } else {
+                            Intent intent = new Intent(MainActivity.this, Password.class);
+                            intent.putExtra(PASS_INTENT_TYPE, TYPE_DEL);
+                            startActivity(intent);
+                        }
                         break;
                     case R.id.nav_settings:
                         navItemIndex = 4;
