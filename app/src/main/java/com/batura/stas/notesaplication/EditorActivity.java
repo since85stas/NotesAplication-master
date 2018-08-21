@@ -181,7 +181,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         mDbHelper = new NoteDbHelper(this);
         mImageDb = mDbHelper.getReadableDatabase();
-        //displayDatabaseInfo();
+        displayDatabaseInfo();
 
     }
 
@@ -451,7 +451,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         // get all images names in one String
         int numImages = images.size();
 
-        if (numImages != 0) {
+
             String allImagesNames = "";
             for (int i = 0; i < numImages; i++) {
                 String name = images.get(i).getName();
@@ -459,7 +459,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             }
             valuesImages.put(NoteContract.NoteEntry.IMAGE_NAME_01,allImagesNames);
             //valuesImages.put(NoteContract.NoteEntry.NOTE_ID,);
-        }
 
         if (mCurrentNoteUri == null) {
 
@@ -681,13 +680,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public void onImageClicked(int position) {
-//        Intent intent = new Intent(EditorActivity.this,ImageBigActivity.class);
-//        Drawable draw = images.get(position).getDraw();
-//        Bitmap bitmap = drawableToBitmap(draw);
-//        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-//        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-//
-//        byte[] byteArray = stream.toByteArray();
+        Intent intent = new Intent(EditorActivity.this,BigImageActivity.class);
+        intent.putExtra(BigImageActivity.class.getSimpleName(),images.get(position).getName());
+        startActivity(intent);
+
 //        intent.putExtra(ImageMy.class.getSimpleName(),byteArray);
 //        startActivity(intent);
     }
@@ -725,13 +721,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             //
             // In the while loop below, iterate through the rows of the cursor and display
             // the information from each column in this order.
-//            TextView displayView = findViewById(R.id.textViewTest1);
-//            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
-//            displayView.append(NoteContract.NoteEntry.NOTE_ID + " - " +
-//                    NoteContract.NoteEntry.IMAGE_NAME_01 + " - " +
-//                    NoteContract.NoteEntry.IMAGE_NAME_02 + " - " +
-//                    NoteContract.NoteEntry.IMAGE_NAME_03 + " - " +
-//                     "\n");
+            TextView displayView = findViewById(R.id.textViewTest1);
+            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
+            displayView.append(NoteContract.NoteEntry.NOTE_ID + " - " +
+                    NoteContract.NoteEntry.IMAGE_NAME_01 + " - " +
+                    NoteContract.NoteEntry.IMAGE_NAME_02 + " - " +
+                    NoteContract.NoteEntry.IMAGE_NAME_03 + " - " +
+                     "\n");
 
             // Figure out the index of each column
             int _idColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
@@ -749,10 +745,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 String currentName1 = cursor.getString(image1NameColumnIndex);
                 String currentName2 = cursor.getString(image2NameColumnIndex);
                 String currentName3 = cursor.getString(image3NameColumnIndex);
-//                displayView.append(current_ID + " - " +
-//                        currentName1 + " - " +
-//                        + currentID +
-//                        "\n");
+                displayView.append(current_ID + " - " +
+                        currentName1 + " - " +
+                        + currentID +
+                        "\n");
             }
         } finally {
             // Always close the cursor when you're done reading from it. This releases all its

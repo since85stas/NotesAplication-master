@@ -54,6 +54,11 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:orientation="vertical">
+        <TextView
+            android:id="@+id/textViewTest1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
         <com.batura.stas.notesaplication.LinedEditText
             android:id="@+id/noteTextInput"
             android:layout_width="match_parent"

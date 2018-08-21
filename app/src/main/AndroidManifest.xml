@@ -27,7 +27,6 @@
         </activity>
 
         <activity
-
             android:name=".EditorActivity"
             android:label="@string/editorActivTitle"
             android:theme="@style/AppTheme"
@@ -45,6 +44,14 @@
         <activity android:name=".AlarmFuncs.AlarmSetActivity"
             android:label="@string/set_notification"
             android:theme="@style/AppTheme">
+        </activity>
+
+        <activity android:name=".BigImageActivity"
+            android:label="Image"
+            android:theme="@style/AppTheme">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND"/>
+            </intent-filter>
         </activity>
 
         <receiver
