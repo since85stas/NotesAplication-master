@@ -10,7 +10,9 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.app.NavUtils;
 import android.support.v4.content.ContextCompat;
@@ -33,6 +35,7 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,6 +52,8 @@ import com.batura.stas.notesaplication.data.NoteDbHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 
 /**
  * Created by Batura Stas on 18.05.2018.
@@ -117,7 +122,13 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_editor);
+        setContentView(R.layout.activity_editor_full);
+
+        LinearLayout linearLayout = findViewById(R.id.layoutEditor);
+        linearLayout.requestFocus();
+
+        BottomNavigationView bottomNavigation = findViewById(R.id.navigation);
+        bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         mCurrentNoteUri = getIntent().getData();
         if (mCurrentNoteUri != null) {
@@ -181,9 +192,38 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         mDbHelper = new NoteDbHelper(this);
         mImageDb = mDbHelper.getReadableDatabase();
-        displayDatabaseInfo();
+        //displayDatabaseInfo();
 
     }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override
+                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.bbn_image:
+                            // запускаем Галерею
+                            Intent intent = new Intent(Intent.ACTION_PICK,
+                                    android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                            startActivityForResult(intent, REQUEST_GALLERY);
+                            Toast.makeText(getBaseContext(), "image item", Toast.LENGTH_SHORT).show();
+                            return true;
+                        case R.id.bbn_color:
+                            Toast.makeText(getBaseContext(), "color item", Toast.LENGTH_SHORT).show();
+                            return true;
+                        case R.id.bbn_notific:
+                            Intent alarmIntent = new Intent(getBaseContext(), AlarmSetActivity.class);
+                            alarmIntent.putExtra(AlarmSetActivity.NOTE_BODY,mBodyTextView.getText().toString());
+                            startActivityForResult(alarmIntent,NOTIFIC_ANSWER);
+                            Toast.makeText(getBaseContext(), "notif item", Toast.LENGTH_SHORT).show();
+                            return true;
+                        case R.id.bbn_sett:
+                            Toast.makeText(getBaseContext(), "sett item", Toast.LENGTH_SHORT).show();
+                            return true;
+                    }
+                    return false;
+                }
+            };
 
     private void showUnsavedChangesDialog(
             DialogInterface.OnClickListener discardButtonClickListener) {
@@ -590,8 +630,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     mTitleTextView.setText(title);
                     mBodyTextView.setText(body);
 
+                    setEditorViewColor(colorId);
                     int colorBackLight = NoteUtils.getBackColorLight(colorId);
-                    mBodyTextView.setBackgroundColor(ContextCompat.getColor(getBaseContext(), colorBackLight));
+                    //mBodyTextView.setBackgroundColor(ContextCompat.getColor(getBaseContext(), colorBackLight));
                     //mWeightEditText.setText(Integer.toString(weight));
                     mColorSpinner.setSelection(NoteUtils.getColorPosisById(colorId));
                     mBodyTextView.setColorId(colorId);
@@ -619,6 +660,16 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 break;
         }
 
+    }
+
+    private void setEditorViewColor (int colorId) {
+        int colorBackLight = NoteUtils.getBackColorLight(colorId);
+
+        mBodyTextView.setBackgroundColor(ContextCompat.getColor(getBaseContext(), colorBackLight));
+        TextView titleText = findViewById(R.id.noteTitleInput);
+        titleText.setBackgroundColor(ContextCompat.getColor(getBaseContext(),colorBackLight));
+        mImageSwitcher.setBackgroundColor(ContextCompat.getColor(getBaseContext(),colorBackLight));
+        recyclerView.setBackgroundColor(ContextCompat.getColor(getBaseContext(),colorBackLight));
     }
 
     @Override
