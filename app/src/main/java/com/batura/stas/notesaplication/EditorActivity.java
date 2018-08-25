@@ -53,19 +53,24 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import eltos.simpledialogfragment.color.SimpleColorDialog;
 import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 
 /**
  * Created by Batura Stas on 18.05.2018.
  */
 
-public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> , ImagesAdapter.ImageAdapterListener{
+public class EditorActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
+        , ImagesAdapter.ImageAdapterListener
+        , SimpleColorDialog.OnDialogResultListener{
+
+    public static final String TAG = EditorActivity.class.getSimpleName();
 
     private final static int NOTE_LOADER_EDITOR = 0;
     private final static int NOTE_LOADER_IMAGES = 11;
     private final static int NOTIFIC_ANSWER = 0;
     private static final int REQUEST_GALLERY = 100; // запрос для галереи
-    public static final String TAG = EditorActivity.class.getSimpleName();
+    private final static String COLOR_DILOG = "colorDilog";
 
     private EditText mTitleTextView;
     private LinedEditText mBodyTextView;
@@ -128,6 +133,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         linearLayout.requestFocus();
 
         BottomNavigationView bottomNavigation = findViewById(R.id.navigation);
+//        bottomNavigation.text
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         mCurrentNoteUri = getIntent().getData();
@@ -210,6 +216,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                             return true;
                         case R.id.bbn_color:
                             Toast.makeText(getBaseContext(), "color item", Toast.LENGTH_SHORT).show();
+                            createColorDialog();
                             return true;
                         case R.id.bbn_notific:
                             Intent alarmIntent = new Intent(getBaseContext(), AlarmSetActivity.class);
@@ -650,9 +657,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     if(mCurrentNoteUri != null) {
                         //загружаем изображения
                         String [] imageNamesMassive = imagesNames.split(" ");
-                        for (String anImageNamesMassive : imageNamesMassive) {
-                            ImageMy imageMy = new ImageMy(anImageNamesMassive, ImageStorage.getImageBitmap(anImageNamesMassive));
-                            images.add(imageMy);
+                        if ( imageNamesMassive[0] != "")   {
+                            for (String anImageNamesMassive : imageNamesMassive) {
+                                ImageMy imageMy = new ImageMy(anImageNamesMassive, ImageStorage.getImageBitmap(anImageNamesMassive));
+                                images.add(imageMy);
+                            }
                         }
                     }
                     Log.i(TAG, "onLoadFinished: " + cursor.toString());
@@ -747,6 +756,23 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mImagesAdapter.notifyDataSetChanged();
     }
 
+    void createColorDialog() {
+
+        int[] colors = new int[7];
+        colors[0] = ContextCompat.getColor(getApplicationContext(),R.color.defaultBackLight);
+        colors[1] = ContextCompat.getColor(getApplicationContext(),R.color.blueBackLight);
+        colors[2] = ContextCompat.getColor(getApplicationContext(),R.color.yellowBackLight);
+        colors[3] = ContextCompat.getColor(getApplicationContext(),R.color.orangeBackLight);
+        colors[4] = ContextCompat.getColor(getApplicationContext(),R.color.redBackLight);
+        colors[5] = ContextCompat.getColor(getApplicationContext(),R.color.greenBackLight);
+        colors[6] = ContextCompat.getColor(getApplicationContext(),R.color.purpleBackLight);
+        SimpleColorDialog.build()
+                .title("Select note color")
+                .allowCustom(false)
+                .colors(colors)
+                .show(this,COLOR_DILOG);
+    }
+
 
     /**
      * +     * Temporary helper method to display information in the onscreen TextView about the state of
@@ -789,7 +815,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
             // Iterate through all the returned rows in the cursor
             while (cursor.moveToNext()) {
-                // Use that index to extract the String or Int value of the word
+                // Use that  index to extract the String or Int value of the word
                 // at the current row the cursor is on.
                 int current_ID = cursor.getInt(_idColumnIndex);
                 int currentID = cursor.getInt(idColumnIndex);
@@ -806,5 +832,10 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             // resources and makes it invalid.
             cursor.close();
         }
+    }
+
+    @Override
+    public boolean onResult(@NonNull String dialogTag, int which, @NonNull Bundle extras) {
+        return false;
     }
 }
