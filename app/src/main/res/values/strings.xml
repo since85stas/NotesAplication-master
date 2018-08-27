@@ -54,7 +54,7 @@
     <string name="nav_photos">Photos</string>
     <string name="nav_set_password">Password</string>
     <string name="nav_notifications">Rate App</string>
-    <string name="nav_settings">Settings</string>
+    <string name="nav_settings">Rate an App</string>
     <string name="nav_about_us">About Us</string>
 
     <!-- Toolbar titles when navigation menu item is selected -->
@@ -80,6 +80,44 @@
     <string name="bottomImage">Image</string>
     <string name="bottomColr">Color</string>
     <string name="menuSave">save</string>
+    <string name="dialogTitle">Thx, for rating us!</string>
+    <string name="dialogMessage">If you like this app, please leave us a feedback</string>
+    <string name="dialogYes">Yes, rate now</string>
+    <string name="dialogNo">No, maybe later</string>
+    <string name="dialogYesthx">Thx</string>
+    <string name="dialogNoThx">Thx, for patience</string>
+    <string name="appMarketLink">market://details?id=com.batura.stas.atmosphere</string>
+
+    //licences
+    <string name="myLicense">
+        Copyright 2018 Stanislav Batura \n
+        Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at\n
+
+   http://www.apache.org/licenses/LICENSE-2.0\n
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License</string>
+
+    <string name="dexPermis">
+        Copyright (C) 2015 Thomas Bruyelle \n
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at\n
+
+   http://www.apache.org/licenses/LICENSE-2.0\n
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+    </string>
 
 
 </resources>

@@ -1,10 +1,10 @@
 /*
-* MainActivity.java
-*
-* version 1.1
-*
-* Автор Батура Стас 10.07.2018
-*/
+ * MainActivity.java
+ *
+ * version 1.1
+ *
+ * Автор Батура Стас 10.07.2018
+ */
 
 package com.batura.stas.notesaplication;
 
@@ -12,20 +12,18 @@ import android.Manifest;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.ContentUris;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -47,6 +45,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.batura.stas.notesaplication.Other.Password;
+import com.batura.stas.notesaplication.Other.PrivacyPolicyActivity;
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
 import com.jakewharton.rxbinding2.view.RxView;
@@ -71,6 +70,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String HAS_PASS = "hasPass";
     public static final String PASSWORD = "password";
     public static final String SORTED_BY = "sorted";
+    public static final String VELOCITY_SPINNER_MODE = "Mode"; // положение переключателя
+    public static final String NUMBER_OF_OPENS = "Opens"; // количество запусков приложения
+    public static final String IS_RATED = "Rated";       // прошли ли по ссылке в маркет
+    public static final int NUMBER_OPEN_NUM = 20;
+    public int mNumberOfOpens;
+    public int mRated;
 
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
@@ -93,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private View navHeader;
     private ImageView imgNavHeaderBg, imgProfile;
     private TextView txtName, txtWebsite;
-    Toolbar toolbar;
+    private Toolbar toolbar;
 
     private NoteDbHelper mDbHelper;
     private NoteCursorAdapter mCursorAdapter;
@@ -112,6 +117,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public final static String TYPE_CHECK = "chek";
     public final static String TYPE_SET = "set";
     public final static String TYPE_DEL = "del";
+
 
     @Override
     public boolean onSearchRequested(SearchEvent searchEvent) {
@@ -140,6 +146,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         editor.putBoolean(HAS_PASS, mHasPass);
         editor.putString(PASSWORD, mPass);
         editor.putString(SORTED_BY, mOrderByLoaderString);
+        //editor.putInt(VELOCITY_SPINNER_MODE, mMachSpinnerMode);
+        editor.putInt(NUMBER_OF_OPENS, mNumberOfOpens);
+        editor.putInt(IS_RATED, mRated);
         editor.apply();
     }
 
@@ -153,11 +162,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (mSettings.contains(SORTED_BY)) {
             mOrderByLoaderString = mSettings.getString(SORTED_BY, NoteContract.NoteEntry.COLUMN_NOTE_TIME);
         }
+        //mMachSpinnerMode = mSettings.getInt(VELOCITY_SPINNER_MODE,MACH_MODE);
+        mNumberOfOpens = mSettings.getInt(NUMBER_OF_OPENS, 1);
+        mRated = mSettings.getInt(IS_RATED, 0);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
+        getSupportLoaderManager().destroyLoader(NOTE_LOADER);
         saveSettings();
     }
 
@@ -176,6 +189,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mSettings = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         loadSettings();
 
+        if (mNumberOfOpens % NUMBER_OPEN_NUM == 0 && mRated != 1) {
+            MyDialogFragment myDialogFragment = new MyDialogFragment();
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+            myDialogFragment.show(transaction, "Dialog");
+
+        }
+
         if (mHasPass && !mPasswordCorrect) {
             Intent intent = new Intent(MainActivity.this, Password.class);
             //intent.putExtra(Password.PASS_OK_INTENT);
@@ -192,8 +213,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Locale locale = new Locale("en"); // задаем локаль, пока принудительно
         Locale.setDefault(locale);
         // определяем спинер для упорядочивания заметок
-            mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
-            setupOrderSpinner();
+        mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
+        setupOrderSpinner();
 
         disposable = RxView.clicks(findViewById(R.id.fab))
                 .compose(rxPermissions.ensureEach(Manifest.permission.WRITE_EXTERNAL_STORAGE))
@@ -260,7 +281,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             mSearchString = intent.getStringExtra(SearchManager.QUERY);
             //System.out.println(query);
         }
-
         getLoaderManager().initLoader(NOTE_LOADER, null, this);
 
     }
@@ -343,7 +363,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             startActivity(intent);
                         }
                         break;
-                    case R.id.nav_settings:
+                    case R.id.nav_rate:
+                        mRated = 1; //если прошли по ссылке то болье диалог не вылезает
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(getString(R.string.appMarketLink)));
+                        startActivity(intent);
                         navItemIndex = 4;
                         CURRENT_TAG = TAG_SETTINGS;
                         break;
@@ -354,8 +378,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         return true;
                     case R.id.nav_privacy_policy:
                         // launch new intent instead of loading fragment
-                        //startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
-                        drawer.closeDrawers();
+                        startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
                         return true;
                     default:
                         navItemIndex = 0;
@@ -446,22 +469,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onOptionsItemSelected(item);
     }
 
-//        private void insertNote() {
-//            SQLiteDatabase db = mDbHelper.getWritableDatabase();
-//            ContentValues values = new ContentValues();
-//            values.put(NoteContract.NoteEntry.COLUMN_NOTE_TITLE, "Test");
-//            values.put(NoteContract.NoteEntry.COLUMN_NOTE_BODY, "Test note");
-//            values.put(NoteContract.NoteEntry.COLUMN_NOTE_COLOR, 1);
-//            values.put(NoteContract.NoteEntry.COLUMN_NOTE_TIME, 7);
-//            // Insert a new row for Toto in the database, returning the ID of that new row.
-//            // The first argument for db.insert() is the pets table name.
-//            // The second argument provides the name of a column in which the framework
-//            // can insert NULL in the event that the ContentValues is empty (if
-//            // this is set to "null", then the framework will not insert a row when
-//            // there are no values).
-//            //Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI,values);
-//            long newRowId = db.insert(NoteContract.NoteEntry.IMAGE_TABLE_NAME, null, values);
-//        }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -559,5 +566,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
+    }
+
+    public void cancelClicked() {
+    }
+
+    public void okClicked() {
+        mRated = 1; //если прошли по ссылке то болье диалог не вылезает
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(getString(R.string.appMarketLink)));
+        startActivity(intent);
     }
 }

@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:id="@+id/layoutEditor"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layoutEditor"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_marginBottom="0dp">
+    android:layout_marginBottom="46dp"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,21 +15,21 @@
         <EditText
             android:id="@+id/noteTitleInput"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="@dimen/noteTitleHeight"
-            android:hint="@string/noteTitle"
-            android:paddingTop="@dimen/list_item_margin"
+            android:layout_weight="1"
             android:focusableInTouchMode="true"
+            android:hint="@string/noteTitle"
             android:paddingLeft="@dimen/activity_margin"
+            android:paddingTop="@dimen/list_item_margin"
+            android:textColor="#2B3D4D"
             android:textSize="16sp"
-            android:textStyle="bold"
-            android:textColor="#2B3D4D"/>
+            android:textStyle="bold" />
+
         <ImageSwitcher
             android:id="@+id/imageSwitcherFav"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/noteTitleHeight"
-            android:paddingEnd="16dp"
-            >
+            android:paddingEnd="16dp">
 
             <ImageView
                 android:id="@+id/imageStarOut"
@@ -38,59 +37,52 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:src="@drawable/outline_grade_black_36" />
+
             <ImageView
                 android:id="@+id/imageStarFill"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/baseline_grade_black_36"
                 android:layout_gravity="center"
-                />
+                android:src="@drawable/baseline_grade_black_36" />
         </ImageSwitcher>
+
         <Spinner
             android:id="@+id/colorSpinner"
             android:layout_width="150dp"
             android:layout_height="@dimen/noteTitleHeight"
-            android:spinnerMode="dropdown"
             android:paddingRight="@dimen/activity_margin"
-            android:visibility="gone">
-        </Spinner>
+            android:spinnerMode="dropdown"
+            android:visibility="gone"></Spinner>
     </LinearLayout>
 
-    <LinearLayout
+    <com.batura.stas.notesaplication.LinedEditText
+        android:id="@+id/noteTextInput"
         android:layout_width="match_parent"
         android:layout_height="250dp"
-        android:orientation="vertical">
-        <TextView
-            android:id="@+id/textViewTest1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:visibility="gone"/>
-        <com.batura.stas.notesaplication.LinedEditText
-            android:id="@+id/noteTextInput"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:textColor="#2B3D4D"
-            android:layout_gravity="top"
-            android:gravity="top"
-            android:hint="@string/noteHint"
-            android:textSize="16sp"
-            android:paddingBottom="8dp"
-            android:paddingLeft="16dp"
-            android:paddingRight="16dp"
-            android:paddingTop="8dp"
-            android:focusableInTouchMode="true"
-            />
+        android:layout_gravity="top"
+        android:focusableInTouchMode="true"
+        android:gravity="top"
+        android:hint="@string/noteHint"
+        android:paddingBottom="8dp"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:paddingTop="8dp"
+        android:textColor="#2B3D4D"
+        android:textSize="16sp" />
 
-    </LinearLayout>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@android:color/darker_gray" />
+
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/lay"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        tools:context=".MainActivity"
+
+        android:layout_height="120dp"
         android:orientation="vertical"
-        android:id="@+id/lay">
+        tools:context=".MainActivity">
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
@@ -101,8 +93,7 @@
                 android:id="@+id/recycler_view"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:scrollbars="vertical"
-                />
+                android:scrollbars="vertical" />
         </android.support.v4.widget.SwipeRefreshLayout>
     </LinearLayout>
 

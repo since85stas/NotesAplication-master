@@ -58,6 +58,11 @@
             android:name=".AlarmFuncs.AlarmReceiver"
             android:process=":remote"/>
 
+        <activity android:name=".Other.PrivacyPolicyActivity"
+            android:label="Privacy Policy"
+            android:theme="@style/AppTheme">
+        </activity>
+
         <provider
             android:name=".data.NoteProvider"
             android:authorities="com.batura.stas.notesaplication"

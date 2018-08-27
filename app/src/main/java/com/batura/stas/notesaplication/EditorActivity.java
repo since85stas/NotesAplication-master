@@ -663,6 +663,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         titleText.setBackgroundColor(ContextCompat.getColor(getBaseContext(),colorBackLight));
         mImageSwitcher.setBackgroundColor(ContextCompat.getColor(getBaseContext(),colorBackLight));
         recyclerView.setBackgroundColor(ContextCompat.getColor(getBaseContext(),colorBackLight));
+        LinearLayout editorLay = findViewById(R.id.layoutEditor);
+        editorLay.setBackgroundColor(ContextCompat.getColor(getBaseContext(),colorBackLight));
     }
 
     @Override
@@ -782,60 +784,60 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
      * +     * the pets database.
      * +
      */
-    private void displayDatabaseInfo() {
-        // To access our database, we instantiate our subclass of SQLiteOpenHelper
-        // and pass the context, which is the current activity.
-        // Create and/or open a database to read from it
-
-        // Perform this raw SQL query "SELECT * FROM pets"
-        // to get a Cursor that contains all rows from the pets table.
-        Cursor cursor = mImageDb.rawQuery("SELECT * FROM " + NoteContract.NoteEntry.IMAGE_TABLE_NAME, null);
-
-        try {
-            // Display the number of rows in the Cursor (which reflects the number of rows in the
-            // pets table in the database).
-            // Create a header in the Text View that looks like this:
-            //
-            // The pets table contains <number of rows in Cursor> pets.
-            // _id - name - breed - gender - weight
-            //
-            // In the while loop below, iterate through the rows of the cursor and display
-            // the information from each column in this order.
-            TextView displayView = findViewById(R.id.textViewTest1);
-            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
-            displayView.append(NoteContract.NoteEntry.NOTE_ID + " - " +
-                    NoteContract.NoteEntry.IMAGE_NAME_01 + " - " +
-                    NoteContract.NoteEntry.IMAGE_NAME_02 + " - " +
-                    NoteContract.NoteEntry.IMAGE_NAME_03 + " - " +
-                     "\n");
-
-            // Figure out the index of each column
-            int _idColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
-            int idColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.NOTE_ID);
-            int image1NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_01);
-            int image2NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_02);
-            int image3NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_03);
-
-            // Iterate through all the returned rows in the cursor
-            while (cursor.moveToNext()) {
-                // Use that  index to extract the String or Int value of the word
-                // at the current row the cursor is on.
-                int current_ID = cursor.getInt(_idColumnIndex);
-                int currentID = cursor.getInt(idColumnIndex);
-                String currentName1 = cursor.getString(image1NameColumnIndex);
-                String currentName2 = cursor.getString(image2NameColumnIndex);
-                String currentName3 = cursor.getString(image3NameColumnIndex);
-                displayView.append(current_ID + " - " +
-                        currentName1 + " - " +
-                        + currentID +
-                        "\n");
-            }
-        } finally {
-            // Always close the cursor when you're done reading from it. This releases all its
-            // resources and makes it invalid.
-            cursor.close();
-        }
-    }
+//    private void displayDatabaseInfo() {
+//        // To access our database, we instantiate our subclass of SQLiteOpenHelper
+//        // and pass the context, which is the current activity.
+//        // Create and/or open a database to read from it
+//
+//        // Perform this raw SQL query "SELECT * FROM pets"
+//        // to get a Cursor that contains all rows from the pets table.
+//        Cursor cursor = mImageDb.rawQuery("SELECT * FROM " + NoteContract.NoteEntry.IMAGE_TABLE_NAME, null);
+//
+//        try {
+//            // Display the number of rows in the Cursor (which reflects the number of rows in the
+//            // pets table in the database).
+//            // Create a header in the Text View that looks like this:
+//            //
+//            // The pets table contains <number of rows in Cursor> pets.
+//            // _id - name - breed - gender - weight
+//            //
+//            // In the while loop below, iterate through the rows of the cursor and display
+//            // the information from each column in this order.
+//            TextView displayView = findViewById(R.id.textViewTest1);
+//            displayView.setText("The pets table contains " + cursor.getCount() + " pets.\n\n");
+//            displayView.append(NoteContract.NoteEntry.NOTE_ID + " - " +
+//                    NoteContract.NoteEntry.IMAGE_NAME_01 + " - " +
+//                    NoteContract.NoteEntry.IMAGE_NAME_02 + " - " +
+//                    NoteContract.NoteEntry.IMAGE_NAME_03 + " - " +
+//                     "\n");
+//
+//            // Figure out the index of each column
+//            int _idColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
+//            int idColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.NOTE_ID);
+//            int image1NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_01);
+//            int image2NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_02);
+//            int image3NameColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_03);
+//
+//            // Iterate through all the returned rows in the cursor
+//            while (cursor.moveToNext()) {
+//                // Use that  index to extract the String or Int value of the word
+//                // at the current row the cursor is on.
+//                int current_ID = cursor.getInt(_idColumnIndex);
+//                int currentID = cursor.getInt(idColumnIndex);
+//                String currentName1 = cursor.getString(image1NameColumnIndex);
+//                String currentName2 = cursor.getString(image2NameColumnIndex);
+//                String currentName3 = cursor.getString(image3NameColumnIndex);
+//                displayView.append(current_ID + " - " +
+//                        currentName1 + " - " +
+//                        + currentID +
+//                        "\n");
+//            }
+//        } finally {
+//            // Always close the cursor when you're done reading from it. This releases all its
+//            // resources and makes it invalid.
+//            cursor.close();
+//        }
+//    }
 
     @Override
     public boolean onResult(@NonNull String dialogTag, int which, @NonNull Bundle extras) {

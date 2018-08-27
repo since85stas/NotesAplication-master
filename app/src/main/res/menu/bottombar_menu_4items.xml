@@ -9,7 +9,7 @@
     <item
         android:id="@+id/bbn_image"
         android:color="@color/colorPrimary"
-        android:icon="@drawable/ic_photo_library_black_24dp"
+        android:icon="@drawable/outline_add_photo_alternate_white_24"
         android:title="@string/bottomImage"
         app:showAsAction="ifRoom"/>
     <item
@@ -17,9 +17,7 @@
         android:color="@android:color/holo_green_dark"
         android:icon="@drawable/baseline_color_lens_black_24"
         android:title="@string/bottomColr"
-        app:showAsAction="ifRoom"
-        />
-
+        app:showAsAction="ifRoom"    />
     <item
         android:id="@+id/bbn_notific"
         android:color="@android:color/holo_orange_dark"
@@ -29,9 +27,8 @@
     <item
         android:id="@+id/bbn_sett"
         android:color="#FF5252"
-        android:icon="@android:drawable/ic_menu_delete"
+        android:icon="@drawable/outline_delete_forever_white_24"
         android:title="@string/bottomDelete"
-        app:showAsAction="ifRoom"
-        />
+        app:showAsAction="ifRoom"        />
 
 </menu>
