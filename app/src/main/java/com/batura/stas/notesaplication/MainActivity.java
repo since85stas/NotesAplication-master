@@ -349,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     case R.id.nav_photos:
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_PHOTOS;
-                        Toast.makeText(getBaseContext(), "Sorry this chapter is in developing", Toast.LENGTH_SHORT);
+                        Toast.makeText(getBaseContext(), R.string.photoToast,Toast.LENGTH_SHORT).show();
                         break;
                     case R.id.nav_set_pass:
                         navItemIndex = 3;
@@ -420,6 +420,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
     }
+
 
     @Override
     public void onBackPressed() {
