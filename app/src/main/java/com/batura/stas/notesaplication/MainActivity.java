@@ -274,6 +274,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        //toolbar.setBackgroundColor(getResources().getColor(R.color.actionBarColor));
 
         // Navigation view header
         navHeader = navigationView.getHeaderView(0);
@@ -299,22 +300,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
      */
     private void loadNavHeader() {
         // name, website
-        txtName.setText("Ravi Tamada");
-        txtWebsite.setText("www.androidhive.info");
+        txtName.setText("Stanislav Batura");
+        txtWebsite.setText("stanislav.batura85@gmail.com");
 
-        // loading header background image
-//        Glide.with(this).load(urlNavHeaderBg)
-//                .crossFade()
-//                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                .into(imgNavHeaderBg);
-//
-//        // Loading profile image
-//        Glide.with(this).load(urlProfileImg)
-//                .crossFade()
-//                .thumbnail(0.5f)
-//                .bitmapTransform(new CircleTransform(this))
-//                .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                .into(imgProfile);
+        //imgNavHeaderBg.setImageResource(R.drawable.before_cookie);
+        imgNavHeaderBg.setImageResource(R.drawable.drawer_back);
+        imgProfile.setImageResource(R.drawable.cat_portrait_cute_animal);
 
         // showing dot next to notifications label
         navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
@@ -333,10 +324,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     case R.id.nav_home:
                         navItemIndex = 0;
                         CURRENT_TAG = TAG_HOME;
+                        drawer.closeDrawers();
                         break;
                     case R.id.nav_photos:
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_PHOTOS;
+                        Toast.makeText(getBaseContext(),"Sorry this chapter is in developing",Toast.LENGTH_SHORT);
                         break;
                     case R.id.nav_set_pass:
                         navItemIndex = 3;

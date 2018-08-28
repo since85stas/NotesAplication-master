@@ -1,5 +1,7 @@
 package com.batura.stas.notesaplication.Static;
 
+import android.support.v4.content.ContextCompat;
+
 import com.batura.stas.notesaplication.R;
 import com.batura.stas.notesaplication.data.NoteContract;
 
@@ -127,4 +129,34 @@ public final class NoteUtils {
         }
         return position;
     }
+
+    public static int getColorIdByPosit (int colorPos) {
+        int colorId = 0;
+        switch (colorPos) {
+            case 0:
+                colorId = NoteContract.NoteEntry.COLOR_DEFAULT;
+                break;
+            case 1:
+                colorId = NoteContract.NoteEntry.COLOR_RED;
+                break;
+            case 2:
+                colorId = NoteContract.NoteEntry.COLOR_ORANGE;
+                break;
+            case 3:
+                colorId = NoteContract.NoteEntry.COLOR_YELLOW;
+                break;
+            case 4:
+                colorId = NoteContract.NoteEntry.COLOR_GREEN;
+                break;
+            case 5:
+                colorId = NoteContract.NoteEntry.COLOR_BLUE;
+                break;
+            case 6:
+                colorId = NoteContract.NoteEntry.COLOR_PURPLE;
+                break;
+        }
+        return colorId;
+    }
+
+
 }

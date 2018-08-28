@@ -2,15 +2,13 @@
 <resources>
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorAccent">#ff1744</color>
     <!-- Text color for the details -->
-    <color name="textColorLight">#B4BAC0</color>
+    <color name="textColorLight">#29302E</color>
     <!-- Text color for the primary text-->
-    <color name="textColorPrimary">#2B3D4D</color>
+    <color name="textColorPrimary">#356859</color>
 
-    <color name="backMainDefaultColor">#BDBDBD</color>
-
-
+    <color name="backMainDefaultColor">#FFFBE6</color>
 
     <!--  colors for different backgrounds item list view-->
     <color name="defaultBack">#EEEEEE</color>
@@ -40,5 +38,8 @@
     <color name="purpleBack">#CE93D8</color>
     <color name="purpleBackAccent">#AB47BC</color>
     <color name="purpleBackLight">#E1BEE7</color>
+
+    <color name="actionBarColor">#795548</color>
+    <color name="actionBarDarkColor">#5D4037</color>
 
 </resources>

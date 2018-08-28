@@ -5,7 +5,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginBottom="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -21,11 +22,14 @@
             android:paddingTop="@dimen/list_item_margin"
             android:focusableInTouchMode="true"
             android:paddingLeft="@dimen/activity_margin"
-            android:textSize="20sp"/>
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#2B3D4D"/>
         <ImageSwitcher
             android:id="@+id/imageSwitcherFav"
             android:layout_width="wrap_content"
             android:layout_height="@dimen/noteTitleHeight"
+            android:paddingEnd="16dp"
             >
 
             <ImageView
@@ -54,7 +58,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"
+        android:layout_height="250dp"
         android:orientation="vertical">
         <TextView
             android:id="@+id/textViewTest1"
@@ -65,12 +69,12 @@
         <com.batura.stas.notesaplication.LinedEditText
             android:id="@+id/noteTextInput"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-
+            android:layout_height="300dp"
+            android:textColor="#2B3D4D"
             android:layout_gravity="top"
             android:gravity="top"
             android:hint="@string/noteHint"
+            android:textSize="16sp"
             android:paddingBottom="8dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
@@ -80,10 +84,10 @@
 
     </LinearLayout>
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         tools:context=".MainActivity"
         android:orientation="vertical"
         android:id="@+id/lay">
@@ -91,16 +95,15 @@
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/swipe_refresh_layout"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/recycler_view"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:scrollbars="vertical"
                 />
         </android.support.v4.widget.SwipeRefreshLayout>
-
     </LinearLayout>
 
 </LinearLayout>

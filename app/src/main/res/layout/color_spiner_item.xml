@@ -1,6 +1,6 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/color_spin_item_id"
-    style="?android:attr/spinnerItemStyle"
+    style="@style/spinnerStyle"
     android:singleLine="true"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

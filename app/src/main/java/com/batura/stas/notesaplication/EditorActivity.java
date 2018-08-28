@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -39,6 +40,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.batura.stas.notesaplication.AlarmFuncs.AlarmSetActivity;
 import com.batura.stas.notesaplication.ImageFuncs.DividerItemDecoration;
@@ -70,7 +72,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private final static int NOTE_LOADER_IMAGES = 11;
     private final static int NOTIFIC_ANSWER = 0;
     private static final int REQUEST_GALLERY = 100; // запрос для галереи
-    private final static String COLOR_DILOG = "colorDilog";
+    private final static String COLOR_DIALOG = "colorDilog";
 
     private EditText mTitleTextView;
     private LinedEditText mBodyTextView;
@@ -95,6 +97,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private RecyclerView recyclerView;
     private ImagesAdapter mImagesAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
+    //private Toolbar toolbar;
+
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -129,11 +133,14 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor_full);
 
-        LinearLayout linearLayout = findViewById(R.id.layoutEditor);
-        linearLayout.requestFocus();
+
+
+        //getSupportActionBar()
+        //        .setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.actionBarColor)));
 
         BottomNavigationView bottomNavigation = findViewById(R.id.navigation);
 //        bottomNavigation.text
+        bottomNavigation.setBackgroundColor(getResources().getColor(R.color.actionBarColor));
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         mCurrentNoteUri = getIntent().getData();
@@ -156,14 +163,12 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
 
         mTitleTextView = (EditText) findViewById(R.id.noteTitleInput);
+
         mBodyTextView = findViewById(R.id.noteTextInput);
         //mBodyTextView = new LinedEditText(this,null,19);
-        mColorSpinner = (Spinner) findViewById(R.id.colorSpinner);
+        //mColorSpinner = (Spinner) findViewById(R.id.colorSpinner);
         mTime = System.currentTimeMillis();
         mImageSwitcher = (ImageSwitcher) findViewById(R.id.imageSwitcherFav);
-
-        //mImageSwitcher.setImageResource(mFavImagId[mFav]);
-        //mImageSwitcher.chil
 
         mImageSwitcher.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -183,10 +188,11 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mTitleTextView.setOnTouchListener(mTouchListener);
         mBodyTextView.setOnTouchListener(mTouchListener);
 
-        setupSpinner();
+        //setupSpinner();
 
         //определяем recycle view для фото
         recyclerView = findViewById(R.id.recycler_view);
+
         mImagesAdapter = new ImagesAdapter(this,images,this);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext(),LinearLayoutManager.HORIZONTAL,true);
@@ -198,7 +204,21 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
         mDbHelper = new NoteDbHelper(this);
         mImageDb = mDbHelper.getReadableDatabase();
+
+        LinearLayout linearLayout = findViewById(R.id.layoutEditor);
+        linearLayout.requestFocus();
         //displayDatabaseInfo();
+//        mTitleTextView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View view, boolean b) {
+//                if (hasWindowFocus()) {
+//                    recyclerView.setVisibility(View.GONE);
+//                }
+//                else {
+//                    recyclerView.setVisibility(View.VISIBLE);
+//                }
+//            }
+//        });
 
     }
 
@@ -642,6 +662,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     //mBodyTextView.setBackgroundColor(ContextCompat.getColor(getBaseContext(), colorBackLight));
                     //mWeightEditText.setText(Integer.toString(weight));
                     mColorSpinner.setSelection(NoteUtils.getColorPosisById(colorId));
+                    mColor = colorId;
                     mBodyTextView.setColorId(colorId);
                 }
                 break;
@@ -757,22 +778,41 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     void createColorDialog() {
-
         int[] colors = new int[7];
         colors[0] = ContextCompat.getColor(getApplicationContext(),R.color.defaultBackLight);
-        colors[1] = ContextCompat.getColor(getApplicationContext(),R.color.blueBackLight);
-        colors[2] = ContextCompat.getColor(getApplicationContext(),R.color.yellowBackLight);
-        colors[3] = ContextCompat.getColor(getApplicationContext(),R.color.orangeBackLight);
-        colors[4] = ContextCompat.getColor(getApplicationContext(),R.color.redBackLight);
-        colors[5] = ContextCompat.getColor(getApplicationContext(),R.color.greenBackLight);
+        colors[5] = ContextCompat.getColor(getApplicationContext(),R.color.blueBackLight);
+        colors[3] = ContextCompat.getColor(getApplicationContext(),R.color.yellowBackLight);
+        colors[2] = ContextCompat.getColor(getApplicationContext(),R.color.orangeBackLight);
+        colors[1] = ContextCompat.getColor(getApplicationContext(),R.color.redBackLight);
+        colors[4] = ContextCompat.getColor(getApplicationContext(),R.color.greenBackLight);
         colors[6] = ContextCompat.getColor(getApplicationContext(),R.color.purpleBackLight);
         SimpleColorDialog.build()
                 .title("Select note color")
                 .allowCustom(false)
                 .colors(colors)
-                .show(this,COLOR_DILOG);
+                .show(this,COLOR_DIALOG);
     }
 
+    public int getColorIdByRcolor (int colorR) {
+        int colorId;
+        int iColor = 0;
+        int[] colors = new int[7];
+        colors[0] = ContextCompat.getColor(getApplicationContext(),R.color.defaultBackLight);
+        colors[5] = ContextCompat.getColor(getApplicationContext(),R.color.blueBackLight);
+        colors[3] = ContextCompat.getColor(getApplicationContext(),R.color.yellowBackLight);
+        colors[2] = ContextCompat.getColor(getApplicationContext(),R.color.orangeBackLight);
+        colors[1] = ContextCompat.getColor(getApplicationContext(),R.color.redBackLight);
+        colors[4] = ContextCompat.getColor(getApplicationContext(),R.color.greenBackLight);
+        colors[6] = ContextCompat.getColor(getApplicationContext(),R.color.purpleBackLight);
+        for (int i = 0; i <colors.length ; i++) {
+            if (colors[i] == colorR) {
+                break;
+            }
+            iColor ++;
+        }
+        colorId =NoteUtils.getColorIdByPosit(iColor);
+        return colorId;
+    }
 
     /**
      * +     * Temporary helper method to display information in the onscreen TextView about the state of
@@ -836,6 +876,21 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public boolean onResult(@NonNull String dialogTag, int which, @NonNull Bundle extras) {
+        Log.i("ttt", "onResult: ");
+        if (which == BUTTON_POSITIVE) {
+            switch (dialogTag) {
+                case COLOR_DIALOG:
+                    int[] colors = extras.getIntArray(SimpleColorDialog.COLORS);
+                    Toast.makeText(this, "ttttttt", Toast.LENGTH_LONG);
+                    //setEditorViewColor(colors[0]);
+
+                    if (colors != null) {
+                        mColor = getColorIdByRcolor(colors[0]);
+                    }
+                    Log.i(TAG, "onResult: ");
+                    setEditorViewColor(mColor);
+            }
+        }
         return false;
     }
 }

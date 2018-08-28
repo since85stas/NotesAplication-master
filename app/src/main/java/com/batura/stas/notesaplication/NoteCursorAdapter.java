@@ -3,7 +3,10 @@ package com.batura.stas.notesaplication;
 import android.content.Context;
 import android.content.res.Resources;
 import android.database.Cursor;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -70,8 +73,13 @@ public class NoteCursorAdapter extends CursorAdapter {
         TextView bodyTextView = (TextView) view.findViewById(R.id.bodyItem);
         TextView dateTextView = (TextView) view.findViewById(R.id.date);
         TextView timeTextView = (TextView) view.findViewById(R.id.time);
+
         ImageView favorImageView =(ImageView) view.findViewById(R.id.favNoteImag);
+        favorImageView.setColorFilter(R.color.textColorPrimary);
         ImageView notifImageView = (ImageView)view.findViewById(R.id.notificNoteImag);
+        notifImageView.setColorFilter(R.color.textColorPrimary);
+        ImageView photoImageView = view.findViewById(R.id.imageNoteImag);
+        photoImageView.setColorFilter(R.color.textColorPrimary);
 
         int idIColoumnIndex  =  cursor.getColumnIndex(NoteContract.NoteEntry._ID);
         int titleColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE);
@@ -80,6 +88,7 @@ public class NoteCursorAdapter extends CursorAdapter {
         int colorColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
         int favColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
         int notifColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_WIDGET);
+        int imageColoumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_IMAGE);
 
         String noteTitle = cursor.getString(titleColoumnIndex);
         String noteBody = cursor.getString(bodyColoumnIndex);
@@ -88,6 +97,7 @@ public class NoteCursorAdapter extends CursorAdapter {
         int noteColor = cursor.getInt(colorColoumnIndex);
         int noteIsFavor = cursor.getInt(favColoumnIndex);
         int noteNotifIsOn = cursor.getInt(notifColoumnIndex);
+        int hasImages = cursor.getInt(imageColoumnIndex);
 
         Log.i(TAG, "bindView: _id " + noteId  );
 //        Log.i(TAG, "bindView: noteBody " + noteBody );
@@ -96,12 +106,12 @@ public class NoteCursorAdapter extends CursorAdapter {
 //        Log.i(TAG, "bindView: noteNotifIsOn " + noteNotifIsOn );
 
         if (noteTitle.length() == 0 || noteTitle == null) {
-            titleTextView.setText("No title");
+            titleTextView.setText("...");
         } else {
             titleTextView.setText(noteTitle);
         }
         if (noteBody.length() == 0 || noteBody == null) {
-            bodyTextView.setText("No text");
+            bodyTextView.setText("...");
         } else {
             bodyTextView.setText(noteBody);
         }
@@ -122,11 +132,14 @@ public class NoteCursorAdapter extends CursorAdapter {
         view.setBackgroundColor(ContextCompat.getColor(context, color));
         // favorite
         if (noteIsFavor != 1) {
-            favorImageView.setVisibility(View.INVISIBLE);
+            favorImageView.setVisibility(View.GONE);
         }
         //notif
         if (noteNotifIsOn != 1) {
-            notifImageView.setVisibility(View.INVISIBLE);
+            notifImageView.setVisibility(View.GONE);
+        }
+        if (hasImages <= 0) {
+            photoImageView.setVisibility(View.GONE);
         }
 //        else {
 //            notifImageView.setImageResource(R.drawable.baseline_grade_black_18);

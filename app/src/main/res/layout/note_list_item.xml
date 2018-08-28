@@ -3,7 +3,7 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="64dp"
     android:orientation="horizontal"
     android:paddingLeft="@dimen/activity_margin"
     android:paddingRight="@dimen/activity_margin"
@@ -23,9 +23,10 @@
             android:fontFamily="sans-serif-medium"
             android:textAppearance="?android:textAppearanceMedium"
             android:textColor="#2B3D4D"
-            android:textSize="14dp"
+            android:textSize="16dp"
             android:text="title"
-            android:maxLines="1"/>
+            android:maxLines="1"
+            android:textStyle="bold"/>
 
         <TextView
             android:id="@+id/bodyItem"
@@ -33,7 +34,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:textAppearance="?android:textAppearanceSmall"
-            android:textColor="#AEB6BD"
+            android:textColor="#2B3D4D"
             android:textSize="16dp"
             android:text="body"
             android:maxLines="1"/>
@@ -45,6 +46,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:src="@drawable/outline_grade_black_18"
+
             />
         <ImageView
             android:id="@+id/notificNoteImag"
@@ -53,6 +55,13 @@
             android:layout_gravity="center"
             android:src="@drawable/baseline_notifications_active_black_18"
             />
+    <ImageView
+        android:id="@+id/imageNoteImag"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_gravity="center"
+        android:src="@drawable/ic_photo_library_black_24dp"
+        />
 
 
     <LinearLayout
