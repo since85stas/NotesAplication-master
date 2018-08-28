@@ -10,13 +10,13 @@
         android:id="@+id/bbn_image"
         android:color="@color/colorPrimary"
         android:icon="@drawable/ic_photo_library_black_24dp"
-        android:title="Image"
+        android:title="@string/bottomImage"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/bbn_color"
         android:color="@android:color/holo_green_dark"
         android:icon="@drawable/baseline_color_lens_black_24"
-        android:title="Color"
+        android:title="@string/bottomColr"
         app:showAsAction="ifRoom"
         />
 
@@ -24,13 +24,13 @@
         android:id="@+id/bbn_notific"
         android:color="@android:color/holo_orange_dark"
         android:icon="@drawable/baseline_notifications_active_black_24"
-        android:title="Notification"
+        android:title="@string/bottomNotification"
         app:showAsAction="ifRoom"/>
     <item
         android:id="@+id/bbn_sett"
         android:color="#FF5252"
-        android:icon="@drawable/ic_settings_black_24dp"
-        android:title="Settings"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/bottomDelete"
         app:showAsAction="ifRoom"
         />
 

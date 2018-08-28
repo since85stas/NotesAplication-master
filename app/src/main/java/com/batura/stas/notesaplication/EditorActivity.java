@@ -83,7 +83,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private boolean mNotificIsOn = false;
     private Uri mCurrentNoteUri;
     private Uri mCurrentNoteImagesUri;
-    private Spinner mColorSpinner;
+    //private Spinner mColorSpinner;
     private ImageSwitcher mImageSwitcher;
     private ShareActionProvider mShareActionProvider ;
     private final int[] mFavImagId = {R.id.imageStarOut,R.id.imageStarFill};
@@ -245,6 +245,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                             Toast.makeText(getBaseContext(), "notif item", Toast.LENGTH_SHORT).show();
                             return true;
                         case R.id.bbn_sett:
+                            showDeleteConfirmationDialog();
                             Toast.makeText(getBaseContext(), "sett item", Toast.LENGTH_SHORT).show();
                             return true;
                     }
@@ -360,10 +361,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                 saveNote();
                 finish();
                 return true;
-            // Respond to a click on the "Delete" menu option
-            case R.id.action_delete:
-                showDeleteConfirmationDialog();
-                return true;
             // Respond to a click on the "Up" arrow button in the app bar
             case android.R.id.home:
                 // If the pet hasn't changed, continue with navigating up to parent activity
@@ -390,43 +387,9 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             case R.id.action_share:
                 //Log.v(LOG_TAG,"12121212");
                 return true;
-            case R.id.action_alarm:
-                Intent alarmIntent = new Intent(getBaseContext(), AlarmSetActivity.class);
-                alarmIntent.putExtra(AlarmSetActivity.NOTE_BODY,mBodyTextView.getText().toString());
-                startActivityForResult(alarmIntent,NOTIFIC_ANSWER);
-                return true;
-            case R.id.action_add_image:
-                // запускаем Галерею
-                Intent intent = new Intent(Intent.ACTION_PICK,
-                        android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-                startActivityForResult(intent, REQUEST_GALLERY);
-                return true;
-            case R.id.action_add_image_database:
-                insertImageDb();
-                return true;
-
          }
         return super.onOptionsItemSelected(item);
     }
-
-        private void insertImageDb() {
-            mDbHelper = new NoteDbHelper(this);
-            mImageDb = mDbHelper.getWritableDatabase();
-            ContentValues values = new ContentValues();
-            values.put(NoteContract.NoteEntry.NOTE_ID, 2);
-            values.put(NoteContract.NoteEntry.IMAGE_NAME_01, "Test image 1");
-            values.put(NoteContract.NoteEntry.IMAGE_NAME_02, "Test image 2");
-            values.put(NoteContract.NoteEntry.IMAGE_NAME_03, "Test image 3");
-            // Insert a new row for Toto in the database, returning the ID of that new row.
-            // The first argument for db.insert() is the pets table name.
-            // The second argument provides the name of a column in which the framework
-            // can insert NULL in the event that the ContentValues is empty (if
-            // this is set to "null", then the framework will not insert a row when
-            // there are no values).
-            //Uri newUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI,values);
-            long newRowId = mImageDb.insert(NoteContract.NoteEntry.IMAGE_TABLE_NAME, null, values);
-            //displayDatabaseInfo();
-        }
 
 
     @Override
@@ -661,7 +624,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     int colorBackLight = NoteUtils.getBackColorLight(colorId);
                     //mBodyTextView.setBackgroundColor(ContextCompat.getColor(getBaseContext(), colorBackLight));
                     //mWeightEditText.setText(Integer.toString(weight));
-                    mColorSpinner.setSelection(NoteUtils.getColorPosisById(colorId));
+                    //mColorSpinner.setSelection(NoteUtils.getColorPosisById(colorId));
                     mColor = colorId;
                     mBodyTextView.setColorId(colorId);
                 }
@@ -669,8 +632,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             case (NOTE_LOADER_IMAGES):
                 if (cursor.moveToFirst()) {
                     int image01colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_01);
-                    int image02colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_02);
-                    int image03colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_03);
+//                    int image02colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_02);
+//                    int image03colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_03);
                     int noteIdColomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
 
                     String imagesNames = cursor.getString(image01colomnIndex);
@@ -714,50 +677,50 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     /**
      * Setup the dropdown spinner that allows the user to select the gender of the pet.
      */
-    private void setupSpinner() {
-        // Create adapter for spinner. The list options are from the String array it will use
-        // the spinner will use the default layout
-
-        int[] colorId = {665,666,667,668,669,670,671};
-        SpinnerColorAdapter myAdapter = new  SpinnerColorAdapter (EditorActivity.this,
-                R.layout.color_dropdown_item , getResources().getStringArray(R.array.color_array_string),colorId);
-
-        // Apply the adapter to the spinner
-        mColorSpinner.setAdapter(myAdapter);
-
-        // Set the integer mSelected to the constant values
-        mColorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selection = (String) parent.getItemAtPosition(position);
-                if (!TextUtils.isEmpty(selection)) {
-                    if (selection.equals(getString(R.string.color_default))) {
-                        mColor = 665;
-                    } else if (selection.equals(getString(R.string.color_red))) {
-                        mColor = NoteContract.NoteEntry.COLOR_RED;
-                    } else if (selection.equals(getString(R.string.color_orange))) {
-                        mColor = NoteContract.NoteEntry.COLOR_ORANGE;
-                    } else if (selection.equals(getString(R.string.color_yellow))) {
-                        mColor = NoteContract.NoteEntry.COLOR_YELLOW;
-                    } else if (selection.equals(getString(R.string.color_green))) {
-                        mColor = NoteContract.NoteEntry.COLOR_GREEN;
-                    } else if (selection.equals(getString(R.string.color_blue))) {
-                        mColor = NoteContract.NoteEntry.COLOR_BLUE;
-                    } else if (selection.equals(getString(R.string.color_purple))) {
-                        mColor = NoteContract.NoteEntry.COLOR_PURPLE;
-                    } else {
-                        Log.e(TAG, "Wrong color spinner value");
-                    }
-                }
-            }
-
-            // Because AdapterView is an abstract class, onNothingSelected must be defined
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                mColor = 665; // default
-            }
-        });
-    }
+//    private void setupSpinner() {
+//        // Create adapter for spinner. The list options are from the String array it will use
+//        // the spinner will use the default layout
+//
+//        int[] colorId = {665,666,667,668,669,670,671};
+//        SpinnerColorAdapter myAdapter = new  SpinnerColorAdapter (EditorActivity.this,
+//                R.layout.color_dropdown_item , getResources().getStringArray(R.array.color_array_string),colorId);
+//
+//        // Apply the adapter to the spinner
+//        mColorSpinner.setAdapter(myAdapter);
+//
+//        // Set the integer mSelected to the constant values
+//        mColorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+//            @Override
+//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+//                String selection = (String) parent.getItemAtPosition(position);
+//                if (!TextUtils.isEmpty(selection)) {
+//                    if (selection.equals(getString(R.string.color_default))) {
+//                        mColor = 665;
+//                    } else if (selection.equals(getString(R.string.color_red))) {
+//                        mColor = NoteContract.NoteEntry.COLOR_RED;
+//                    } else if (selection.equals(getString(R.string.color_orange))) {
+//                        mColor = NoteContract.NoteEntry.COLOR_ORANGE;
+//                    } else if (selection.equals(getString(R.string.color_yellow))) {
+//                        mColor = NoteContract.NoteEntry.COLOR_YELLOW;
+//                    } else if (selection.equals(getString(R.string.color_green))) {
+//                        mColor = NoteContract.NoteEntry.COLOR_GREEN;
+//                    } else if (selection.equals(getString(R.string.color_blue))) {
+//                        mColor = NoteContract.NoteEntry.COLOR_BLUE;
+//                    } else if (selection.equals(getString(R.string.color_purple))) {
+//                        mColor = NoteContract.NoteEntry.COLOR_PURPLE;
+//                    } else {
+//                        Log.e(TAG, "Wrong color spinner value");
+//                    }
+//                }
+//            }
+//
+//            // Because AdapterView is an abstract class, onNothingSelected must be defined
+//            @Override
+//            public void onNothingSelected(AdapterView<?> parent) {
+//                mColor = 665; // default
+//            }
+//        });
+//    }
 
     @Override
     public void onImageClicked(int position) {

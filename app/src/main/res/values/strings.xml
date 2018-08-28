@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">NotesAplication</string>
+    <string name="app_name">GoodNotes</string>
     <string name="action_settings">Settings</string>
     <string name="noteTitle">Title</string>
 
@@ -72,6 +72,14 @@
     <string name="action_logout">Logout</string>
     <string name="action_mark_all_read">Mark All as Read</string>
     <string name="privacy_policy">Privacy Policy</string>
+    <string name="notificTitle">Notification</string>
+    <string name="notificInfo">Form GoodNotes!</string>
+    <string name="notifTicker">Hi</string>
+    <string name="bottomDelete">Settings</string>
+    <string name="bottomNotification">Notification</string>
+    <string name="bottomImage">Image</string>
+    <string name="bottomColr">Color</string>
+    <string name="menuSave">save</string>
 
 
 </resources>

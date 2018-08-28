@@ -6,7 +6,7 @@
     <!-- Text color for the details -->
     <color name="textColorLight">#29302E</color>
     <!-- Text color for the primary text-->
-    <color name="textColorPrimary">#356859</color>
+    <color name="textColorPrimary">#2B3D4D</color>
 
     <color name="backMainDefaultColor">#FFFBE6</color>
 

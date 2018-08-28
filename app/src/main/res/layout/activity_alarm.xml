@@ -2,45 +2,54 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    style="@style/spinnerStyle"
+    android:background="@color/backMainDefaultColor">
 
     <Button
         android:id="@+id/buttonShowDatePickDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/set_date" />
+        android:text="@string/set_date"
+        style="@style/spinnerStyle"/>
 
     <TextView
         android:id="@+id/textViewSetDate"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        style="@style/spinnerStyle"/>
 
     <Button
         android:id="@+id/buttonShowTimePickDialog"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/set_time" />
+        android:text="@string/set_time"
+        style="@style/spinnerStyle"/>
 
     <TextView
         android:id="@+id/textViewSetTime"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        style="@style/spinnerStyle"/>
 
     <Button
         android:id="@+id/buttonSetAlarm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/set_notification"/>
+        android:text="@string/set_notification"
+        style="@style/spinnerStyle"/>
 
     <Button
         android:id="@+id/buttonCancel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/cancel_alarm"/>
+        android:text="@string/cancel_alarm"
+        style="@style/spinnerStyle"/>
 
     <TextView
         android:id="@+id/textViewAlarmPrompt"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        style="@style/spinnerStyle"/>
 
 </LinearLayout>

@@ -36,6 +36,8 @@
         android:text="Hello World!"
         android:divider="@color/backMainDefaultColor"
         android:dividerHeight="4dp"
+        android:paddingLeft="6dp"
+        android:paddingRight="6dp"
  />
 
 </LinearLayout>

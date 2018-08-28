@@ -52,8 +52,8 @@ public class AlarmReceiver extends BroadcastReceiver {
                 intent, 0);
 
         builder.setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle("Notification").setContentText(notifText)
-                .setContentInfo("Накорми кота!").setTicker("Голодный котик")
+                .setContentTitle(context.getString(R.string.notificTitle)).setContentText(notifText)
+                .setContentInfo(context.getString(R.string.notificInfo)).setTicker(context.getString(R.string.notifTicker))
                 .setLights(0xFFFF0000, 500, 500)
                 .setContentIntent(pendingIntent).setAutoCancel(true);
 

@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private SharedPreferences mSettings;
     private boolean mHasPass;
-    private String  mPass = "";
+    private String mPass = "";
     private boolean mPasswordCorrect;
     public final static String PASS_INTENT_TYPE = MainActivity.class.getPackage() + ".passIntentType";
     public final static String TYPE_CHECK = "chek";
@@ -128,30 +128,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == PASS_OK) {
             if (resultCode == RESULT_OK) {
-                mPasswordCorrect = data.getBooleanExtra(Password.PASS_OK_INTENT,false);
+                mPasswordCorrect = data.getBooleanExtra(Password.PASS_OK_INTENT, false);
             } else {
                 finish();
             }
         }
     }
 
-    private void saveSettings () {
+    private void saveSettings() {
         SharedPreferences.Editor editor = mSettings.edit();
-        editor.putBoolean(HAS_PASS,mHasPass);
-        editor.putString(PASSWORD,mPass);
-        editor.putString(SORTED_BY,mOrderByLoaderString);
+        editor.putBoolean(HAS_PASS, mHasPass);
+        editor.putString(PASSWORD, mPass);
+        editor.putString(SORTED_BY, mOrderByLoaderString);
         editor.apply();
     }
 
     private void loadSettings() {
         if (mSettings.contains(HAS_PASS)) {
-            mHasPass = mSettings.getBoolean(HAS_PASS,false);
+            mHasPass = mSettings.getBoolean(HAS_PASS, false);
         }
         if (mSettings.contains(PASSWORD) && mHasPass) {
-            mPass = mSettings.getString(PASSWORD,"1");
+            mPass = mSettings.getString(PASSWORD, "1");
         }
-        if (mSettings.contains(SORTED_BY) ) {
-            mOrderByLoaderString = mSettings.getString(SORTED_BY,NoteContract.NoteEntry.COLUMN_NOTE_TIME);
+        if (mSettings.contains(SORTED_BY)) {
+            mOrderByLoaderString = mSettings.getString(SORTED_BY, NoteContract.NoteEntry.COLUMN_NOTE_TIME);
         }
     }
 
@@ -179,90 +179,90 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (mHasPass && !mPasswordCorrect) {
             Intent intent = new Intent(MainActivity.this, Password.class);
             //intent.putExtra(Password.PASS_OK_INTENT);
-            intent.putExtra(PASS_INTENT_TYPE,TYPE_CHECK);
-            startActivityForResult(intent,PASS_OK);
+            intent.putExtra(PASS_INTENT_TYPE, TYPE_CHECK);
+            startActivityForResult(intent, PASS_OK);
         }
 
-            RxPermissions rxPermissions = new RxPermissions(this);
-            rxPermissions.setLogging(true);
-            setContentView(R.layout.activity_main);
+        RxPermissions rxPermissions = new RxPermissions(this);
+        rxPermissions.setLogging(true);
+        setContentView(R.layout.activity_main);
 
-            setupNavigationDraver();
+        setupNavigationDraver();
 
-            Locale locale = new Locale("en"); // задаем локаль, пока принудительно
-            Locale.setDefault(locale);
-            // определяем спинер для упорядочивания заметок
+        Locale locale = new Locale("en"); // задаем локаль, пока принудительно
+        Locale.setDefault(locale);
+        // определяем спинер для упорядочивания заметок
             mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
             setupOrderSpinner();
 
-            disposable = RxView.clicks(findViewById(R.id.fab))
-                    .compose(rxPermissions.ensureEach(Manifest.permission.WRITE_EXTERNAL_STORAGE))
-                    .subscribe(new Consumer<Permission>() {
-                                   public void accept(Permission permission) {
-                                       Log.i(TAG, "Permission result " + permission);
-                                       if (permission.granted) {
-                                           Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                                           startActivity(intent);
-                                           Log.i(TAG, "Permission for storage granted");
+        disposable = RxView.clicks(findViewById(R.id.fab))
+                .compose(rxPermissions.ensureEach(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+                .subscribe(new Consumer<Permission>() {
+                               public void accept(Permission permission) {
+                                   Log.i(TAG, "Permission result " + permission);
+                                   if (permission.granted) {
+                                       Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                       startActivity(intent);
+                                       Log.i(TAG, "Permission for storage granted");
 
-                                       } else if (permission.shouldShowRequestPermissionRationale) {
-                                           // Denied permission without ask never again
-                                           Toast.makeText(MainActivity.this,
-                                                   "Denied permission without ask never again",
-                                                   Toast.LENGTH_SHORT).show();
-                                           Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                                           startActivity(intent);
-                                       } else {
-                                           // Denied permission with ask never again
-                                           // Need to go to the settings
-                                           Toast.makeText(MainActivity.this,
-                                                   "Permission denied, can't load images",
-                                                   Toast.LENGTH_SHORT).show();
-                                           Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                                           startActivity(intent);
-                                       }
+                                   } else if (permission.shouldShowRequestPermissionRationale) {
+                                       // Denied permission without ask never again
+                                       Toast.makeText(MainActivity.this,
+                                               "Denied permission without ask never again",
+                                               Toast.LENGTH_SHORT).show();
+                                       Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                       startActivity(intent);
+                                   } else {
+                                       // Denied permission with ask never again
+                                       // Need to go to the settings
+                                       Toast.makeText(MainActivity.this,
+                                               "Permission denied, can't load images",
+                                               Toast.LENGTH_SHORT).show();
+                                       Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                       startActivity(intent);
                                    }
-                               },
-                            new Consumer<Throwable>() {
-                                @Override
-                                public void accept(Throwable t) {
-                                    Log.e(TAG, "onError", t);
-                                }
-                            },
-                            new Action() {
-                                @Override
-                                public void run() {
-                                    Log.i(TAG, "OnComplete");
-                                }
-                            });
+                               }
+                           },
+                        new Consumer<Throwable>() {
+                            @Override
+                            public void accept(Throwable t) {
+                                Log.e(TAG, "onError", t);
+                            }
+                        },
+                        new Action() {
+                            @Override
+                            public void run() {
+                                Log.i(TAG, "OnComplete");
+                            }
+                        });
 
         /* задаем listView для списка заметок
          * проверяем изменолись ли данные
          * при нажатии на заметку вызывается редактирование заметки класс EditorAcrtivity
          */
-            ListView noteListView = (ListView) findViewById(R.id.list);
-            mCursorAdapter = new NoteCursorAdapter(this, null);
-            noteListView.setAdapter(mCursorAdapter);
-            mCursorAdapter.notifyDataSetChanged();
-            noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
-                    Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                    Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, id);
-                    intent.setData(currentPetUri);
-                    startActivity(intent);
-                }
-            });
-
-            // вызываем намерение на поиск выражения в тексте заметки
-            Intent intent = getIntent();
-            if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-                mSearchString = intent.getStringExtra(SearchManager.QUERY);
-                //System.out.println(query);
+        ListView noteListView = (ListView) findViewById(R.id.list);
+        mCursorAdapter = new NoteCursorAdapter(this, null);
+        noteListView.setAdapter(mCursorAdapter);
+        mCursorAdapter.notifyDataSetChanged();
+        noteListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, id);
+                intent.setData(currentPetUri);
+                startActivity(intent);
             }
+        });
 
-            getLoaderManager().initLoader(NOTE_LOADER, null, this);
-        
+        // вызываем намерение на поиск выражения в тексте заметки
+        Intent intent = getIntent();
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            mSearchString = intent.getStringExtra(SearchManager.QUERY);
+            //System.out.println(query);
+        }
+
+        getLoaderManager().initLoader(NOTE_LOADER, null, this);
+
     }
 
     private void setupNavigationDraver() {
@@ -329,7 +329,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     case R.id.nav_photos:
                         navItemIndex = 1;
                         CURRENT_TAG = TAG_PHOTOS;
-                        Toast.makeText(getBaseContext(),"Sorry this chapter is in developing",Toast.LENGTH_SHORT);
+                        Toast.makeText(getBaseContext(), "Sorry this chapter is in developing", Toast.LENGTH_SHORT);
                         break;
                     case R.id.nav_set_pass:
                         navItemIndex = 3;
