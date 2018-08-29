@@ -7,7 +7,7 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@mipmap/ic_launcher"
+        android:icon="@drawable/note_icon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -37,7 +37,7 @@
         </activity>
 
         <activity android:name=".Other.Password"
-            android:label="@string/set_notification"
+            android:label="@string/setPin"
             android:theme="@style/Theme.AppCompat.Dialog">
         </activity>
 

@@ -39,7 +39,7 @@
     <string name="set_time">Set time</string>
     <string name="cancel_alarm">Cancel alarm</string>
     <string name="alarm_on">Alarm is on</string>
-    <string name="set_notification">Set notification</string>
+    <string name="set_notification">Set PIN CODE</string>
     <string name="set_date">Set date</string>
     <string name="action_delete">delete</string>
     <string name="action_add_image">Add image</string>
@@ -101,9 +101,11 @@ Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
-limitations under the License</string>
+limitations under the License\n\n External libraries:\n\n
+    </string>
 
     <string name="dexPermis">
+        RxPermissions \n
         Copyright (C) 2015 Thomas Bruyelle \n
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -118,6 +120,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
     </string>
+    <string name="dialogPermis">
+        SimpleDialogFragments\n
+        Copyright 2018 Philipp Niedermayer (github.com/eltos)\n
+        Licensed under the Apache License 2.0\n
+        You may only use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+        the Software in compliance with the License.\n
+        For more information visit http://www.apache.org/licenses/LICENSE-2.0
+
+        </string>
+
+
+    <string name="enter_a_pin">Enter a 4 digit PIN</string>
+    <string name="repeat_pin">Repeat PIN</string>
+    <string name="delletePass">Enter current PIN, and press OK to delete password</string>
+    <string name="setPin">Set PIN</string>
 
 
 </resources>

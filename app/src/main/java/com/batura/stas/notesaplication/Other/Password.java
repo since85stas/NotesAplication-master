@@ -3,6 +3,7 @@ package com.batura.stas.notesaplication.Other;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -15,13 +16,22 @@ import com.batura.stas.notesaplication.MainActivity;
 import com.batura.stas.notesaplication.R;
 import com.batura.stas.notesaplication.data.NoteContract;
 
+import eltos.simpledialogfragment.SimpleDialog.OnDialogResultListener;
+import eltos.simpledialogfragment.color.SimpleColorDialog;
+import eltos.simpledialogfragment.form.SimpleFormDialog;
+import eltos.simpledialogfragment.input.SimplePinDialog;
+
 /**
  * Created by seeyo on 20.08.2018.
  */
 
-public class Password extends AppCompatActivity {
+public class Password extends AppCompatActivity implements OnDialogResultListener {
 
-    public static final String PASS_OK_INTENT = Password.class.getPackage() + ".passOk";
+    public static final String PASS_OK_INTENT = Password.class.getPackage() + ".passOk" ;
+
+    private static final String PIN = "pin";
+    private static final String PIN_TAG = "pin_tag";
+
 
     //preferences keys
     // Sharedpref file name
@@ -77,7 +87,7 @@ public class Password extends AppCompatActivity {
     private void delPassword() {
         setContentView(R.layout.password_activity);
         TextView textView = findViewById(R.id.passTitle);
-        textView.setText("Enter current password, and press Ok to delete password");
+        textView.setText(R.string.delletePass);
         final EditText passwordText = findViewById(R.id.passwordText);
         final EditText confirmPass = findViewById(R.id.passwordTextConfirm);
         confirmPass.setVisibility(View.GONE);
@@ -116,10 +126,11 @@ public class Password extends AppCompatActivity {
             public void onClick(View v) {
                 String passEnter = passwordText.getText().toString();
                 String passConfirm = confirmPass.getText().toString();
-                if (passEnter.equals(passConfirm)) {
+                if (passEnter.equals(passConfirm) && passEnter.length() == 4) {
                     Toast.makeText(Password.this,
                             "Password is set",
                             Toast.LENGTH_SHORT).show();
+
                     mHasPass = true;
                     mPass = passConfirm;
                     saveSettings();
@@ -135,32 +146,63 @@ public class Password extends AppCompatActivity {
     }
 
     private void checkPassword() {
-        setContentView(R.layout.password_activity);
 
-        final EditText passwordText = findViewById(R.id.passwordText);
-        EditText confirmPass = findViewById(R.id.passwordTextConfirm);
-        confirmPass.setVisibility(View.GONE);
-        Button ok = findViewById(R.id.ok);
-        ok.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String passEnter = passwordText.getText().toString();
-                if (passEnter.equals(mPass)) {
+        //setContentView(R.layout.password_activity);
+
+//        SimpleFormDialog.buildPinCodeInput(PIN,4)
+//                .show(this,SimplePinDialog.TAG);
+
+        SimplePinDialog.build()
+                .pin(mPass)
+                //.length(6)
+                .show(this);
+
+//        final EditText passwordText = findViewById(R.id.passwordText);
+//        EditText confirmPass = findViewById(R.id.passwordTextConfirm);
+//        confirmPass.setVisibility(View.GONE);
+//        Button ok = findViewById(R.id.ok);
+//        ok.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                String passEnter = passwordText.getText().toString();
+//                if (passEnter.equals(mPass)) {
+//                    Toast.makeText(Password.this,
+//                            "Password is Ok",
+//                            Toast.LENGTH_SHORT).show();
+//                    Intent answIntent = new Intent(Password.this,MainActivity.class);
+//                    answIntent.putExtra(PASS_OK_INTENT, true);
+//                    setResult(RESULT_OK, answIntent); // отвечаем что напоминание установлено
+//                    //startActi);
+//                    finish();
+//                } else {
+//                    Toast.makeText(Password.this,
+//                            "Wrong password, ENTER another password",
+//                            Toast.LENGTH_LONG).show();
+//                }
+//
+//            }
+//        });
+    }
+
+    @Override
+    public boolean onResult(@NonNull String dialogTag, int which, @NonNull Bundle extras) {
+
+        if (which == BUTTON_POSITIVE) {
+            switch (dialogTag) {
+                case SimplePinDialog.TAG: /** {@link MainActivity#showPinInput(View)} **/
+                    String pin = extras.getString(SimplePinDialog.PIN);
+                    //Toast.makeText(this, pin, Toast.LENGTH_SHORT).show();
                     Toast.makeText(Password.this,
-                            "Password is Ok",
+                            "PIN is Ok",
                             Toast.LENGTH_SHORT).show();
                     Intent answIntent = new Intent(Password.this,MainActivity.class);
                     answIntent.putExtra(PASS_OK_INTENT, true);
-                    setResult(RESULT_OK, answIntent); // отвечаем что напоминание установлено
-                    //startActi);
+                    setResult(RESULT_OK, answIntent);
+                    //startActivity(answIntent);
                     finish();
-                } else {
-                    Toast.makeText(Password.this,
-                            "Wrong password, ENTER another password",
-                            Toast.LENGTH_LONG).show();
+                    return true;
                 }
-
             }
-        });
+        return false;
     }
 }

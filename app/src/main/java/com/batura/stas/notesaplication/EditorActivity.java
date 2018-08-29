@@ -97,8 +97,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private RecyclerView recyclerView;
     private ImagesAdapter mImagesAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
-    //private Toolbar toolbar;
-
 
     private View.OnTouchListener mTouchListener = new View.OnTouchListener() {
         @Override
@@ -132,8 +130,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor_full);
-
-
 
         //getSupportActionBar()
         //        .setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.actionBarColor)));

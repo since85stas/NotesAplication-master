@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.batura.stas.notesaplication.Static.NoteUtils;
@@ -129,7 +130,9 @@ public class NoteCursorAdapter extends CursorAdapter {
 
         // set back ground color for note list item
         int color = NoteUtils.getBackColor(noteColor);
-        view.setBackgroundColor(ContextCompat.getColor(context, color));
+        LinearLayout itemLin = view.findViewById(R.id.noteItemLinear);
+        itemLin.setBackgroundColor(ContextCompat.getColor(context, color));
+
         // favorite
         if (noteIsFavor != 1) {
             favorImageView.setVisibility(View.GONE);

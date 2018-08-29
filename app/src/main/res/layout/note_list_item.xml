@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- Layout for a single list item in the list of pets -->
 <LinearLayout
+
+    android:id="@+id/noteItemLinear"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="64dp"
     android:orientation="horizontal"
     android:paddingLeft="@dimen/activity_margin"
     android:paddingRight="@dimen/activity_margin"
+    android:background="@drawable/shadow_black"
+
+    android:paddingBottom="5px"
+    android:paddingTop="5px"
      >
 
     <LinearLayout
