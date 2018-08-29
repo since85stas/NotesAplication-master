@@ -26,6 +26,12 @@
             android:text="@string/dexPermis"
             android:padding="8dp"
             />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="@string/dialogPermis"
+            android:padding="8dp"
+            />
 
     </LinearLayout>
 </ScrollView>

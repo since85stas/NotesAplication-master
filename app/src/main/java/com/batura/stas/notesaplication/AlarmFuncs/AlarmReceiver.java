@@ -1,11 +1,13 @@
 package com.batura.stas.notesaplication.AlarmFuncs;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.widget.Toast;
 
 import com.batura.stas.notesaplication.EditorActivity;
@@ -45,7 +47,25 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         NotificationManager notificationManager = (NotificationManager) context
                 .getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+        String channelId = "default_channel_id";
+        String channelDescription = "Default Channel";
+//Check if notification channel exists and if not create one
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = notificationManager.getNotificationChannel(channelId);
+            if (notificationChannel == null) {
+                int importance = NotificationManager.IMPORTANCE_HIGH;
+                notificationChannel = new NotificationChannel(channelId, channelDescription, importance);
+                notificationChannel.setLightColor(Color.GREEN);
+                notificationChannel.enableVibration(true);
+                notificationManager.createNotificationChannel(notificationChannel);
+            }
+        }
         Notification.Builder builder = new Notification.Builder(context);
+
+//notificationManager.notify as usual
+
 
         Intent intent = new Intent(context, EditorActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
@@ -55,6 +75,7 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setContentTitle(context.getString(R.string.notificTitle)).setContentText(notifText)
                 .setContentInfo(context.getString(R.string.notificInfo)).setTicker(context.getString(R.string.notifTicker))
                 .setLights(0xFFFF0000, 500, 500)
+                //.setChannelId(id)
                 .setContentIntent(pendingIntent).setAutoCancel(true);
 
         Notification notification = builder.build();

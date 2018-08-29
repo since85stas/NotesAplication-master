@@ -347,6 +347,9 @@ public class NoteProvider extends ContentProvider {
                 // Delete a single row given by the ID in the URI
                 selection = NoteContract.NoteEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+
+
+
                 rowsDeleted = database.delete(NoteContract.NoteEntry.NOTES_TABLE_NAME, selection, selectionArgs);
 
                 //удаляем соотвествующие записи о фотографиях

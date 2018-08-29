@@ -18,6 +18,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -46,6 +47,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.batura.stas.notesaplication.ImageFuncs.ImageMy;
+import com.batura.stas.notesaplication.ImageFuncs.ImageStorage;
+import com.batura.stas.notesaplication.Other.AboutActivity;
 import com.batura.stas.notesaplication.Other.Password;
 import com.batura.stas.notesaplication.Other.PrivacyPolicyActivity;
 import com.batura.stas.notesaplication.data.NoteContract;
@@ -54,6 +58,7 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.net.URI;
 import java.util.Locale;
 
 import io.reactivex.disposables.Disposable;
@@ -75,7 +80,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final String ORDER_SPINNER_MODE = "Mode"; // положение переключателя
     public static final String NUMBER_OF_OPENS = "Opens"; // количество запусков приложения
     public static final String IS_RATED = "Rated";       // прошли ли по ссылке в маркет
-    public static final int NUMBER_OPEN_NUM = 20;
+    public static final int NUMBER_OPEN_NUM = 5;
     public int mNumberOfOpens;
     public int mRated;
     public int mSortBySpinner = 0;
@@ -174,41 +179,108 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onResume() {
         super.onResume();
+        //CursorAdapter.r;
         loadSettings();
+        //onCreate();
         Log.i(TAG, "onResume: ");
+    }
+
+    @Override
+    protected void onStop() {
+        mNumberOfOpens++;  // после закрытия кол запусков увел на 1
+        saveSettings();
+        super.onStop();
     }
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_contex_menu,menu);
+        inflater.inflate(R.menu.main_contex_menu, menu);
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-       AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        // Get readable database
+        mDbHelper = new NoteDbHelper(getBaseContext());
+        SQLiteDatabase database = mDbHelper.getReadableDatabase();
+
+        // This cursor will hold the result of the query
+        Cursor cursor = null;
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         switch (item.getItemId()) {
             case R.id.contex_edit:
                 Toast.makeText(MainActivity.this,
                         "Edit",
                         Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                        Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, info.position);
-                        intent.setData(currentPetUri);
-                        startActivity(intent);
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, info.id);
+                intent.setData(currentPetUri);
+                startActivity(intent);
                 //editElement(info.position);
                 return true;
             case R.id.contex_delete:
                 Toast.makeText(MainActivity.this,
                         "Delete",
                         Toast.LENGTH_SHORT).show();
-                //deleteElement(info.position);
+                Uri currentDelPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, info.id);
+// For every "?" in the selection, we need to have an element in the selection
+                // arguments that will fill in the "?". Since we have 1 question mark in the
+                // selection, we have 1 String in the selection arguments' String array.
+                String[] projection = new String[]{
+                        NoteContract.NoteEntry.IMAGE_NAME_01,
+                        NoteContract.NoteEntry._ID
+                };
+                String selection = NoteContract.NoteEntry._ID + "=?";
+                String[] selectionArgs = new String[]{String.valueOf(ContentUris.parseId(currentDelPetUri))};
+                cursor = database.query(NoteContract.NoteEntry.IMAGE_TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, null);
+                if (cursor.moveToFirst()) {
+                    int image01colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_01);
+                    String imagesNames = cursor.getString(image01colomnIndex);
+                    String[] imageNamesMassive = imagesNames.split(" ");
+                    if (imageNamesMassive[0] != "") {
+                        for (String anImageNamesMassive : imageNamesMassive) {
+                            ImageStorage.deleteFromSd(anImageNamesMassive);
+                        }
+                    }
+                    //deleteElement(info.position);
+                    Log.i(TAG, "onContextItemSelected: " + imagesNames);
+                }
+                cursor.close();
+
+                // удаляем заметку
+                deleteNote(currentDelPetUri);
                 return true;
             default:
                 return super.onContextItemSelected(item);
         }
 
+    }
+
+    /**
+     * Perform the deletion of the note in the database.
+     * @param uri
+     */
+    private void deleteNote(Uri uri) {
+        // Only perform the delete if this is an existing pet.
+        if (uri != null) {
+            // Call the ContentResolver to delete the pet at the given content URI.
+            // Pass in null for the selection and selection args because the mCurrentPetUri
+            // content URI already identifies the pet that we want.
+            int rowsDeleted = getContentResolver().delete(uri, null, null);
+            // Show a toast message depending on whether or not the delete was successful.
+            if (rowsDeleted == 0) {
+                // If no rows were deleted, then there was an error with the delete.
+                Toast.makeText(this, getString(R.string.editor_delete_pet_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the delete was successful and we can display a toast.
+                Toast.makeText(this, getString(R.string.editor_delete_pet_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
+        }
+        //finish();
     }
 
     @Override
@@ -316,6 +388,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
+
+
     private void setupNavigationDraver() {
 
         Handler handler = new Handler();
@@ -377,11 +451,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         CURRENT_TAG = TAG_HOME;
                         drawer.closeDrawers();
                         break;
-                    case R.id.nav_photos:
-                        navItemIndex = 1;
-                        CURRENT_TAG = TAG_PHOTOS;
-                        Toast.makeText(getBaseContext(), R.string.photoToast,Toast.LENGTH_SHORT).show();
-                        break;
+//                    case R.id.nav_photos:
+//                        navItemIndex = 1;
+//                        CURRENT_TAG = TAG_PHOTOS;
+//                        Toast.makeText(getBaseContext(), R.string.photoToast,Toast.LENGTH_SHORT).show();
+//                        break;
                     case R.id.nav_set_pass:
                         navItemIndex = 3;
                         if (!mHasPass) {
@@ -404,7 +478,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         break;
                     case R.id.nav_about_us:
                         // launch new intent instead of loading fragment
-                        //startActivity(new Intent(MainActivity.this, AboutUsActivity.class));
+                        startActivity(new Intent(MainActivity.this, AboutActivity.class));
                         drawer.closeDrawers();
                         return true;
                     case R.id.nav_privacy_policy:
@@ -566,7 +640,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ArrayAdapter<?> adapter =
                 ArrayAdapter.createFromResource(this, R.array.order_by_string_drop, R.layout.order_spinner_item);
         adapter.setDropDownViewResource(R.layout.order_spinner_dropdown_item);
-        
+
         // Вызываем адаптер
         mOrderBySpinner.setAdapter(adapter);
         mOrderBySpinner.setSelection(getSpinnerPosition());
@@ -596,13 +670,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         });
 
     }
-    
-    private int getSpinnerPosition(){
+
+    private int getSpinnerPosition() {
         int spinnerPos = 0;
-        if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_TIME ) {
+        if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_TIME) {
             spinnerPos = 0;
         } else if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_COLOR) {
-            spinnerPos = 1;;
+            spinnerPos = 1;
+            ;
         } else if (mOrderByLoaderString == NoteContract.NoteEntry._ID) {
             spinnerPos = 2;
         } else if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_TITLE) {

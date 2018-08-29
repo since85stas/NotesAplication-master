@@ -41,4 +41,6 @@ dependencies {
     compile 'it.sephiroth.android.library.bottomnavigation:bottom-navigation:2.0.1-rc1'
 
     compile 'com.github.eltos:simpledialogfragment:3.0'
+
+    implementation 'com.google.android.gms:play-services-ads:15.0.1'
 }

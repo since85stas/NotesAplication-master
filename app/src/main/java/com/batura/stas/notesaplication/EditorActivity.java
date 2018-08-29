@@ -234,7 +234,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                             return true;
                         case R.id.bbn_notific:
                             Intent alarmIntent = new Intent(getBaseContext(), AlarmSetActivity.class);
-                            alarmIntent.putExtra(AlarmSetActivity.NOTE_BODY,mBodyTextView.getText().toString());
+                            String text = mBodyTextView.getText().toString();
+                            alarmIntent.putExtra(AlarmSetActivity.NOTE_BODY,text);
                             startActivityForResult(alarmIntent,NOTIFIC_ANSWER);
                             Toast.makeText(getBaseContext(), "notif item", Toast.LENGTH_SHORT).show();
                             return true;
@@ -746,7 +747,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         colors[4] = ContextCompat.getColor(getApplicationContext(),R.color.greenBackLight);
         colors[6] = ContextCompat.getColor(getApplicationContext(),R.color.purpleBackLight);
         SimpleColorDialog.build()
-                .title("Select note color")
+                .title(R.string.colorDilogTitle)
                 .allowCustom(false)
                 .colors(colors)
                 .show(this,COLOR_DIALOG);

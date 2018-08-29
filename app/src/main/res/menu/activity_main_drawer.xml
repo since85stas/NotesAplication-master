@@ -8,11 +8,6 @@
             android:title="@string/nav_home" />
 
         <item
-            android:id="@+id/nav_photos"
-            android:icon="@drawable/ic_photo_library_black_24dp"
-            android:title="@string/nav_photos" />
-
-        <item
             android:id="@+id/nav_set_pass"
             android:icon="@drawable/baseline_lock_black_24"
             android:title="@string/nav_set_password" />
@@ -23,7 +18,7 @@
             android:title="@string/nav_settings" />
     </group>
 
-    <item android:title="Other">
+    <item android:title="@string/drawOther">
         <menu>
             <item
                 android:id="@+id/nav_about_us"

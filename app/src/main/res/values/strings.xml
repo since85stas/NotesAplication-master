@@ -30,16 +30,16 @@
 
     // order by spinner
     <string name="order_by">Order by</string>
-    <string name="order_date">date</string>
-    <string name="order_number">number</string>
-    <string name="order_color">color</string>
-    <string name="order_favourite">favorite</string>
-    <string name="order_title">title</string>
-    <string name="order_note">alphabet</string>
+    <string name="order_date">Date</string>
+    <string name="order_number">Number</string>
+    <string name="order_color">Color</string>
+    <string name="order_favourite">Favorite</string>
+    <string name="order_title">Title</string>
+    <string name="order_note">Alphabet</string>
     <string name="set_time">Set time</string>
     <string name="cancel_alarm">Cancel alarm</string>
     <string name="alarm_on">Alarm is on</string>
-    <string name="set_notification">Set PIN CODE</string>
+    <string name="set_notification">Set notification</string>
     <string name="set_date">Set date</string>
     <string name="action_delete">delete</string>
     <string name="action_add_image">Add image</string>
@@ -137,5 +137,20 @@ limitations under the License.
     <string name="setPin">Set PIN</string>
     <string name="photoToast">Sorry this chapter is in developing</string>
 
+
+    <string name="about">A simple notepad where you can easily record a note or save a photo.
+
+Features:\n
+* Best notes full free application\n
+* Offline notepad where you can easily write thoughts without using the internet.\n
+* Notepad with protection. You can protect your notes with a password.\n
+* Adjust the color of your text for notes or entries in the diary.\n
+* Share your notes with other applications.
+* Check spelling in all your notes.
+* An unincorporated notepad.
+* Easy application that loads instantly.
+* Free diary and notepad for smartphones on android.</string>
+    <string name="drawOther">Other</string>
+    <string name="colorDilogTitle">Select note color</string>
 
 </resources>

@@ -136,6 +136,8 @@ limitations under the License.
     <string name="delletePass">Введите существующий ПИН, и нажмите OK для удаления пароля</string>
     <string name="setPin">Введите ПИН</string>
     <string name="photoToast">Sorry this chapter is in developing</string>
+    <string name="drawOther">Другое</string>
+    <string name="colorDilogTitle">Выберите цвет для  заметки</string>
 
 
 </resources>
