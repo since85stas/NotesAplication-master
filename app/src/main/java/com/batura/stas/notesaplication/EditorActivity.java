@@ -184,8 +184,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         mTitleTextView.setOnTouchListener(mTouchListener);
         mBodyTextView.setOnTouchListener(mTouchListener);
 
-        //setupSpinner();
-
         //определяем recycle view для фото
         recyclerView = findViewById(R.id.recycler_view);
 

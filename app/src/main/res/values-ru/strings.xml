@@ -54,16 +54,16 @@
     <string name="nav_photos">Фото</string>
     <string name="nav_set_password">Пароль</string>
     <string name="nav_notifications">Оценить приложение</string>
-    <string name="nav_settings">Rate an App</string>
+    <string name="nav_settings">Оценить приложение</string>
     <string name="nav_about_us">О приложении</string>
 
     <!-- Toolbar titles when navigation menu item is selected -->
     <string-array name="nav_item_activity_titles">
-        <item>Notes</item>
-        <item>Photos</item>
-        <item>Set password</item>
-        <item>Rate App</item>
-        <item>Settings</item>
+        <item>Заметки</item>
+        <item>Фото</item>
+        <item>Установить пароль</item>
+        <item>Оценить приложение</item>
+        <item>Настройки</item>
     </string-array>
 
     <string name="activity_title_about_us">О приложении</string>
@@ -71,21 +71,21 @@
     <string name="action_clear_all">Clear All</string>
     <string name="action_logout">Logout</string>
     <string name="action_mark_all_read">Mark All as Read</string>
-    <string name="privacy_policy">Privacy Policy</string>
-    <string name="notificTitle">Notification</string>
-    <string name="notificInfo">Form GoodNotes!</string>
-    <string name="notifTicker">Hi</string>
-    <string name="bottomDelete">Settings</string>
-    <string name="bottomNotification">Notification</string>
-    <string name="bottomImage">Image</string>
-    <string name="bottomColr">Color</string>
-    <string name="menuSave">save</string>
-    <string name="dialogTitle">Thx, for rating us!</string>
-    <string name="dialogMessage">If you like this app, please leave us a feedback</string>
-    <string name="dialogYes">Yes, rate now</string>
-    <string name="dialogNo">No, maybe later</string>
-    <string name="dialogYesthx">Thx</string>
-    <string name="dialogNoThx">Thx, for patience</string>
+    <string name="privacy_policy">Лицензия</string>
+    <string name="notificTitle">Напоминание</string>
+    <string name="notificInfo">От GoodNotes!</string>
+    <string name="notifTicker">Привет</string>
+    <string name="bottomDelete">Удалить</string>
+    <string name="bottomNotification">Напоминание</string>
+    <string name="bottomImage">Фото</string>
+    <string name="bottomColr">Цвет</string>
+    <string name="menuSave">сохранить</string>
+    <string name="dialogTitle">Спасибо за оценку!</string>
+    <string name="dialogMessage">Если вам нравится приложениеб пожалуйста, оставьте отзыв</string>
+    <string name="dialogYes">Оценить</string>
+    <string name="dialogNo">Нет, может быть позже</string>
+    <string name="dialogYesthx">Спасибо</string>
+    <string name="dialogNoThx">Спасибо, за терпение</string>
     <string name="appMarketLink">market://details?id=com.batura.stas.atmosphere</string>
 
     //licences
@@ -131,10 +131,10 @@ limitations under the License.
         </string>
 
 
-    <string name="enter_a_pin">Enter a 4 digit PIN</string>
-    <string name="repeat_pin">Repeat PIN</string>
-    <string name="delletePass">Enter current PIN, and press OK to delete password</string>
-    <string name="setPin">Set PIN</string>
+    <string name="enter_a_pin">Введите 4 значный ПИН</string>
+    <string name="repeat_pin">Повторите ПИН</string>
+    <string name="delletePass">Введите существующий ПИН, и нажмите OK для удаления пароля</string>
+    <string name="setPin">Введите ПИН</string>
     <string name="photoToast">Sorry this chapter is in developing</string>
 
 

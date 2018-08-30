@@ -31,6 +31,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuInflater;
 import android.view.SearchEvent;
 import android.view.View;
 import android.view.Menu;
@@ -70,28 +72,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String HAS_PASS = "hasPass";
     public static final String PASSWORD = "password";
     public static final String SORTED_BY = "sorted";
-    public static final String VELOCITY_SPINNER_MODE = "Mode"; // положение переключателя
+    public static final String ORDER_SPINNER_MODE = "Mode"; // положение переключателя
     public static final String NUMBER_OF_OPENS = "Opens"; // количество запусков приложения
     public static final String IS_RATED = "Rated";       // прошли ли по ссылке в маркет
     public static final int NUMBER_OPEN_NUM = 20;
     public int mNumberOfOpens;
     public int mRated;
+    public int mSortBySpinner = 0;
 
     // tags used to attach the fragments
     private static final String TAG_HOME = "home";
     private static final String TAG_PHOTOS = "photos";
-    private static final String TAG_MOVIES = "movies";
     private static final String TAG_NOTIFICATIONS = "notifications";
     private static final String TAG_SETTINGS = "settings";
     public static String CURRENT_TAG = TAG_HOME;
-    // toolbar titles respected to selected nav menu item
-    private String[] activityTitles;
+
     // index to identify current nav menu item
     public static int navItemIndex = 0;
-
-    // flag to load home fragment when user presses back key
-    private boolean shouldLoadHomeFragOnBackPress = true;
-    private Handler mHandler;
 
     private NavigationView navigationView;
     private DrawerLayout drawer;
@@ -146,7 +143,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         editor.putBoolean(HAS_PASS, mHasPass);
         editor.putString(PASSWORD, mPass);
         editor.putString(SORTED_BY, mOrderByLoaderString);
-        //editor.putInt(VELOCITY_SPINNER_MODE, mMachSpinnerMode);
+        //editor.putInt(ORDER_SPINNER_MODE, mSortBySpinner);
         editor.putInt(NUMBER_OF_OPENS, mNumberOfOpens);
         editor.putInt(IS_RATED, mRated);
         editor.apply();
@@ -182,6 +179,39 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_contex_menu,menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+       AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.contex_edit:
+                Toast.makeText(MainActivity.this,
+                        "Edit",
+                        Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                        Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, info.position);
+                        intent.setData(currentPetUri);
+                        startActivity(intent);
+                //editElement(info.position);
+                return true;
+            case R.id.contex_delete:
+                Toast.makeText(MainActivity.this,
+                        "Delete",
+                        Toast.LENGTH_SHORT).show();
+                //deleteElement(info.position);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -210,8 +240,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         setupNavigationDraver();
 
-        Locale locale = new Locale("en"); // задаем локаль, пока принудительно
-        Locale.setDefault(locale);
+        //Locale locale = new Locale("en"); // задаем локаль, пока принудительно
+        //Locale.setDefault(locale);
         // определяем спинер для упорядочивания заметок
         mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
         setupOrderSpinner();
@@ -262,6 +292,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
          * при нажатии на заметку вызывается редактирование заметки класс EditorAcrtivity
          */
         ListView noteListView = (ListView) findViewById(R.id.list);
+        registerForContextMenu(noteListView);
         mCursorAdapter = new NoteCursorAdapter(this, null);
         noteListView.setAdapter(mCursorAdapter);
         mCursorAdapter.notifyDataSetChanged();
@@ -287,7 +318,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void setupNavigationDraver() {
 
-        mHandler = new Handler();
+        Handler handler = new Handler();
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
@@ -304,7 +335,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         imgProfile = (ImageView) navHeader.findViewById(R.id.img_profile);
 
         // load toolbar titles from string resources
-        activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
+        String[] activityTitles = getResources().getStringArray(R.array.nav_item_activity_titles);
 
         // load nav menu header data
         loadNavHeader();
@@ -460,9 +491,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
 //        if(id == R.id.add_dummy_data) {
 //            insertNote();
 //            //displayDatabaseInfo();
@@ -538,10 +566,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         ArrayAdapter<?> adapter =
                 ArrayAdapter.createFromResource(this, R.array.order_by_string_drop, R.layout.order_spinner_item);
         adapter.setDropDownViewResource(R.layout.order_spinner_dropdown_item);
-
+        
         // Вызываем адаптер
         mOrderBySpinner.setAdapter(adapter);
-
+        mOrderBySpinner.setSelection(getSpinnerPosition());
         mOrderBySpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int selectedItemPosition, long selectedId) {
@@ -567,6 +595,24 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
+    }
+    
+    private int getSpinnerPosition(){
+        int spinnerPos = 0;
+        if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_TIME ) {
+            spinnerPos = 0;
+        } else if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_COLOR) {
+            spinnerPos = 1;;
+        } else if (mOrderByLoaderString == NoteContract.NoteEntry._ID) {
+            spinnerPos = 2;
+        } else if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_TITLE) {
+            spinnerPos = 3;
+        } else if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_BODY) {
+            spinnerPos = 4;
+        } else if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE) {
+            spinnerPos = 5;
+        }
+        return spinnerPos;
     }
 
     public void cancelClicked() {
