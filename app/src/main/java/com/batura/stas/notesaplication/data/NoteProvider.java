@@ -234,15 +234,6 @@ public class NoteProvider extends ContentProvider {
      */
     private Uri insertImages(Uri uri, ContentValues values) {
 
-//        }
-        Integer image = values.getAsInteger(NoteContract.NoteEntry.FOLDER_ID);
-        if ( image == null ) {
-            throw new IllegalArgumentException("Wrong image id for folder");
-        }
-        String folder = values.getAsString(NoteContract.NoteEntry.FOLDER_NAME);
-        if ( folder == null || folder.isEmpty() ) {
-            throw new IllegalArgumentException("Wrong name for folder");
-        }
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Insert the new pet with the given values
@@ -264,6 +255,10 @@ public class NoteProvider extends ContentProvider {
     private Uri insertFolder(Uri uri, ContentValues values) {
 
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
+        String folder = values.getAsString(NoteContract.NoteEntry.FOLDER_NAME);
+        if ( folder == null || folder.isEmpty() ) {
+            throw new IllegalArgumentException("Wrong name for folder");
+        }
         // Insert the new pet with the given values
         long id = database.insert(NoteContract.NoteEntry.FOLDER_TABLE_NAME, null, values);
         // If the ID is -1, then the insertion failed. Log an error and return null.

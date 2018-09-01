@@ -49,7 +49,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.batura.stas.notesaplication.ImageFuncs.ImageMy;
 import com.batura.stas.notesaplication.ImageFuncs.ImageStorage;
 import com.batura.stas.notesaplication.Other.AboutActivity;
 import com.batura.stas.notesaplication.Other.CircleTransform;
@@ -63,13 +62,10 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
-import java.net.URI;
 import java.util.ArrayList;
-import java.util.Locale;
 
 import eltos.simpledialogfragment.SimpleDialog;
 import eltos.simpledialogfragment.input.SimpleInputDialog;
-import eltos.simpledialogfragment.input.SimplePinDialog;
 import eltos.simpledialogfragment.list.SimpleListDialog;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
@@ -138,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private boolean mPasswordCorrect;
 
     Folder mainFolder = new Folder(0, "main");
-    private ArrayList<Folder> mFolders = new ArrayList<Folder>();
+    private ArrayList<Folder> mFolders;// = new ArrayList<Folder>();
 
 
     @Override
@@ -309,7 +305,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
 
         // root directory always in
-        mFolders.add(mainFolder);
+        //mFolders.add(mainFolder);
 
         //mHasPass = true;
         mSettings = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -320,7 +316,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             FragmentManager manager = getSupportFragmentManager();
             FragmentTransaction transaction = manager.beginTransaction();
             myDialogFragment.show(transaction, "Dialog");
-
         }
 
         if (mHasPass && !mPasswordCorrect) {
@@ -406,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 startActivity(intent);
             }
         });
-
+//
         // вызываем намерение на поиск выражения в тексте заметки
         Intent intent = getIntent();
         if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
@@ -428,6 +423,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         // get menu
         Menu menu = navigationView.getMenu();
+
+        //menu.add(R.id.notesGroupNew,Menu.NONE,0,"menu1");
+
+        //NavMenuClass navMenuObject = new NavMenuClass(menu,items);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -483,16 +482,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 //Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
-                    case R.id.nav_home:
-                        navItemIndex = 0;
-                        CURRENT_TAG = TAG_HOME;
-                        drawer.closeDrawers();
-                        break;
-//                    case R.id.nav_photos:
-//                        navItemIndex = 1;
-//                        CURRENT_TAG = TAG_PHOTOS;
-//                        Toast.makeText(getBaseContext(), R.string.photoToast,Toast.LENGTH_SHORT).show();
+//                    case R.id.nav_home:
+//                        navItemIndex = 0;
+//                        CURRENT_TAG = TAG_HOME;
+//                        drawer.closeDrawers();
 //                        break;
+                    case 1:
+                        Log.i(TAG, "onNavigationItemSelected: ");
+                        break;
                     case R.id.nav_set_pass:
                         navItemIndex = 3;
                         if (!mHasPass) {
@@ -525,7 +522,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     default:
                         navItemIndex = 0;
                 }
-
                 //Checking if the item is in checked state or not, if not make it in checked state
                 if (menuItem.isChecked()) {
                     menuItem.setChecked(false);
@@ -533,13 +529,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     menuItem.setChecked(true);
                 }
                 menuItem.setChecked(true);
-
 //                loadHomeFragment();
-
                 return true;
             }
         });
-
 
         ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
 
@@ -548,7 +541,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 // Code here will be triggered once the drawer closes as we dont want anything to happen so we leave this blank
                 super.onDrawerClosed(drawerView);
             }
-
             @Override
             public void onDrawerOpened(View drawerView) {
                 // Code here will be triggered once the drawer open as we dont want anything to happen so we leave this blank
@@ -656,27 +648,44 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         if (folderUri != null) {
             Toast.makeText(this, "Folder created", Toast.LENGTH_SHORT).show();
         }
+
+        getLoaderManager().restartLoader(FOLDERS_LOADER,null,this);
+//        Menu menu = navigationView.getMenu();
+//        menu.add(R.id.notesGroupNew,0,mFolders.get(i).getFolderName());
         Log.i(TAG, "saveFolderInDb: " + folderUri.toString());
 
     }
 
     private void getFoldersFormDb(Cursor cursor) {
-        cursor.moveToFirst();
-        try {
-            int idColomn = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
-            int folderNameColomn = cursor.getColumnIndex(NoteContract.NoteEntry.FOLDER_NAME);
-            int folderId = cursor.getInt(idColomn);
+        mFolders = new ArrayList<Folder>();
+        mFolders.add(mainFolder);
+        if (cursor.moveToFirst()) {
+            try {
+                int idColomn = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
+                int folderNameColomn = cursor.getColumnIndex(NoteContract.NoteEntry.FOLDER_NAME);
+                int folderId = cursor.getInt(idColomn);
 
-            while (cursor.moveToNext()) {
-                String folderName = cursor.getString(folderNameColomn);
-                Folder newFol = new Folder(folderId, folderName);
-                mFolders.add(newFol);
+                while (cursor.moveToNext()) {
+                    String folderName = cursor.getString(folderNameColomn);
+                    Folder newFol = new Folder(folderId, folderName);
+                    mFolders.add(newFol);
+                }
+
+            } finally {
+                cursor.close();
             }
-
-        } finally {
-            cursor.close();
+            Log.i(TAG, "getFoldersFormDb: ");
         }
-        Log.i(TAG, "getFoldersFormDb: ");
+        addingFoldersDb();;
+    }
+
+    private void addingFoldersDb(){
+        Menu menu = navigationView.getMenu();
+
+        for (int i = 0; i < mFolders.size() ; i++) {
+            menu.add(R.id.notesGroupNew,mFolders.get(i).getFolderId(),0,mFolders.get(i).getFolderName());
+                //.setIcon();
+        }
     }
 
     @Override
