@@ -88,6 +88,11 @@
     <string name="dialogNoThx">Thx, for patience</string>
     <string name="appMarketLink">market://details?id=com.batura.stas.atmosphere</string>
 
+    //folder diloag
+    <string name="create_folder">Create folder</string>
+    <string name="delete_folder">Delete folder</string>
+    <string name="Cancel">Delete folder</string>
+
     //licences
     <string name="myLicense">
         Copyright 2018 Stanislav Batura \n

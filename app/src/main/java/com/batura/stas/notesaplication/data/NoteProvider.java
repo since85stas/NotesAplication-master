@@ -7,7 +7,10 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.provider.ContactsContract;
 import android.util.Log;
+
+import org.w3c.dom.Text;
 
 /**
  * Created by seeyo on 21.05.2018.
@@ -28,6 +31,12 @@ public class NoteProvider extends ContentProvider {
     /** URI matcher code for the content URI for the images   */
     private static final int NOTE_IMAGES = 667;
 
+    /** URI matcher code for the content URI for the folders   */
+    private static final int FOLDERS = 668;
+
+    /** URI matcher code for the content URI for a single pet in the pets table */
+    private static final int FOLDER_ID = 669;
+
     /**
      * UriMatcher object to match a content URI to a corresponding code.
      * The input passed into the constructor represents the code to return for the root URI.
@@ -43,6 +52,8 @@ public class NoteProvider extends ContentProvider {
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES,NOTES);
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES + "/#",NOTE_ID);
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_IMAGES +"/#" ,NOTE_IMAGES);
+        sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_FOLDERS,FOLDERS);
+        sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_FOLDERS + "/#",FOLDER_ID);
     }
 
 
@@ -102,6 +113,10 @@ public class NoteProvider extends ContentProvider {
                 cursor = database.query(NoteContract.NoteEntry.IMAGE_TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;
+            case FOLDERS:
+                cursor = database.query(NoteContract.NoteEntry.FOLDER_TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
             default:
                 throw new IllegalArgumentException( "Cannot query unknown URI " + uri);
                 //throw new IllegalArgumentException("sss",new Throwable t);
@@ -139,6 +154,8 @@ public class NoteProvider extends ContentProvider {
                 return insertNote(uri, contentValues);
             case NOTE_IMAGES:
                 return insertImages(uri, contentValues);
+            case FOLDERS:
+                return insertFolder(uri, contentValues) ;
             default:
                 throw new IllegalArgumentException("Insertion is not supported for " + uri);
         }
@@ -218,10 +235,37 @@ public class NoteProvider extends ContentProvider {
     private Uri insertImages(Uri uri, ContentValues values) {
 
 //        }
+        Integer image = values.getAsInteger(NoteContract.NoteEntry.FOLDER_ID);
+        if ( image == null ) {
+            throw new IllegalArgumentException("Wrong image id for folder");
+        }
+        String folder = values.getAsString(NoteContract.NoteEntry.FOLDER_NAME);
+        if ( folder == null || folder.isEmpty() ) {
+            throw new IllegalArgumentException("Wrong name for folder");
+        }
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
         // Insert the new pet with the given values
         long id = database.insert(NoteContract.NoteEntry.IMAGE_TABLE_NAME, null, values);
+        // If the ID is -1, then the insertion failed. Log an error and return null.
+        if (id == -1) {
+            Log.e(LOG, "Failed to insert row for " + uri);
+            return null;
+        }
+        // Once we know the ID of the new row in the table,
+        // return the new URI with the ID appended to the end of it
+
+        getContext().getContentResolver().notifyChange(uri, null);
+
+        return ContentUris.withAppendedId(uri, id);
+
+    }
+
+    private Uri insertFolder(Uri uri, ContentValues values) {
+
+        SQLiteDatabase database = mDbHelper.getWritableDatabase();
+        // Insert the new pet with the given values
+        long id = database.insert(NoteContract.NoteEntry.FOLDER_TABLE_NAME, null, values);
         // If the ID is -1, then the insertion failed. Log an error and return null.
         if (id == -1) {
             Log.e(LOG, "Failed to insert row for " + uri);

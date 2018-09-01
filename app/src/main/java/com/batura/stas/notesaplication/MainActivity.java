@@ -12,6 +12,7 @@ import android.Manifest;
 import android.app.LoaderManager;
 import android.app.SearchManager;
 import android.content.ContentUris;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -22,6 +23,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -50,29 +52,44 @@ import android.widget.Toast;
 import com.batura.stas.notesaplication.ImageFuncs.ImageMy;
 import com.batura.stas.notesaplication.ImageFuncs.ImageStorage;
 import com.batura.stas.notesaplication.Other.AboutActivity;
+import com.batura.stas.notesaplication.Other.CircleTransform;
+import com.batura.stas.notesaplication.Other.Folder;
 import com.batura.stas.notesaplication.Other.Password;
 import com.batura.stas.notesaplication.Other.PrivacyPolicyActivity;
 import com.batura.stas.notesaplication.data.NoteContract;
 import com.batura.stas.notesaplication.data.NoteDbHelper;
+import com.bumptech.glide.Glide;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Locale;
 
+import eltos.simpledialogfragment.SimpleDialog;
+import eltos.simpledialogfragment.input.SimpleInputDialog;
+import eltos.simpledialogfragment.input.SimplePinDialog;
+import eltos.simpledialogfragment.list.SimpleListDialog;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
+        , SimpleDialog.OnDialogResultListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     private static final int NOTE_LOADER = 0;
+    private static final int FOLDERS_LOADER = 1;
     private static final int PASS_OK = 11;
 
+    //intent Const
+    public final static String PASS_INTENT_TYPE = MainActivity.class.getPackage() + ".passIntentType";
+    public final static String TYPE_CHECK = "chek";
+    public final static String TYPE_SET = "set";
+    public final static String TYPE_DEL = "del";
+
     //preferences keys
-    // Sharedpref file name
     private static final String PREF_NAME = "NotesPref";
     private static final String HAS_PASS = "hasPass";
     public static final String PASSWORD = "password";
@@ -91,6 +108,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private static final String TAG_NOTIFICATIONS = "notifications";
     private static final String TAG_SETTINGS = "settings";
     public static String CURRENT_TAG = TAG_HOME;
+
+    //dialogs tags
+    private static final String CHOICE_DIALOG_FOLDER = "folder_choise";
+    private static final String INPUT_DIALOG_FOLDER = "input_folder";
 
     // index to identify current nav menu item
     public static int navItemIndex = 0;
@@ -115,10 +136,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private boolean mHasPass;
     private String mPass = "";
     private boolean mPasswordCorrect;
-    public final static String PASS_INTENT_TYPE = MainActivity.class.getPackage() + ".passIntentType";
-    public final static String TYPE_CHECK = "chek";
-    public final static String TYPE_SET = "set";
-    public final static String TYPE_DEL = "del";
+
+    Folder mainFolder = new Folder(0, "main");
+    private ArrayList<Folder> mFolders = new ArrayList<Folder>();
 
 
     @Override
@@ -260,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     /**
      * Perform the deletion of the note in the database.
+     *
      * @param uri
      */
     private void deleteNote(Uri uri) {
@@ -286,6 +307,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // root directory always in
+        mFolders.add(mainFolder);
 
         //mHasPass = true;
         mSettings = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
@@ -359,6 +383,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             }
                         });
 
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
         /* задаем listView для списка заметок
          * проверяем изменолись ли данные
          * при нажатии на заметку вызывается редактирование заметки класс EditorAcrtivity
@@ -384,11 +413,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             mSearchString = intent.getStringExtra(SearchManager.QUERY);
             //System.out.println(query);
         }
+
         getLoaderManager().initLoader(NOTE_LOADER, null, this);
+        getLoaderManager().initLoader(FOLDERS_LOADER, null, this);
 
     }
-
-
 
     private void setupNavigationDraver() {
 
@@ -396,6 +425,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         navigationView = (NavigationView) findViewById(R.id.nav_view);
+
+        // get menu
+        Menu menu = navigationView.getMenu();
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -430,10 +462,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //imgNavHeaderBg.setImageResource(R.drawable.before_cookie);
         imgNavHeaderBg.setImageResource(R.drawable.drawer_back);
-        imgProfile.setImageResource(R.drawable.cat_portrait_cute_animal);
+
+        Glide.with(this).load(R.drawable.cat_portrait_cute_animal)
+                .bitmapTransform(new CircleTransform(this))
+                .into(imgProfile);
+
+        //imgProfile.setImageResource(R.drawable.cat_portrait_cute_animal);
 
         // showing dot next to notifications label
-        navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
+        //navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
     }
 
     private void setUpNavigationView() {
@@ -562,44 +599,130 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-//        if(id == R.id.add_dummy_data) {
-//            insertNote();
-//            //displayDatabaseInfo();
-//        }
+        switch (item.getItemId()) {
+            case (R.id.action_add_folder):
+                SimpleListDialog.build()
+                        .title("Selet one")
+                        .choiceMode(SimpleListDialog.SINGLE_CHOICE_DIRECT)
+                        .items(getBaseContext(), R.array.folder_choise)
+                        .show(this, CHOICE_DIALOG_FOLDER);
+        }
         return super.onOptionsItemSelected(item);
     }
 
 
     @Override
+    public boolean onResult(@NonNull String dialogTag, int which, @NonNull Bundle extras) {
+
+        switch (dialogTag) {
+            case CHOICE_DIALOG_FOLDER: /** {@link MainActivity#showDirectChoice}, {@link MainActivity#showMultiChoice} **/
+                ArrayList<String> labels = extras.getStringArrayList(SimpleListDialog.SELECTED_LABELS);
+                String result = labels.get(0);
+                if (result != null) {
+                    if (result.equals(getResources().getString(R.string.create_folder))) {
+                        Log.i(TAG, "onResult: create");
+                        SimpleInputDialog.build()
+                                .title("Folder name")
+                                .show(this, INPUT_DIALOG_FOLDER);
+                    } else if (result == getResources().getString(R.string.delete_folder)) {
+                        Log.i(TAG, "onResult: dele");
+                    } else if (result == getResources().getString(R.string.cancel)) {
+                        Log.i(TAG, "onResult: can");
+                    } else {
+                        Log.i(TAG, "onResult: else");
+                    }
+                }
+                Toast.makeText(this, android.text.TextUtils.join(", ", labels), Toast.LENGTH_SHORT).show();
+                return true;
+            case INPUT_DIALOG_FOLDER:
+                String name = extras.getString(SimpleInputDialog.TEXT);
+                saveFolderInDb(name);
+                return true;
+        }
+        return false;
+    }
+
+    private void saveFolderInDb(String folderName) {
+        // Create a ContentValues object where column names are the keys,
+        // and pet attributes from the editor are the values.
+        ContentValues values = new ContentValues();
+        if (folderName.isEmpty() || folderName.equals("")) {
+            Toast.makeText(this, "Empty folder name", Toast.LENGTH_SHORT).show();
+            throw (new IllegalArgumentException("wrong empty folder"));
+        }
+        values.put(NoteContract.NoteEntry.FOLDER_NAME, folderName);
+
+        Uri folderUri = getContentResolver().insert(NoteContract.NoteEntry.CONTENT_URI_FOLDERS, values);
+        if (folderUri != null) {
+            Toast.makeText(this, "Folder created", Toast.LENGTH_SHORT).show();
+        }
+        Log.i(TAG, "saveFolderInDb: " + folderUri.toString());
+
+    }
+
+    private void getFoldersFormDb(Cursor cursor) {
+        cursor.moveToFirst();
+        try {
+            int idColomn = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
+            int folderNameColomn = cursor.getColumnIndex(NoteContract.NoteEntry.FOLDER_NAME);
+            int folderId = cursor.getInt(idColomn);
+
+            while (cursor.moveToNext()) {
+                String folderName = cursor.getString(folderNameColomn);
+                Folder newFol = new Folder(folderId, folderName);
+                mFolders.add(newFol);
+            }
+
+        } finally {
+            cursor.close();
+        }
+        Log.i(TAG, "getFoldersFormDb: ");
+    }
+
+    @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
         // задаем проекцию по которой будет происходить считывние из БД
-        String[] projection = new String[]{
-                NoteContract.NoteEntry._ID,
-                NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
-                NoteContract.NoteEntry.COLUMN_NOTE_BODY,
-                NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
-                NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE,
-                NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD,
-                NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD_HASH,
-                NoteContract.NoteEntry.COLUMN_NOTE_IMAGE,
-                NoteContract.NoteEntry.COLUMN_NOTE_WIDGET,
-                NoteContract.NoteEntry.COLUMN_NOTE_TIME
-        };
+        switch (id) {
+            case (NOTE_LOADER):
+                String[] projection = new String[]{
+                        NoteContract.NoteEntry._ID,
+                        NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
+                        NoteContract.NoteEntry.COLUMN_NOTE_BODY,
+                        NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
+                        NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE,
+                        NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD,
+                        NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD_HASH,
+                        NoteContract.NoteEntry.COLUMN_NOTE_IMAGE,
+                        NoteContract.NoteEntry.COLUMN_NOTE_WIDGET,
+                        NoteContract.NoteEntry.COLUMN_NOTE_TIME
+                };
 
-        // задается условия для поиска ключ слов в БД
-        String selection = setupSelectionString();
-        ///String orderBy   = setupOrderByString();
+                // задается условия для поиска ключ слов в БД
+                String selection = setupSelectionString();
+                ///String orderBy   = setupOrderByString();
 
-        return new CursorLoader(this,
-                NoteContract.NoteEntry.CONTENT_URI,
-                projection,
-                selection,
-                null,
-                mOrderByLoaderString);
+                return new CursorLoader(this,
+                        NoteContract.NoteEntry.CONTENT_URI,
+                        projection,
+                        selection,
+                        null,
+                        mOrderByLoaderString);
+            case(FOLDERS_LOADER):
+                String[] projectionLoader = new String[]{
+                        NoteContract.NoteEntry._ID,
+                        NoteContract.NoteEntry.FOLDER_NAME,
+                 };
+
+                return new CursorLoader(this,
+                        NoteContract.NoteEntry.CONTENT_URI_FOLDERS,
+                        projectionLoader,
+                        null,
+                        null,
+                        null);
+        }
+
+        return null;
     }
 
     /*
@@ -621,8 +744,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mCursorAdapter.swapCursor(data);
+        switch (loader.getId()) {
+            case NOTE_LOADER:
+                mCursorAdapter.swapCursor(data);
+                break;
+            case FOLDERS_LOADER:
+                getFoldersFormDb(data);
+
 //        mCursorAdapter.co
+        }
 
     }
 

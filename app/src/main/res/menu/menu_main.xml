@@ -9,4 +9,10 @@
         android:title="@string/menu_search"
         app:actionViewClass="android.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView" />
+
+    <item
+        android:id="@+id/action_add_folder"
+        android:title="add folder"
+        android:icon="@drawable/baseline_create_new_folder_white_18"
+        app:showAsAction="always" />
 </menu>

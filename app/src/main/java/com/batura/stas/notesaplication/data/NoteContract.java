@@ -23,6 +23,9 @@ public class NoteContract {
 
     public static final String PATH_IMAGES = "images";
 
+    public static final String PATH_FOLDERS = "folders";
+
+
     // To prevent someone from accidentally instantiating the contract class,
     // give it an empty constructor.
     private NoteContract() {
@@ -52,11 +55,20 @@ public class NoteContract {
         public static final String CONTENT_IMAGE_TYPE =
                 ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_IMAGES;
 
+        /**
+         * The MIME type of the {@link #CONTENT_URI} for a notes images.
+         */
+        public static final String CONTENT_FOLDERS_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_IMAGES;
+
         /** The content URI to access the pet data in the provider */
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_NOTES);
 
         /** The content URI to access the pet data in the provider */
         public static final Uri CONTENT_URI_IMAGES = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_IMAGES);
+
+        /** The content URI to access the folder data in the provider */
+        public static final Uri CONTENT_URI_FOLDERS = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_FOLDERS);
         /**
          * Name of database table for notes
          */
@@ -66,6 +78,11 @@ public class NoteContract {
          * Name of database table for images
          */
         public final static String IMAGE_TABLE_NAME = "images";
+
+        /**
+         * Name of database table for folders
+         */
+        public final static String FOLDER_TABLE_NAME = "folders";
 
         /**
          * Unique ID number for the note (only for use in the database table).
@@ -138,6 +155,29 @@ public class NoteContract {
          * Type: INTEGER
          */
         public final static String COLUMN_NOTE_WIDGET = "widget";
+
+        /**           *
+         * Folder.
+         * <p>
+         * Type: INTEGER
+         */
+        public final static String COLUMN_NOTE_FOLDER = "folder";
+
+        /**
+         * Unique ID number for the note (only for use in the database table).
+         * <p>
+         * Type: INTEGER
+         */
+        public final static String FOLDER_ID = "folder_id";
+
+        /**
+         * Unique ID number for the note (only for use in the database table).
+         * <p>
+         * Type: String
+         */
+        public final static String FOLDER_NAME = "folder_name";
+
+
 
 
          public static final int COLOR_DEFAULT = 665;

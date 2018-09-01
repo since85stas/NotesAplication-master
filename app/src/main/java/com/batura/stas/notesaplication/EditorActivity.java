@@ -670,55 +670,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
 
     }
 
-
-    /**
-     * Setup the dropdown spinner that allows the user to select the gender of the pet.
-     */
-//    private void setupSpinner() {
-//        // Create adapter for spinner. The list options are from the String array it will use
-//        // the spinner will use the default layout
-//
-//        int[] colorId = {665,666,667,668,669,670,671};
-//        SpinnerColorAdapter myAdapter = new  SpinnerColorAdapter (EditorActivity.this,
-//                R.layout.color_dropdown_item , getResources().getStringArray(R.array.color_array_string),colorId);
-//
-//        // Apply the adapter to the spinner
-//        mColorSpinner.setAdapter(myAdapter);
-//
-//        // Set the integer mSelected to the constant values
-//        mColorSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-//            @Override
-//            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                String selection = (String) parent.getItemAtPosition(position);
-//                if (!TextUtils.isEmpty(selection)) {
-//                    if (selection.equals(getString(R.string.color_default))) {
-//                        mColor = 665;
-//                    } else if (selection.equals(getString(R.string.color_red))) {
-//                        mColor = NoteContract.NoteEntry.COLOR_RED;
-//                    } else if (selection.equals(getString(R.string.color_orange))) {
-//                        mColor = NoteContract.NoteEntry.COLOR_ORANGE;
-//                    } else if (selection.equals(getString(R.string.color_yellow))) {
-//                        mColor = NoteContract.NoteEntry.COLOR_YELLOW;
-//                    } else if (selection.equals(getString(R.string.color_green))) {
-//                        mColor = NoteContract.NoteEntry.COLOR_GREEN;
-//                    } else if (selection.equals(getString(R.string.color_blue))) {
-//                        mColor = NoteContract.NoteEntry.COLOR_BLUE;
-//                    } else if (selection.equals(getString(R.string.color_purple))) {
-//                        mColor = NoteContract.NoteEntry.COLOR_PURPLE;
-//                    } else {
-//                        Log.e(TAG, "Wrong color spinner value");
-//                    }
-//                }
-//            }
-//
-//            // Because AdapterView is an abstract class, onNothingSelected must be defined
-//            @Override
-//            public void onNothingSelected(AdapterView<?> parent) {
-//                mColor = 665; // default
-//            }
-//        });
-//    }
-
     @Override
     public void onImageClicked(int position) {
         Intent intent = new Intent(EditorActivity.this,BigImageActivity.class);

@@ -30,4 +30,10 @@
         <item>@string/order_note</item>
         <item>@string/order_favourite</item>
     </string-array>
+
+    <string-array name="folder_choise">
+        <item>@string/create_folder</item>
+        <item>@string/delete_folder</item>
+        <item>@string/delete</item>
+    </string-array>
 </resources>
