@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GoodNotes</string>
+    <string name="app_name">Заметки</string>
     <string name="action_settings">Настройки</string>
     <string name="noteTitle">Заголовок</string>
 
@@ -86,7 +86,7 @@
     <string name="dialogNo">Нет, может быть позже</string>
     <string name="dialogYesthx">Спасибо</string>
     <string name="dialogNoThx">Спасибо, за терпение</string>
-    <string name="appMarketLink">market://details?id=com.batura.stas.atmosphere</string>
+    <string name="appMarketLink">market://details?id=com.batura.stas.notesaplication</string>
 
     //licences
     <string name="myLicense">

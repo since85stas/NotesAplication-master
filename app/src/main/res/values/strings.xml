@@ -86,7 +86,7 @@
     <string name="dialogNo">No, maybe later</string>
     <string name="dialogYesthx">Thx</string>
     <string name="dialogNoThx">Thx, for patience</string>
-    <string name="appMarketLink">market://details?id=com.batura.stas.atmosphere</string>
+    <string name="appMarketLink">market://details?id=com.batura.stas.notesaplication</string>
 
     //folder diloag
     <string name="create_folder">Create folder</string>
@@ -137,6 +137,7 @@ limitations under the License.
 
 
     <string name="enter_a_pin">Enter a 4 digit PIN</string>
+    <string name="repeat_pin">Repeat</string>
     <string name="Repeat">Repeat PIN</string>
     <string name="delletePass">Enter current PIN, and press OK to delete password</string>
     <string name="setPin">Set PIN</string>
@@ -161,4 +162,6 @@ Features:\n
     <string name="validTimeNo">No valid time</string>
     <string name="pin">PIN</string>
 
+    <string name="admob_app_id">ca-app-pub-5445531684247341~9468768820</string>
+    <string name="banner_ad_unit_id">ca-app-pub-5445531684247341/3450155384</string>
 </resources>

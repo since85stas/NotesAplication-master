@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final String ORDER_SPINNER_MODE = "Mode"; // положение переключателя
     public static final String NUMBER_OF_OPENS = "Opens"; // количество запусков приложения
     public static final String IS_RATED = "Rated";       // прошли ли по ссылке в маркет
-    public static final int NUMBER_OPEN_NUM = 5;
+    public static final int NUMBER_OPEN_NUM = 50;
     public int mNumberOfOpens;
     public int mRated;
     public int mSortBySpinner = 0;
@@ -351,7 +351,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //imgNavHeaderBg.setImageResource(R.drawable.before_cookie);
         imgNavHeaderBg.setImageResource(R.drawable.drawer_back);
 
-        Glide.with(this).load(R.drawable.cat_portrait_cute_animal)
+        Glide.with(this).load(R.drawable.cat_my)
                 .bitmapTransform(new CircleTransform(this))
                 .into(imgProfile);
 
@@ -409,21 +409,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 for (int i = 0; i < mFolders.size() ; i++) {
                     if(menuItem.getItemId() == mFolders.get(i).getFolderId()) {
-                        toolbar.setTitle(mFolders.get(i).getFolderName());
-                        mCurrentFolder = mFolders.get(i);
-                        getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
-                        drawer.closeDrawers();
+
+                        selectFolder(mFolders.get(i));
+//                        toolbar.setTitle(mFolders.get(i).getFolderName());
+//                        mCurrentFolder = mFolders.get(i);
+//                        getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
+//                        drawer.closeDrawers();
                     }
                 }
-
-                //Checking if the item is in checked state or not, if not make it in checked state
-//                if (menuItem.isChecked()) {
-//                    menuItem.setChecked(false);
-//                } else {
-//                    menuItem.setChecked(true);
-//                }
-//                menuItem.setChecked(true);
-//                loadHomeFragment();
                 return true;
             }
         });
@@ -448,6 +441,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
+    }
+
+    private void selectFolder(Folder folder ) {
+        toolbar.setTitle(folder.getFolderName());
+        mCurrentFolder = folder;
+        getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
+        drawer.closeDrawers();
     }
 
 
@@ -691,6 +691,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         menu.add(R.id.notesGroupNew,id,0,folderName).setIcon(R.drawable.baseline_folder_black_24);
         Log.i(TAG, "saveFolderInDb: " + folderUri.toString());
         mFolders.add(new Folder(id,folderName));
+        selectFolder(new Folder(id,folderName));
         return true;
     }
 

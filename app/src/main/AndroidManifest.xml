@@ -26,7 +26,12 @@
             </intent-filter>
             <meta-data android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
+
         </activity>
+        <activity
+            android:name="com.google.android.gms.ads.AdActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"
+            android:theme="@android:style/Theme.Translucent" />
 
         <activity
             android:name=".EditorActivity"

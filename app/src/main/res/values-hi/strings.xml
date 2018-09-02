@@ -86,7 +86,7 @@
     <string name="dialogNo">नहीं, शायद बाद में</string>
     <string name="dialogYesthx">धन्यवाद</string>
     <string name="dialogNoThx">धैर्य के लिए Thx</string>
-    <string name="appMarketLink">market://details?id=com.batura.stas.atmosphere</string>
+    <string name="appMarketLink">market://details?id=com.batura.stas.notesaplication</string>
 
     //folder diloag
     <string name="create_folder">फोल्डर बनाएं</string>
@@ -138,6 +138,7 @@ limitations under the License.
 
     <string name="enter_a_pin">एक चार अंक पिन दर्ज करें</string>
     <string name="Repeat">दोहराना</string>
+    <string name="repeat_pin">दोहराना</string>
     <string name="delletePass">वर्तमान पिन दर्ज करें, और पासवर्ड हटाने के लिए ठीक दबाएं</string>
     <string name="setPin">पिन सेट करें</string>
     <string name="photoToast">Sorry this chapter is in developing</string>
