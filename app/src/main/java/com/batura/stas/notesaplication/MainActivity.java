@@ -108,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     //dialogs tags
     private static final String CHOICE_DIALOG_FOLDER = "folder_choise";
     private static final String INPUT_DIALOG_FOLDER = "input_folder";
+    private static final String DELETE_DIALOG_FOLDER = "delete_folder";
 
     // index to identify current nav menu item
     public static int navItemIndex = 0;
@@ -178,31 +179,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
 
-    /**
-     * Perform the deletion of the note in the database.
-     *
-     * @param uri
-     */
-    private void deleteNote(Uri uri) {
-        // Only perform the delete if this is an existing pet.
-        if (uri != null) {
-            // Call the ContentResolver to delete the pet at the given content URI.
-            // Pass in null for the selection and selection args because the mCurrentPetUri
-            // content URI already identifies the pet that we want.
-            int rowsDeleted = getContentResolver().delete(uri, null, null);
-            // Show a toast message depending on whether or not the delete was successful.
-            if (rowsDeleted == 0) {
-                // If no rows were deleted, then there was an error with the delete.
-                Toast.makeText(this, getString(R.string.editor_delete_pet_failed),
-                        Toast.LENGTH_SHORT).show();
-            } else {
-                // Otherwise, the delete was successful and we can display a toast.
-                Toast.makeText(this, getString(R.string.editor_delete_pet_successful),
-                        Toast.LENGTH_SHORT).show();
-            }
-        }
-        //finish();
-    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -442,12 +419,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
 
                 //Checking if the item is in checked state or not, if not make it in checked state
-                if (menuItem.isChecked()) {
-                    menuItem.setChecked(false);
-                } else {
-                    menuItem.setChecked(true);
-                }
-                menuItem.setChecked(true);
+//                if (menuItem.isChecked()) {
+//                    menuItem.setChecked(false);
+//                } else {
+//                    menuItem.setChecked(true);
+//                }
+//                menuItem.setChecked(true);
 //                loadHomeFragment();
                 return true;
             }
@@ -517,9 +494,85 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         .title("Selet one")
                         .choiceMode(SimpleListDialog.SINGLE_CHOICE_DIRECT)
                         .items(getBaseContext(), R.array.folder_choise)
-                        .show(this, CHOICE_DIALOG_FOLDER);
+
+                        .show(this, CHOICE_DIALOG_FOLDER)
+                        ;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onResult(@NonNull String dialogTag, int which, @NonNull Bundle extras) {
+
+        if (which == BUTTON_POSITIVE) {
+            switch (dialogTag) {
+                case CHOICE_DIALOG_FOLDER: /** {@link MainActivity#showDirectChoice}, {@link MainActivity#showMultiChoice} **/
+                    ArrayList<String> labels = extras.getStringArrayList(SimpleListDialog.SELECTED_LABELS);
+                    String result = labels.get(0);
+                    if (result != null) {
+                        if (result.equals(getResources().getString(R.string.create_folder))) {
+                            Log.i(TAG, "onResult: create");
+                            SimpleInputDialog.build()
+                                    .title("Folder name")
+                                    .text("NewNotes")
+                                    .show(this, INPUT_DIALOG_FOLDER)
+                            ;
+                        } else if (result.equals(getResources().getString(R.string.delete_folder)) ) {
+                            Log.i(TAG, "onResult: dele");
+                            chooseDeleteFolder();
+                            return true;
+                        } else if (result.equals(getResources().getString(R.string.cancel))) {
+                            Log.i(TAG, "onResult: can");
+                            return true;
+                        } else {
+                            Log.i(TAG, "onResult: else");
+                        }
+                    }
+                    Toast.makeText(this, android.text.TextUtils.join(", ", labels), Toast.LENGTH_SHORT).show();
+                    return true;
+                case INPUT_DIALOG_FOLDER:
+                    String name = extras.getString(SimpleInputDialog.TEXT);
+                    saveFolderInDb(name);
+                    return true;
+                case DELETE_DIALOG_FOLDER:
+                    ArrayList<String> labelsDel = extras.getStringArrayList(SimpleListDialog.SELECTED_LABELS);
+                    String resultDel = labelsDel.get(0);
+                    for (int i = 0; i < mFolders.size() ; i++) {
+                        if( resultDel == mFolders.get(i).getFolderName() ) {
+                            Log.i(TAG, "onResult: delelte folder");
+                            //mFolders.remove(i);
+                            deleteFolder(mFolders.get(i));
+                        }
+                    }
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private void chooseDeleteFolder() {
+        String[] folderNames = new String[mFolders.size()];
+        for (int i = 0; i < mFolders.size() ; i++) {
+            folderNames[i] = mFolders.get(i).getFolderName();
+        }
+        SimpleListDialog.build()
+                .title("Choose folder to delete.\n Be careful it will delete \n all notes in this folder!")
+                .choiceMode(SimpleListDialog.SINGLE_CHOICE)
+                .items(folderNames)
+                .show(this, DELETE_DIALOG_FOLDER);
+    }
+
+    private void deleteFolder(Folder folder) {
+        mFolders.remove(folder);
+
+        // delete from foldera DB
+        Uri currentFolderUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI_FOLDERS, folder.getFolderId());
+        getContentResolver().delete(currentFolderUri,null,null);
+
+
+        getLoaderManager().restartLoader(FOLDERS_LOADER,null,MainActivity.this);
+        int delFolderId = folder.getFolderId();
+
     }
 
     @Override
@@ -589,45 +642,43 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
-
-    @Override
-    public boolean onResult(@NonNull String dialogTag, int which, @NonNull Bundle extras) {
-
-        switch (dialogTag) {
-            case CHOICE_DIALOG_FOLDER: /** {@link MainActivity#showDirectChoice}, {@link MainActivity#showMultiChoice} **/
-                ArrayList<String> labels = extras.getStringArrayList(SimpleListDialog.SELECTED_LABELS);
-                String result = labels.get(0);
-                if (result != null) {
-                    if (result.equals(getResources().getString(R.string.create_folder))) {
-                        Log.i(TAG, "onResult: create");
-                        SimpleInputDialog.build()
-                                .title("Folder name")
-                                .show(this, INPUT_DIALOG_FOLDER);
-                    } else if (result == getResources().getString(R.string.delete_folder)) {
-                        Log.i(TAG, "onResult: dele");
-                    } else if (result == getResources().getString(R.string.cancel)) {
-                        Log.i(TAG, "onResult: can");
-                    } else {
-                        Log.i(TAG, "onResult: else");
-                    }
-                }
-                Toast.makeText(this, android.text.TextUtils.join(", ", labels), Toast.LENGTH_SHORT).show();
-                return true;
-            case INPUT_DIALOG_FOLDER:
-                String name = extras.getString(SimpleInputDialog.TEXT);
-                saveFolderInDb(name);
-                return true;
+    /**
+     * Perform the deletion of the note in the database.
+     *
+     * @param uri
+     */
+    private void deleteNote(Uri uri) {
+        // Only perform the delete if this is an existing pet.
+        if (uri != null) {
+            // Call the ContentResolver to delete the pet at the given content URI.
+            // Pass in null for the selection and selection args because the mCurrentPetUri
+            // content URI already identifies the pet that we want.
+            int rowsDeleted = getContentResolver().delete(uri, null, null);
+            // Show a toast message depending on whether or not the delete was successful.
+            if (rowsDeleted == 0) {
+                // If no rows were deleted, then there was an error with the delete.
+                Toast.makeText(this, getString(R.string.editor_delete_pet_failed),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                // Otherwise, the delete was successful and we can display a toast.
+                Toast.makeText(this, getString(R.string.editor_delete_pet_successful),
+                        Toast.LENGTH_SHORT).show();
+            }
         }
-        return false;
+        //finish();
     }
 
-    private void saveFolderInDb(String folderName) {
+
+
+
+    private boolean saveFolderInDb(String folderName) {
         // Create a ContentValues object where column names are the keys,
         // and pet attributes from the editor are the values.
         ContentValues values = new ContentValues();
         if (folderName.isEmpty() || folderName.equals("")) {
             Toast.makeText(this, "Empty folder name", Toast.LENGTH_SHORT).show();
-            throw (new IllegalArgumentException("wrong empty folder"));
+            return false;
+            //throw (new IllegalArgumentException("wrong empty folder"));
         }
         values.put(NoteContract.NoteEntry.FOLDER_NAME, folderName);
 
@@ -639,10 +690,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getLoaderManager().destroyLoader(FOLDERS_LOADER);
         int id = (int)ContentUris.parseId(folderUri);
         Menu menu = navigationView.getMenu();
-        menu.add(R.id.notesGroupNew,id,0,folderName);
+        menu.add(R.id.notesGroupNew,id,0,folderName).setIcon(R.drawable.baseline_folder_black_24);
         Log.i(TAG, "saveFolderInDb: " + folderUri.toString());
         mFolders.add(new Folder(id,folderName));
-
+        return true;
     }
 
     private void getFoldersFormDb(Cursor cursor) {
@@ -664,7 +715,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         for (int i = 0; i < mFolders.size(); i++) {
             menu.add(R.id.notesGroupNew, mFolders.get(i).getFolderId(), 0, mFolders.get(i).getFolderName())
-                .setIcon(R.drawable.baseline_create_new_folder_white_24);
+                .setIcon(R.drawable.baseline_folder_black_24);
         }
     }
 

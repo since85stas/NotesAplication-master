@@ -376,7 +376,10 @@ public class NoteProvider extends ContentProvider {
      */
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        int rowsDeleted;
+        int rowsDeleted = 0;
+        int rowsDeletedIm = 0;
+        int rowsDeletedFol = 0;
+
         // Get writeable database
         SQLiteDatabase database = mDbHelper.getWritableDatabase();
 
@@ -391,24 +394,27 @@ public class NoteProvider extends ContentProvider {
                 // Delete a single row given by the ID in the URI
                 selection = NoteContract.NoteEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-
-
-
                 rowsDeleted = database.delete(NoteContract.NoteEntry.NOTES_TABLE_NAME, selection, selectionArgs);
 
                 //удаляем соотвествующие записи о фотографиях
                 selection = NoteContract.NoteEntry._ID + "=?";
                 selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
-                int rowsDeletedIm = database.delete(NoteContract.NoteEntry.IMAGE_TABLE_NAME, selection, selectionArgs);
+                rowsDeletedIm = database.delete(NoteContract.NoteEntry.IMAGE_TABLE_NAME, selection, selectionArgs);
 
                 break;
-            //return database.delete(PetContract.PetEntry.IMAGE_TABLE_NAME, selection, selectionArgs);
+            case FOLDER_ID:
+                // Delete a single row given by the ID in the URI
+                selection = NoteContract.NoteEntry._ID + "=?";
+                selectionArgs = new String[]{String.valueOf(ContentUris.parseId(uri))};
+                rowsDeletedFol = database.delete(NoteContract.NoteEntry.FOLDER_TABLE_NAME, selection, selectionArgs);
+                break;
+
             default:
                 throw new IllegalArgumentException("Deletion is not supported for " + uri);
         }
         // If 1 or more rows were deleted, then notify all listeners that the data at the
         // given URI has changed
-        if (rowsDeleted != 0) {
+        if (rowsDeleted != 0 || rowsDeletedIm != 0 || rowsDeletedFol != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
         return rowsDeleted;

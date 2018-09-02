@@ -34,6 +34,6 @@
     <string-array name="folder_choise">
         <item>@string/create_folder</item>
         <item>@string/delete_folder</item>
-        <item>@string/delete</item>
+        <item>@string/cancel</item>
     </string-array>
 </resources>
