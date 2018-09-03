@@ -304,6 +304,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+
         // root directory always in
         //mFolders.add(mainFolder);
 
@@ -378,11 +379,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             }
                         });
 
+        getLoaderManager().initLoader(FOLDERS_LOADER, null, this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+        // список директорий
+//        mFolders = new ArrayList<Folder>();
+//        mFolders.add(mainFolder);
+
         /* задаем listView для списка заметок
          * проверяем изменолись ли данные
          * при нажатии на заметку вызывается редактирование заметки класс EditorAcrtivity
@@ -410,9 +416,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         }
 
         getLoaderManager().initLoader(NOTE_LOADER, null, this);
-        getLoaderManager().initLoader(FOLDERS_LOADER, null, this);
 
     }
+
 
     private void setupNavigationDraver() {
 
@@ -422,9 +428,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         navigationView = (NavigationView) findViewById(R.id.nav_view);
 
         // get menu
-        Menu menu = navigationView.getMenu();
-
-        //menu.add(R.id.notesGroupNew,Menu.NONE,0,"menu1");
+        //Menu menu = navigationView.getMenu();
 
         //NavMenuClass navMenuObject = new NavMenuClass(menu,items);
 
@@ -466,8 +470,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 .bitmapTransform(new CircleTransform(this))
                 .into(imgProfile);
 
-        //imgProfile.setImageResource(R.drawable.cat_portrait_cute_animal);
-
         // showing dot next to notifications label
         //navigationView.getMenu().getItem(3).setActionView(R.layout.menu_dot);
     }
@@ -482,13 +484,15 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 //Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
-//                    case R.id.nav_home:
-//                        navItemIndex = 0;
-//                        CURRENT_TAG = TAG_HOME;
-//                        drawer.closeDrawers();
-//                        break;
+                    case R.id.nav_main:
+
+                        break;
                     case 1:
                         Log.i(TAG, "onNavigationItemSelected: ");
+                        toolbar.setTitle(mFolders.get(1).getFolderName());
+                        break;
+                    case 2:
+                        toolbar.setTitle(mFolders.get(2).getFolderName());
                         break;
                     case R.id.nav_set_pass:
                         navItemIndex = 3;
@@ -649,16 +653,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             Toast.makeText(this, "Folder created", Toast.LENGTH_SHORT).show();
         }
 
-        getLoaderManager().restartLoader(FOLDERS_LOADER,null,this);
-//        Menu menu = navigationView.getMenu();
-//        menu.add(R.id.notesGroupNew,0,mFolders.get(i).getFolderName());
+        getLoaderManager().destroyLoader(FOLDERS_LOADER);
+        int id = (int)ContentUris.parseId(folderUri);
+        Menu menu = navigationView.getMenu();
+        menu.add(R.id.notesGroupNew,id,0,folderName);
         Log.i(TAG, "saveFolderInDb: " + folderUri.toString());
 
     }
 
     private void getFoldersFormDb(Cursor cursor) {
         mFolders = new ArrayList<Folder>();
-        mFolders.add(mainFolder);
         if (cursor.moveToFirst()) {
             try {
                 int idColomn = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
@@ -672,19 +676,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 }
 
             } finally {
-                cursor.close();
+                //cursor.close();
             }
             Log.i(TAG, "getFoldersFormDb: ");
         }
-        addingFoldersDb();;
-    }
-
-    private void addingFoldersDb(){
         Menu menu = navigationView.getMenu();
 
-        for (int i = 0; i < mFolders.size() ; i++) {
-            menu.add(R.id.notesGroupNew,mFolders.get(i).getFolderId(),0,mFolders.get(i).getFolderName());
-                //.setIcon();
+        for (int i = 0; i < mFolders.size(); i++) {
+            menu.add(R.id.notesGroupNew, mFolders.get(i).getFolderId(), 0, mFolders.get(i).getFolderName());
+            //.setIcon();
+
+
         }
     }
 
@@ -759,11 +761,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 break;
             case FOLDERS_LOADER:
                 getFoldersFormDb(data);
+                break;
 
 //        mCursorAdapter.co
         }
-
     }
+
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
@@ -807,7 +810,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             }
         });
-
     }
 
     private int getSpinnerPosition() {
@@ -816,7 +818,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             spinnerPos = 0;
         } else if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_COLOR) {
             spinnerPos = 1;
-            ;
         } else if (mOrderByLoaderString == NoteContract.NoteEntry._ID) {
             spinnerPos = 2;
         } else if (mOrderByLoaderString == NoteContract.NoteEntry.COLUMN_NOTE_TITLE) {
