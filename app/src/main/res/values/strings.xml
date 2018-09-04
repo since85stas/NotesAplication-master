@@ -157,5 +157,6 @@ Features:\n
 * Free diary and notepad for smartphones on android.</string>
     <string name="drawOther">Other</string>
     <string name="colorDilogTitle">Select note color</string>
+    <string name="validTimeNo">No valid time</string>
 
 </resources>

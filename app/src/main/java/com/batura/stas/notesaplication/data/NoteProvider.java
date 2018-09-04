@@ -79,6 +79,11 @@ public class NoteProvider extends ContentProvider {
                 // For the PETS code, query the pets table directly with the given
                 // projection, selection, selection arguments, and sort order. The cursor
                 // could contain multiple rows of the pets table.
+                if(selection == null) {
+                    selection = NoteContract.NoteEntry.COLUMN_NOTE_FOLDER + "=?";
+                } else {
+                    selection += NoteContract.NoteEntry.COLUMN_NOTE_FOLDER + "=?";
+                }
                 cursor = database.query(NoteContract.NoteEntry.NOTES_TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;

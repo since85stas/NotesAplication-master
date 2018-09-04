@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -32,15 +31,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ImageSwitcher;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.batura.stas.notesaplication.AlarmFuncs.AlarmSetActivity;
 import com.batura.stas.notesaplication.ImageFuncs.DividerItemDecoration;
@@ -56,7 +52,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import eltos.simpledialogfragment.color.SimpleColorDialog;
-import it.sephiroth.android.library.bottomnavigation.BottomNavigation;
 
 /**
  * Created by Batura Stas on 18.05.2018.
@@ -72,6 +67,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private final static int NOTE_LOADER_IMAGES = 11;
     private final static int NOTIFIC_ANSWER = 0;
     private static final int REQUEST_GALLERY = 100; // запрос для галереи
+    public final static String NOTE_FOLD_ID_INTENT = EditorActivity.class.getSimpleName()
+            + "noteIdIntent";
     private final static String COLOR_DIALOG = "colorDilog";
 
     private EditText mTitleTextView;
@@ -79,6 +76,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
     private int mColor = 665;
     private long mTime = 0;
     private int mFav   = 0;
+    private int mCurrentNoteFolderId;
+
     private int mReopenActivity = 0;
     private boolean mNotificIsOn = false;
     private Uri mCurrentNoteUri;
@@ -144,6 +143,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
             mCurrentNoteImagesUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI_IMAGES,
                     ContentUris.parseId(mCurrentNoteUri));
         }
+
+        mCurrentNoteFolderId = getIntent().getIntExtra(NOTE_FOLD_ID_INTENT,0);
 
         if (mCurrentNoteUri == null) {
             setTitle("Add note");
@@ -459,6 +460,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE, mFav);
         // constant values
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD, 0);
+        values.put(NoteContract.NoteEntry.COLUMN_NOTE_FOLDER,mCurrentNoteFolderId);
 
         //вставляем колво изображений
         values.put(NoteContract.NoteEntry.COLUMN_NOTE_IMAGE, images.size());
@@ -475,8 +477,6 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         
         // get all images names in one String
         int numImages = images.size();
-
-
             String allImagesNames = "";
             for (int i = 0; i < numImages; i++) {
                 String name = images.get(i).getName();
@@ -561,7 +561,8 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     NoteContract.NoteEntry.COLUMN_NOTE_BODY,
                     NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
                     NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE,
-                    NoteContract.NoteEntry.COLUMN_NOTE_TIME
+                    NoteContract.NoteEntry.COLUMN_NOTE_TIME,
+                    NoteContract.NoteEntry.COLUMN_NOTE_FOLDER
             };
             return new android.support.v4.content.CursorLoader(this,
                     mCurrentNoteUri,
@@ -600,6 +601,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     int colorColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_COLOR);
                     int timeColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME);
                     int favColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE);
+                    int foldColumnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_FOLDER);
 
                     // Extract out the value from the Cursor for the given column index
                     String title = cursor.getString(titleColumnIndex);
@@ -607,6 +609,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
                     int colorId = cursor.getInt(colorColumnIndex);
                     int weight = cursor.getInt(timeColumnIndex);
                     mFav = cursor.getInt(favColumnIndex);
+                    mCurrentNoteFolderId = cursor.getInt(foldColumnIndex);
 
                     // Update the views on the screen with the values from the database
                     if (mFav == 1) {

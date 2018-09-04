@@ -133,7 +133,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private String mPass = "";
     private boolean mPasswordCorrect;
 
-    Folder mainFolder = new Folder(0, "main");
+    Folder mMainFolder = new Folder(0, "main");
+    Folder mCurrentFolder;
+
+    private Loader<Cursor> mNoteLoader;
+    private Loader<Cursor> mFolderLoader;
     private ArrayList<Folder> mFolders;// = new ArrayList<Folder>();
 
 
@@ -147,43 +151,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onContentChanged();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PASS_OK) {
-            if (resultCode == RESULT_OK) {
-                mPasswordCorrect = data.getBooleanExtra(Password.PASS_OK_INTENT, false);
-            } else {
-                finish();
-            }
-        }
-    }
 
-    private void saveSettings() {
-        SharedPreferences.Editor editor = mSettings.edit();
-        editor.putBoolean(HAS_PASS, mHasPass);
-        editor.putString(PASSWORD, mPass);
-        editor.putString(SORTED_BY, mOrderByLoaderString);
-        //editor.putInt(ORDER_SPINNER_MODE, mSortBySpinner);
-        editor.putInt(NUMBER_OF_OPENS, mNumberOfOpens);
-        editor.putInt(IS_RATED, mRated);
-        editor.apply();
-    }
-
-    private void loadSettings() {
-        if (mSettings.contains(HAS_PASS)) {
-            mHasPass = mSettings.getBoolean(HAS_PASS, false);
-        }
-        if (mSettings.contains(PASSWORD) && mHasPass) {
-            mPass = mSettings.getString(PASSWORD, "1");
-        }
-        if (mSettings.contains(SORTED_BY)) {
-            mOrderByLoaderString = mSettings.getString(SORTED_BY, NoteContract.NoteEntry.COLUMN_NOTE_TIME);
-        }
-        //mMachSpinnerMode = mSettings.getInt(VELOCITY_SPINNER_MODE,MACH_MODE);
-        mNumberOfOpens = mSettings.getInt(NUMBER_OF_OPENS, 1);
-        mRated = mSettings.getInt(IS_RATED, 0);
-    }
 
     @Override
     protected void onPause() {
@@ -208,71 +176,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onStop();
     }
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        super.onCreateContextMenu(menu, v, menuInfo);
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.main_contex_menu, menu);
-    }
 
-    @Override
-    public boolean onContextItemSelected(MenuItem item) {
-        // Get readable database
-        mDbHelper = new NoteDbHelper(getBaseContext());
-        SQLiteDatabase database = mDbHelper.getReadableDatabase();
-
-        // This cursor will hold the result of the query
-        Cursor cursor = null;
-        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
-        switch (item.getItemId()) {
-            case R.id.contex_edit:
-                Toast.makeText(MainActivity.this,
-                        "Edit",
-                        Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, info.id);
-                intent.setData(currentPetUri);
-                startActivity(intent);
-                //editElement(info.position);
-                return true;
-            case R.id.contex_delete:
-                Toast.makeText(MainActivity.this,
-                        "Delete",
-                        Toast.LENGTH_SHORT).show();
-                Uri currentDelPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, info.id);
-// For every "?" in the selection, we need to have an element in the selection
-                // arguments that will fill in the "?". Since we have 1 question mark in the
-                // selection, we have 1 String in the selection arguments' String array.
-                String[] projection = new String[]{
-                        NoteContract.NoteEntry.IMAGE_NAME_01,
-                        NoteContract.NoteEntry._ID
-                };
-                String selection = NoteContract.NoteEntry._ID + "=?";
-                String[] selectionArgs = new String[]{String.valueOf(ContentUris.parseId(currentDelPetUri))};
-                cursor = database.query(NoteContract.NoteEntry.IMAGE_TABLE_NAME, projection, selection, selectionArgs,
-                        null, null, null);
-                if (cursor.moveToFirst()) {
-                    int image01colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_01);
-                    String imagesNames = cursor.getString(image01colomnIndex);
-                    String[] imageNamesMassive = imagesNames.split(" ");
-                    if (imageNamesMassive[0] != "") {
-                        for (String anImageNamesMassive : imageNamesMassive) {
-                            ImageStorage.deleteFromSd(anImageNamesMassive);
-                        }
-                    }
-                    //deleteElement(info.position);
-                    Log.i(TAG, "onContextItemSelected: " + imagesNames);
-                }
-                cursor.close();
-
-                // удаляем заметку
-                deleteNote(currentDelPetUri);
-                return true;
-            default:
-                return super.onContextItemSelected(item);
-        }
-
-    }
 
     /**
      * Perform the deletion of the note in the database.
@@ -306,11 +210,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
         // root directory always in
-        //mFolders.add(mainFolder);
+        //mFolders.add(mMainFolder);
 
         //mHasPass = true;
         mSettings = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         loadSettings();
+
+        mCurrentFolder = mMainFolder;
 
         if (mNumberOfOpens % NUMBER_OPEN_NUM == 0 && mRated != 1) {
             MyDialogFragment myDialogFragment = new MyDialogFragment();
@@ -345,6 +251,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                    Log.i(TAG, "Permission result " + permission);
                                    if (permission.granted) {
                                        Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                       intent.putExtra(EditorActivity.NOTE_FOLD_ID_INTENT,mCurrentFolder.getFolderId());
                                        startActivity(intent);
                                        Log.i(TAG, "Permission for storage granted");
 
@@ -354,6 +261,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                                "Denied permission without ask never again",
                                                Toast.LENGTH_SHORT).show();
                                        Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                       intent.putExtra(EditorActivity.NOTE_FOLD_ID_INTENT,mCurrentFolder.getFolderId());
                                        startActivity(intent);
                                    } else {
                                        // Denied permission with ask never again
@@ -362,6 +270,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                                "Permission denied, can't load images",
                                                Toast.LENGTH_SHORT).show();
                                        Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                                       intent.putExtra(EditorActivity.NOTE_FOLD_ID_INTENT,mCurrentFolder.getFolderId());
                                        startActivity(intent);
                                    }
                                }
@@ -379,7 +288,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             }
                         });
 
-        getLoaderManager().initLoader(FOLDERS_LOADER, null, this);
+        mFolderLoader = getLoaderManager().initLoader(FOLDERS_LOADER, null, this);
     }
 
     @Override
@@ -387,7 +296,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         super.onStart();
         // список директорий
 //        mFolders = new ArrayList<Folder>();
-//        mFolders.add(mainFolder);
+//        mFolders.add(mMainFolder);
 
         /* задаем listView для списка заметок
          * проверяем изменолись ли данные
@@ -404,6 +313,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Intent intent = new Intent(MainActivity.this, EditorActivity.class);
                 Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, id);
                 intent.setData(currentPetUri);
+                intent.putExtra(EditorActivity.NOTE_FOLD_ID_INTENT,mCurrentFolder.getFolderId());
                 startActivity(intent);
             }
         });
@@ -415,7 +325,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             //System.out.println(query);
         }
 
-        getLoaderManager().initLoader(NOTE_LOADER, null, this);
+        mNoteLoader = getLoaderManager().initLoader(NOTE_LOADER, null, this);
 
     }
 
@@ -485,14 +395,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 //Check to see which item was being clicked and perform appropriate action
                 switch (menuItem.getItemId()) {
                     case R.id.nav_main:
-
-                        break;
-                    case 1:
-                        Log.i(TAG, "onNavigationItemSelected: ");
-                        toolbar.setTitle(mFolders.get(1).getFolderName());
-                        break;
-                    case 2:
-                        toolbar.setTitle(mFolders.get(2).getFolderName());
+                        toolbar.setTitle(R.string.app_name);
+                        mCurrentFolder = mMainFolder;
+                        getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
+                        drawer.closeDrawers();
                         break;
                     case R.id.nav_set_pass:
                         navItemIndex = 3;
@@ -512,7 +418,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         intent.setData(Uri.parse(getString(R.string.appMarketLink)));
                         startActivity(intent);
                         navItemIndex = 4;
-                        CURRENT_TAG = TAG_SETTINGS;
                         break;
                     case R.id.nav_about_us:
                         // launch new intent instead of loading fragment
@@ -526,6 +431,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     default:
                         navItemIndex = 0;
                 }
+
+                for (int i = 0; i < mFolders.size() ; i++) {
+                    if(menuItem.getItemId() == mFolders.get(i).getFolderId()) {
+                        toolbar.setTitle(mFolders.get(i).getFolderName());
+                        mCurrentFolder = mFolders.get(i);
+                        getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
+                        drawer.closeDrawers();
+                    }
+                }
+
                 //Checking if the item is in checked state or not, if not make it in checked state
                 if (menuItem.isChecked()) {
                     menuItem.setChecked(false);
@@ -538,7 +453,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             }
         });
 
-        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
+        ActionBarDrawerToggle actionBarDrawerToggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.openDrawer, R.string.closeDrawer) {
 
             @Override
             public void onDrawerClosed(View drawerView) {
@@ -606,6 +522,73 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_contex_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        // Get readable database
+        mDbHelper = new NoteDbHelper(getBaseContext());
+        SQLiteDatabase database = mDbHelper.getReadableDatabase();
+
+        // This cursor will hold the result of the query
+        Cursor cursor = null;
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.contex_edit:
+                Toast.makeText(MainActivity.this,
+                        "Edit",
+                        Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, info.id);
+                intent.setData(currentPetUri);
+                startActivity(intent);
+                //editElement(info.position);
+                return true;
+            case R.id.contex_delete:
+                Toast.makeText(MainActivity.this,
+                        "Delete",
+                        Toast.LENGTH_SHORT).show();
+                Uri currentDelPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, info.id);
+// For every "?" in the selection, we need to have an element in the selection
+                // arguments that will fill in the "?". Since we have 1 question mark in the
+                // selection, we have 1 String in the selection arguments' String array.
+                String[] projection = new String[]{
+                        NoteContract.NoteEntry.IMAGE_NAME_01,
+                        NoteContract.NoteEntry._ID
+                };
+                String selection = NoteContract.NoteEntry._ID + "=?";
+                String[] selectionArgs = new String[]{String.valueOf(ContentUris.parseId(currentDelPetUri))};
+                cursor = database.query(
+                        NoteContract.NoteEntry.IMAGE_TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, null);
+                if (cursor.moveToFirst()) {
+                    int image01colomnIndex = cursor.getColumnIndex(NoteContract.NoteEntry.IMAGE_NAME_01);
+                    String imagesNames = cursor.getString(image01colomnIndex);
+                    String[] imageNamesMassive = imagesNames.split(" ");
+                    if (imageNamesMassive[0] != "") {
+                        for (String anImageNamesMassive : imageNamesMassive) {
+                            ImageStorage.deleteFromSd(anImageNamesMassive);
+                        }
+                    }
+                    //deleteElement(info.position);
+                    Log.i(TAG, "onContextItemSelected: " + imagesNames);
+                }
+                cursor.close();
+
+                // удаляем заметку
+                deleteNote(currentDelPetUri);
+                return true;
+            default:
+                return super.onContextItemSelected(item);
+        }
+
+    }
+
 
     @Override
     public boolean onResult(@NonNull String dialogTag, int which, @NonNull Bundle extras) {
@@ -658,35 +641,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Menu menu = navigationView.getMenu();
         menu.add(R.id.notesGroupNew,id,0,folderName);
         Log.i(TAG, "saveFolderInDb: " + folderUri.toString());
+        mFolders.add(new Folder(id,folderName));
 
     }
 
     private void getFoldersFormDb(Cursor cursor) {
         mFolders = new ArrayList<Folder>();
         if (cursor.moveToFirst()) {
-            try {
-                int idColomn = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
-                int folderNameColomn = cursor.getColumnIndex(NoteContract.NoteEntry.FOLDER_NAME);
+            int idColomn = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
+            int folderNameColomn = cursor.getColumnIndex(NoteContract.NoteEntry.FOLDER_NAME);
+
+            do  {
                 int folderId = cursor.getInt(idColomn);
+                String folderName = cursor.getString(folderNameColomn);
+                Folder newFol = new Folder(folderId, folderName);
+                mFolders.add(newFol);
+            } while (cursor.moveToNext());
 
-                while (cursor.moveToNext()) {
-                    String folderName = cursor.getString(folderNameColomn);
-                    Folder newFol = new Folder(folderId, folderName);
-                    mFolders.add(newFol);
-                }
-
-            } finally {
-                //cursor.close();
-            }
             Log.i(TAG, "getFoldersFormDb: ");
         }
         Menu menu = navigationView.getMenu();
 
         for (int i = 0; i < mFolders.size(); i++) {
-            menu.add(R.id.notesGroupNew, mFolders.get(i).getFolderId(), 0, mFolders.get(i).getFolderName());
-            //.setIcon();
-
-
+            menu.add(R.id.notesGroupNew, mFolders.get(i).getFolderId(), 0, mFolders.get(i).getFolderName())
+                .setIcon(R.drawable.baseline_create_new_folder_white_24);
         }
     }
 
@@ -706,18 +684,20 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD_HASH,
                         NoteContract.NoteEntry.COLUMN_NOTE_IMAGE,
                         NoteContract.NoteEntry.COLUMN_NOTE_WIDGET,
-                        NoteContract.NoteEntry.COLUMN_NOTE_TIME
+                        NoteContract.NoteEntry.COLUMN_NOTE_TIME,
+                        NoteContract.NoteEntry.COLUMN_NOTE_FOLDER
                 };
 
                 // задается условия для поиска ключ слов в БД
                 String selection = setupSelectionString();
                 ///String orderBy   = setupOrderByString();
+                String[] selectionArgs = {String.valueOf(mCurrentFolder.getFolderId())};
 
                 return new CursorLoader(this,
                         NoteContract.NoteEntry.CONTENT_URI,
                         projection,
                         selection,
-                        null,
+                        selectionArgs,
                         mOrderByLoaderString);
             case(FOLDERS_LOADER):
                 String[] projectionLoader = new String[]{
@@ -762,9 +742,45 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             case FOLDERS_LOADER:
                 getFoldersFormDb(data);
                 break;
-
-//        mCursorAdapter.co
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == PASS_OK) {
+            if (resultCode == RESULT_OK) {
+                mPasswordCorrect = data.getBooleanExtra(Password.PASS_OK_INTENT, false);
+            } else {
+                finish();
+            }
+        }
+    }
+
+    private void saveSettings() {
+        SharedPreferences.Editor editor = mSettings.edit();
+        editor.putBoolean(HAS_PASS, mHasPass);
+        editor.putString(PASSWORD, mPass);
+        editor.putString(SORTED_BY, mOrderByLoaderString);
+        //editor.putInt(ORDER_SPINNER_MODE, mSortBySpinner);
+        editor.putInt(NUMBER_OF_OPENS, mNumberOfOpens);
+        editor.putInt(IS_RATED, mRated);
+        editor.apply();
+    }
+
+    private void loadSettings() {
+        if (mSettings.contains(HAS_PASS)) {
+            mHasPass = mSettings.getBoolean(HAS_PASS, false);
+        }
+        if (mSettings.contains(PASSWORD) && mHasPass) {
+            mPass = mSettings.getString(PASSWORD, "1");
+        }
+        if (mSettings.contains(SORTED_BY)) {
+            mOrderByLoaderString = mSettings.getString(SORTED_BY, NoteContract.NoteEntry.COLUMN_NOTE_TIME);
+        }
+        //mMachSpinnerMode = mSettings.getInt(VELOCITY_SPINNER_MODE,MACH_MODE);
+        mNumberOfOpens = mSettings.getInt(NUMBER_OF_OPENS, 1);
+        mRated = mSettings.getInt(IS_RATED, 0);
     }
 
 

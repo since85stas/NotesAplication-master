@@ -62,7 +62,7 @@ public class NoteDbHelper extends SQLiteOpenHelper {
 
         String SQL_CREATE_FOLDERS_TABLE = "CREATE TABLE " + NoteContract.NoteEntry.FOLDER_TABLE_NAME + " ("
                 + NoteContract.NoteEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + NoteContract.NoteEntry.FOLDER_ID + " INTEGER NOT NULL DEFAULT 0, "
+                + NoteContract.NoteEntry.COLUMN_NOTE_FOLDER_ID + " INTEGER NOT NULL DEFAULT 0, "
                 + NoteContract.NoteEntry.FOLDER_NAME + " TEXT " + ");"
                 ;
 

@@ -168,7 +168,7 @@ public class NoteContract {
          * <p>
          * Type: INTEGER
          */
-        public final static String FOLDER_ID = "folder_id";
+        public final static String COLUMN_NOTE_FOLDER_ID = "folder_id";
 
         /**
          * Unique ID number for the note (only for use in the database table).

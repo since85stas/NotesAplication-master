@@ -118,7 +118,7 @@ public class NoteCursorAdapter extends CursorAdapter {
         }
 
         if (noteTime < 0) {
-            dateTextView.setText("Wrong time");
+            dateTextView.setText(R.string.validTimeNo);
         } else {
 
             Date dateObject = new Date(noteTime);
@@ -134,14 +134,21 @@ public class NoteCursorAdapter extends CursorAdapter {
         itemLin.setBackgroundColor(ContextCompat.getColor(context, color));
 
         // favorite
-        if (noteIsFavor != 1) {
+        if (noteIsFavor == 1) {
+            favorImageView.setVisibility(View.VISIBLE);
+        } else {
             favorImageView.setVisibility(View.GONE);
         }
+
         //notif
-        if (noteNotifIsOn != 1) {
+        if (noteNotifIsOn == 1) {
+            notifImageView.setVisibility(View.VISIBLE);
+        } else {
             notifImageView.setVisibility(View.GONE);
         }
-        if (hasImages <= 0) {
+        if (hasImages > 0) {
+            photoImageView.setVisibility(View.VISIBLE);
+        } else {
             photoImageView.setVisibility(View.GONE);
         }
 //        else {
