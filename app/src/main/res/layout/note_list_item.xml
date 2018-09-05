@@ -9,18 +9,15 @@
     android:orientation="horizontal"
     android:paddingLeft="@dimen/activity_margin"
     android:paddingRight="@dimen/activity_margin"
-    android:background="@drawable/shadow_black"
-
-    android:paddingBottom="5px"
-    android:paddingTop="5px"
      >
 
     <LinearLayout
+        android:id="@+id/notesInternalLay"
         android:layout_width="0dp"
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="@dimen/list_item_margin"
+        android:padding="8dp"
         >
         <TextView
             android:id="@+id/titleItem"

@@ -317,8 +317,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         // get menu
         //Menu menu = navigationView.getMenu();
 
-        //NavMenuClass navMenuObject = new NavMenuClass(menu,items);
-
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         //toolbar.setBackgroundColor(getResources().getColor(R.color.actionBarColor));
@@ -528,7 +526,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                             Log.i(TAG, "onResult: else");
                         }
                     }
-                    Toast.makeText(this, android.text.TextUtils.join(", ", labels), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, android.text.TextUtils.join(", ", labels)
+                            , Toast.LENGTH_SHORT).show();
                     return true;
                 case INPUT_DIALOG_FOLDER:
                     String name = extras.getString(SimpleInputDialog.TEXT);
@@ -563,16 +562,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void deleteFolder(Folder folder) {
+
+        Menu menu = navigationView.getMenu();
+        for (int i = 0; i < mFolders.size() ; i++) {
+            menu.removeItem(mFolders.get(i).getFolderId());
+        }
         mFolders.remove(folder);
 
         // delete from foldera DB
-        Uri currentFolderUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI_FOLDERS, folder.getFolderId());
+        Uri currentFolderUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI_FOLDERS
+                ,folder.getFolderId());
         getContentResolver().delete(currentFolderUri,null,null);
-
-
         getLoaderManager().restartLoader(FOLDERS_LOADER,null,MainActivity.this);
-        int delFolderId = folder.getFolderId();
-
     }
 
     @Override
@@ -668,9 +669,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //finish();
     }
 
-
-
-
     private boolean saveFolderInDb(String folderName) {
         // Create a ContentValues object where column names are the keys,
         // and pet attributes from the editor are the values.
@@ -711,6 +709,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
             Log.i(TAG, "getFoldersFormDb: ");
         }
+        //navigationView = findViewById(R.id.navigation);
         Menu menu = navigationView.getMenu();
 
         for (int i = 0; i < mFolders.size(); i++) {

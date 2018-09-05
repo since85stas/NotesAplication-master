@@ -130,7 +130,7 @@ public class NoteCursorAdapter extends CursorAdapter {
 
         // set back ground color for note list item
         int color = NoteUtils.getBackColor(noteColor);
-        LinearLayout itemLin = view.findViewById(R.id.noteItemLinear);
+        LinearLayout itemLin = view.findViewById(R.id.noteItemLinear );
         itemLin.setBackgroundColor(ContextCompat.getColor(context, color));
 
         // favorite

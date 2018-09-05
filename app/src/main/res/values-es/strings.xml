@@ -132,12 +132,13 @@ limitations under the License.
 
 
     <string name="enter_a_pin">Ingrese un PIN de 4 dígitos</string>
-    <string name="repeat_pin">Repita el PIN</string>
+    <string name="repeat_pin">Repita</string>
     <string name="delletePass">Ingrese el PIN actual y presione OK para borrar la contraseña</string>
     <string name="setPin">Establecer PIN</string>
     <string name="photoToast">Sorry this chapter is in developing</string>
     <string name="drawOther">Otro</string>
     <string name="colorDilogTitle">Seleccione el color de la nota</string>
+    <string name="pin">PIN</string>
 
 
 </resources>

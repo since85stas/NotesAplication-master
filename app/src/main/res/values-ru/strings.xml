@@ -81,7 +81,7 @@
     <string name="bottomColr">Цвет</string>
     <string name="menuSave">сохранить</string>
     <string name="dialogTitle">Спасибо за оценку!</string>
-    <string name="dialogMessage">Если вам нравится приложениеб пожалуйста, оставьте отзыв</string>
+    <string name="dialogMessage">Если вам нравится приложение, пожалуйста, оставьте отзыв</string>
     <string name="dialogYes">Оценить</string>
     <string name="dialogNo">Нет, может быть позже</string>
     <string name="dialogYesthx">Спасибо</string>
@@ -132,12 +132,13 @@ limitations under the License.
 
 
     <string name="enter_a_pin">Введите 4 значный ПИН</string>
-    <string name="repeat_pin">Повторите ПИН</string>
+    <string name="repeat_pin">Повторите</string>
     <string name="delletePass">Введите существующий ПИН, и нажмите OK для удаления пароля</string>
     <string name="setPin">Введите ПИН</string>
     <string name="photoToast">Sorry this chapter is in developing</string>
     <string name="drawOther">Другое</string>
-    <string name="colorDilogTitle">Выберите цвет для  заметки</string>
+    <string name="colorDilogTitle">Выберите цвет для заметки</string>
+    <string name="pin">ПИН</string>
 
 
 </resources>
