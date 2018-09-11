@@ -17,8 +17,7 @@
         android:layout_weight="1"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="8dp"
-        >
+        android:padding="8dp"   >
         <TextView
             android:id="@+id/titleItem"
             android:layout_width="match_parent"
