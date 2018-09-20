@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GoodNotes</string>
+    <string name="app_name">Buenas notas</string>
     <string name="action_settings">Configuraciones</string>
     <string name="noteTitle">Título</string>
 
@@ -39,7 +39,7 @@
     <string name="set_time">Fijar tiempo</string>
     <string name="cancel_alarm">Cancelar alarma</string>
     <string name="alarm_on">La alarma está encendida</string>
-    <string name="set_notification">Establecer el CÓDIGO PIN</string>
+    <string name="set_notification">Habilitar notificación</string>
     <string name="set_date">Establece la fecha</string>
     <string name="action_delete">borrar</string>
     <string name="action_add_image">Añadir imagen</string>
@@ -139,6 +139,10 @@ limitations under the License.
     <string name="drawOther">Otro</string>
     <string name="colorDilogTitle">Seleccione el color de la nota</string>
     <string name="pin">PIN</string>
+
+    <string name="create_folder">Crear carpeta</string>
+    <string name="delete_folder">Eliminar carpeta</string>
+    <string name="Cancel">Cancelar</string>
 
 
 </resources>

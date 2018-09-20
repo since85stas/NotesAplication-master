@@ -39,7 +39,7 @@
     <string name="set_time">निर्धारित समय</string>
     <string name="cancel_alarm">अलार्म रद्द करें</string>
     <string name="alarm_on">अलार्म चालू है</string>
-    <string name="set_notification">अधिसूचना सेट करें</string>
+    <string name="set_notification">अधिसूचना सक्षम करें</string>
     <string name="set_date">तारीख सेट करें</string>
     <string name="action_delete">हटाना</string>
     <string name="action_add_image">छवि जोड़ें</string>
