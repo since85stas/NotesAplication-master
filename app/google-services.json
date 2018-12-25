@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "466405417741",
+    "firebase_url": "https://notesapp-712aa.firebaseio.com",
+    "project_id": "notesapp-712aa",
+    "storage_bucket": "notesapp-712aa.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:466405417741:android:0be0189cc43bd8a1",
+        "android_client_info": {
+          "package_name": "com.batura.stas.notesaplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "466405417741-qo40rohiot04pbt1df4o1c5tn8o5f5k4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAuZEfPu6Nk4b1wSqYwi2Ffn6EB5c0jm8k"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
