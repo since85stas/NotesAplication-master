@@ -10,26 +10,32 @@
     </group>
     <item
         android:orderInCategory="1"
+        android:id="@+id/nav_synchronize"
+        android:icon="@drawable/baseline_lock_black_24"
+        android:title="@string/nav_synch" />
+
+    <item
+        android:orderInCategory="2"
         android:id="@+id/nav_set_pass"
         android:icon="@drawable/baseline_lock_black_24"
         android:title="@string/nav_set_password" />
 
     <item
-        android:orderInCategory="2"
+        android:orderInCategory="3"
         android:id="@+id/nav_rate"
         android:icon="@drawable/baseline_grade_black_24"
         android:title="@string/nav_settings" />
 
     <item android:title="@string/drawOther"
-        android:orderInCategory="3">
+        android:orderInCategory="4">
 
         <menu>
             <item
-                android:orderInCategory="4"
+                android:orderInCategory="5"
                 android:id="@+id/nav_about_us"
                 android:title="@string/nav_about_us" />
             <item
-                android:orderInCategory="5"
+                android:orderInCategory="6"
                 android:id="@+id/nav_privacy_policy"
                 android:title="@string/privacy_policy" />
         </menu>

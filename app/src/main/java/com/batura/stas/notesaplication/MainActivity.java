@@ -49,6 +49,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.batura.stas.notesaplication.AuthFunc.AuthMainActivity;
 import com.batura.stas.notesaplication.ImageFuncs.ImageStorage;
 import com.batura.stas.notesaplication.Other.AboutActivity;
 import com.batura.stas.notesaplication.Other.CircleTransform;
@@ -406,6 +407,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     case R.id.nav_privacy_policy:
                         // launch new intent instead of loading fragment
                         startActivity(new Intent(MainActivity.this, PrivacyPolicyActivity.class));
+                        return true;
+                    case R.id.nav_synchronize:
+                        // launch synchronize activity
+                        startActivity(new Intent(MainActivity.this, AuthMainActivity.class));
                         return true;
                     default:
                         navItemIndex = 0;
