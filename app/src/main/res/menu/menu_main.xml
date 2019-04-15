@@ -5,14 +5,14 @@
 
     <item
         android:id="@+id/action_search"
-        android:icon="@android:drawable/ic_search_category_default"
+        android:icon="@drawable/baseline_search_white_36"
         android:title="@string/menu_search"
         app:actionViewClass="android.widget.SearchView"
-        app:showAsAction="ifRoom|collapseActionView" />
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_add_folder"
         android:title="add folder"
-        android:icon="@drawable/baseline_create_new_folder_white_24"
+        android:icon="@drawable/baseline_create_new_folder_white_36"
         app:showAsAction="always" />
 </menu>

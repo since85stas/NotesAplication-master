@@ -63,6 +63,7 @@ import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 import eltos.simpledialogfragment.SimpleDialog;
 import eltos.simpledialogfragment.input.SimpleInputDialog;
@@ -93,7 +94,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final String ORDER_SPINNER_MODE = "Mode"; // положение переключателя
     public static final String NUMBER_OF_OPENS = "Opens"; // количество запусков приложения
     public static final String IS_RATED = "Rated";       // прошли ли по ссылке в маркет
-    public static final int NUMBER_OPEN_NUM = 5;
+    public static final int NUMBER_OPEN_NUM = 40;
     public int mNumberOfOpens;
     public int mRated;
     public int mSortBySpinner = 0;
@@ -195,12 +196,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mCurrentFolder = mMainFolder;
 
-        if (mNumberOfOpens % NUMBER_OPEN_NUM == 0 && mRated != 1) {
-            MyDialogFragment myDialogFragment = new MyDialogFragment();
-            FragmentManager manager = getSupportFragmentManager();
-            FragmentTransaction transaction = manager.beginTransaction();
-            myDialogFragment.show(transaction, "Dialog");
-        }
+
 
         if (mHasPass && !mPasswordCorrect) {
             Intent intent = new Intent(MainActivity.this, Password.class);
@@ -214,9 +210,10 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
 
         setupNavigationDraver();
+        Locale locale = new Locale("es"); // задаем локаль, пока принудительно
+        Locale.setDefault(locale);
 
-        //Locale locale = new Locale("en"); // задаем локаль, пока принудительно
-        //Locale.setDefault(locale);
+
         // определяем спинер для упорядочивания заметок
         mOrderBySpinner = (Spinner) findViewById(R.id.orderBySpinner);
         setupOrderSpinner();
@@ -271,6 +268,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onStart() {
         super.onStart();
+
+        if (mNumberOfOpens % NUMBER_OPEN_NUM == 0 && mRated != 1) {
+            MyDialogFragment myDialogFragment = new MyDialogFragment();
+            FragmentManager manager = getSupportFragmentManager();
+            FragmentTransaction transaction = manager.beginTransaction();
+            myDialogFragment.show(transaction, "Dialog");
+        }
         // список директорий
 //        mFolders = new ArrayList<Folder>();
 //        mFolders.add(mMainFolder);
@@ -351,7 +355,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         //imgNavHeaderBg.setImageResource(R.drawable.before_cookie);
         imgNavHeaderBg.setImageResource(R.drawable.drawer_back);
 
-        Glide.with(this).load(R.drawable.cat_portrait_cute_animal)
+        Glide.with(this).load(R.drawable.cat_my)
                 .bitmapTransform(new CircleTransform(this))
                 .into(imgProfile);
 
@@ -409,21 +413,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 for (int i = 0; i < mFolders.size() ; i++) {
                     if(menuItem.getItemId() == mFolders.get(i).getFolderId()) {
-                        toolbar.setTitle(mFolders.get(i).getFolderName());
-                        mCurrentFolder = mFolders.get(i);
-                        getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
-                        drawer.closeDrawers();
+
+                        selectFolder(mFolders.get(i));
+//                        toolbar.setTitle(mFolders.get(i).getFolderName());
+//                        mCurrentFolder = mFolders.get(i);
+//                        getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
+//                        drawer.closeDrawers();
                     }
                 }
-
-                //Checking if the item is in checked state or not, if not make it in checked state
-//                if (menuItem.isChecked()) {
-//                    menuItem.setChecked(false);
-//                } else {
-//                    menuItem.setChecked(true);
-//                }
-//                menuItem.setChecked(true);
-//                loadHomeFragment();
                 return true;
             }
         });
@@ -448,6 +445,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         //calling sync state is necessary or else your hamburger icon wont show up
         actionBarDrawerToggle.syncState();
+    }
+
+    private void selectFolder(Folder folder ) {
+        toolbar.setTitle(folder.getFolderName());
+        mCurrentFolder = folder;
+        getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
+        drawer.closeDrawers();
     }
 
 
@@ -691,6 +695,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         menu.add(R.id.notesGroupNew,id,0,folderName).setIcon(R.drawable.baseline_folder_black_24);
         Log.i(TAG, "saveFolderInDb: " + folderUri.toString());
         mFolders.add(new Folder(id,folderName));
+        selectFolder(new Folder(id,folderName));
         return true;
     }
 
