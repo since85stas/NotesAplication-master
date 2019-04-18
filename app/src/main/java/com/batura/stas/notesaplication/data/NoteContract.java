@@ -21,6 +21,8 @@ public class NoteContract {
      */
     public static final String PATH_NOTES = "notes";
 
+    public static final String PATH_NOTES_ALL = "notes_all";
+
     public static final String PATH_IMAGES = "images";
 
     public static final String PATH_FOLDERS = "folders";
@@ -63,6 +65,9 @@ public class NoteContract {
 
         /** The content URI to access the pet data in the provider */
         public static final Uri CONTENT_URI = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_NOTES);
+
+        /** The content URI to access the pet data in the provider */
+        public static final Uri CONTENT_URI_ALL = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_NOTES_ALL);
 
         /** The content URI to access the pet data in the provider */
         public static final Uri CONTENT_URI_IMAGES = Uri.withAppendedPath(BASE_CONTENT_URI, PATH_IMAGES);

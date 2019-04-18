@@ -37,6 +37,8 @@ public class NoteProvider extends ContentProvider {
     /** URI matcher code for the content URI for a single pet in the pets table */
     private static final int FOLDER_ID = 669;
 
+    /** URI matcher code for the content URI for the pets table */
+    private static final int ALL_NOTES = 670;
     /**
      * UriMatcher object to match a content URI to a corresponding code.
      * The input passed into the constructor represents the code to return for the root URI.
@@ -50,6 +52,7 @@ public class NoteProvider extends ContentProvider {
         // should recognize. All paths added to the UriMatcher have a corresponding code to return
         // when a match is found.
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES,NOTES);
+        sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES_ALL,ALL_NOTES);
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_NOTES + "/#",NOTE_ID);
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_IMAGES +"/#" ,NOTE_IMAGES);
         sUriMatcher.addURI(NoteContract.CONTENT_AUTHORITY,NoteContract.PATH_FOLDERS,FOLDERS);
@@ -84,6 +87,10 @@ public class NoteProvider extends ContentProvider {
                 } else {
                     selection += NoteContract.NoteEntry.COLUMN_NOTE_FOLDER + "=?";
                 }
+                cursor = database.query(NoteContract.NoteEntry.NOTES_TABLE_NAME, projection, selection, selectionArgs,
+                        null, null, sortOrder);
+                break;
+            case ALL_NOTES:
                 cursor = database.query(NoteContract.NoteEntry.NOTES_TABLE_NAME, projection, selection, selectionArgs,
                         null, null, sortOrder);
                 break;

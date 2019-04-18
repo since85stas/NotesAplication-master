@@ -1,18 +1,28 @@
 package com.batura.stas.notesaplication.AuthFunc;
 
+import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
+import android.content.Loader;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.batura.stas.notesaplication.MainActivity;
+import com.batura.stas.notesaplication.NoteCursorAdapter;
+import com.batura.stas.notesaplication.Other.Folder;
 import com.batura.stas.notesaplication.R;
 import com.batura.stas.notesaplication.data.DbFirePresenter;
+import com.batura.stas.notesaplication.data.NoteContract;
+import com.batura.stas.notesaplication.data.NoteFirePresenter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -20,7 +30,12 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class AuthMainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class AuthMainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private String TAG = AuthMainActivity.class.getName();
 
     private Button btnWriteToDb, btnPullFromDb, btnSendResetEmail, btnRemoveUser,
             changeEmail, changePassword, sendEmail, remove, signOut;
@@ -33,6 +48,12 @@ public class AuthMainActivity extends AppCompatActivity {
     private DatabaseReference mMessagesDatabaseReference;
     private String mUsername;
 
+    private NoteCursorAdapter mCursorAdapter;
+    private Loader<Cursor> mNoteLoader;
+
+    private static final int NOTE_LOADER = 0;
+    private static final int FOLDERS_LOADER = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,10 +61,11 @@ public class AuthMainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.app_name));
-        setSupportActionBar(toolbar);
+//        setSupportActionBar(toolbar);
 
         //get firebase auth instance
         auth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
 
         //get current user
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
@@ -53,6 +75,9 @@ public class AuthMainActivity extends AppCompatActivity {
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 mUsername = firebaseAuth.getCurrentUser().getUid();
+                // database intance
+
+                mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("bases").child(mUsername);
                 if (user == null) {
                     // user auth state is changed - user is null
                     // launch login activity
@@ -61,10 +86,6 @@ public class AuthMainActivity extends AppCompatActivity {
                 }
             }
         };
-
-        // database intance
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
-        mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("bases");
 
         btnWriteToDb = (Button) findViewById(R.id.change_email_button);
         btnPullFromDb = (Button) findViewById(R.id.change_password_button);
@@ -99,8 +120,10 @@ public class AuthMainActivity extends AppCompatActivity {
         btnWriteToDb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DbFirePresenter db = new DbFirePresenter(mUsername,"text");
-                mMessagesDatabaseReference.push().setValue(db);
+                mNoteLoader = getLoaderManager().initLoader(NOTE_LOADER, null, AuthMainActivity.this);
+                getLoaderManager().initLoader(FOLDERS_LOADER,null,AuthMainActivity.this);
+//                DbFirePresenter db = new DbFirePresenter(mUsername,"text");
+//                mMessagesDatabaseReference.push().setValue(db);
             }
         });
 
@@ -270,5 +293,108 @@ public class AuthMainActivity extends AppCompatActivity {
         if (authListener != null) {
             auth.removeAuthStateListener(authListener);
         }
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+
+        // задаем проекцию по которой будет происходить считывние из БД
+        switch (id) {
+            case (NOTE_LOADER):
+                String[] projection = new String[]{
+                        NoteContract.NoteEntry._ID,
+                        NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
+                        NoteContract.NoteEntry.COLUMN_NOTE_BODY,
+                        NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
+                        NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE,
+                        NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD,
+                        NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD_HASH,
+                        NoteContract.NoteEntry.COLUMN_NOTE_IMAGE,
+                        NoteContract.NoteEntry.COLUMN_NOTE_WIDGET,
+                        NoteContract.NoteEntry.COLUMN_NOTE_TIME,
+                        NoteContract.NoteEntry.COLUMN_NOTE_FOLDER
+                };
+
+//                // задается условия для поиска ключ слов в БД
+//                String selection = setupSelectionString();
+//                ///String orderBy   = setupOrderByString();
+//                String[] selectionArgs = {String.valueOf(mCurrentFolder.getFolderId())};
+//                String[] selectionArgs = {String.valueOf(0)};
+                return new CursorLoader(this,
+                        NoteContract.NoteEntry.CONTENT_URI_ALL,
+                        projection,
+                        null,
+                        null,
+                        null
+                );
+            case(FOLDERS_LOADER):
+                String[] projectionLoader = new String[]{
+                        NoteContract.NoteEntry._ID,
+                        NoteContract.NoteEntry.FOLDER_NAME,
+                };
+
+                return new CursorLoader(this,
+                        NoteContract.NoteEntry.CONTENT_URI_FOLDERS,
+                        projectionLoader,
+                        null,
+                        null,
+                        null);
+        }
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        switch (loader.getId()) {
+            case NOTE_LOADER:
+//                mCursorAdapter.swapCursor(data);
+                DbFirePresenter db = new DbFirePresenter(mUsername, data );
+                writeNotesToFireBase(db.getNotesPresenter());
+//                mMessagesDatabaseReference.push().setValue(db);
+                break;
+            case FOLDERS_LOADER:
+                getFoldersFormDb(data);
+                break;
+        }
+    }
+
+    private void writeNotesToFireBase(List<NoteFirePresenter> list) {
+
+        mMessagesDatabaseReference.child("notes").setValue(list);
+    }
+
+    private void getFoldersFormDb(Cursor cursor) {
+        List<Folder> folders = new ArrayList<Folder>();
+        if (cursor.moveToFirst()) {
+            int idColomn = cursor.getColumnIndex(NoteContract.NoteEntry._ID);
+            int folderNameColomn = cursor.getColumnIndex(NoteContract.NoteEntry.FOLDER_NAME);
+
+            do  {
+                int folderId = cursor.getInt(idColomn);
+                String folderName = cursor.getString(folderNameColomn);
+                Folder newFol = new Folder(folderId, folderName);
+                folders.add(newFol);
+            } while (cursor.moveToNext());
+
+            Log.i(TAG, "getFoldersFormDb: ");
+        }
+        writeFoldersToFireBase(folders );
+    }
+
+    private void writeFoldersToFireBase(List<Folder> list) {
+
+        mMessagesDatabaseReference.child("folders").setValue(list);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mCursorAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(AuthMainActivity.this, MainActivity.class);
+        startActivity(intent);
     }
 }

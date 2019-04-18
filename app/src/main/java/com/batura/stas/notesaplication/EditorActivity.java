@@ -105,6 +105,7 @@ public class EditorActivity extends AppCompatActivity implements LoaderManager.L
         }
     };
 
+
     @Override
     protected void onResume() {
         Log.i(TAG, "onResume: ");
