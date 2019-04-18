@@ -14,6 +14,7 @@ public class NoteFirePresenter {
     public int widget;
     public int folder;
 
+    public NoteFirePresenter () {}
 
     public NoteFirePresenter(int id, String title, String body, int color, long time, int favorite, int password, int passwordHash, int imageId, int widget, int folder) {
         this.id = id;

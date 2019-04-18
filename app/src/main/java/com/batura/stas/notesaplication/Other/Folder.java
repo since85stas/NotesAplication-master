@@ -12,6 +12,8 @@ public class Folder {
         return folderName;
     }
 
+    public Folder () {}
+
     public Folder(int id, String name) {
         folderId = id;
         folderName = name;

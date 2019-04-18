@@ -7,6 +7,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -27,8 +28,13 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.GenericTypeIndicator;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +56,9 @@ public class AuthMainActivity extends AppCompatActivity implements LoaderManager
 
     private NoteCursorAdapter mCursorAdapter;
     private Loader<Cursor> mNoteLoader;
+
+    private List<NoteFirePresenter> notesFromFire;
+    private List<Folder> foldersFromFire;
 
     private static final int NOTE_LOADER = 0;
     private static final int FOLDERS_LOADER = 1;
@@ -156,14 +165,82 @@ public class AuthMainActivity extends AppCompatActivity implements LoaderManager
         btnPullFromDb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                oldEmail.setVisibility(View.GONE);
-                newEmail.setVisibility(View.GONE);
-                password.setVisibility(View.GONE);
-                newPassword.setVisibility(View.VISIBLE);
-                changeEmail.setVisibility(View.GONE);
-                changePassword.setVisibility(View.VISIBLE);
-                sendEmail.setVisibility(View.GONE);
-                remove.setVisibility(View.GONE);
+                notesFromFire = new ArrayList<>();
+                foldersFromFire = new ArrayList<>();
+
+                mMessagesDatabaseReference.child("notes").addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                        Log.i(TAG,"note" + dataSnapshot.getValue( NoteFirePresenter.class ) );
+                        GenericTypeIndicator<List<NoteFirePresenter>> t = new GenericTypeIndicator<List<NoteFirePresenter>>() {};
+                        notesFromFire = dataSnapshot.getValue(t);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+
+                    }
+                });
+
+//                mMessagesDatabaseReference.child("notes").addChildEventListener(new ChildEventListener() {
+//                    @Override
+//                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//                        Log.i(TAG,"note" + dataSnapshot.getValue( NoteFirePresenter.class ) );
+//                        NoteFirePresenter note = dataSnapshot.getValue(NoteFirePresenter.class);
+//                        notesFromFire.add(note);
+//                    }
+//
+//                    @Override
+//                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {     }
+//                    @Override
+//                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//                    }
+//                    @Override
+//                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//                    }
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//                    }
+//                });
+//
+//                mMessagesDatabaseReference.child("folders").addChildEventListener(new ChildEventListener() {
+//                    @Override
+//                    public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//                        Log.i(TAG,"note" + dataSnapshot.getValue( Folder.class ) );
+//                        Folder folder = dataSnapshot.getValue(Folder.class);
+//                        foldersFromFire.add(folder);
+//                    }
+//
+//                    @Override
+//                    public void onChildChanged(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onChildRemoved(@NonNull DataSnapshot dataSnapshot) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onChildMoved(@NonNull DataSnapshot dataSnapshot, @Nullable String s) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onCancelled(@NonNull DatabaseError databaseError) {
+//
+//                    }
+//                });
+
+                Log.i(TAG,"end pull" );
+//                oldEmail.setVisibility(View.GONE);
+//                newEmail.setVisibility(View.GONE);
+//                password.setVisibility(View.GONE);
+//                newPassword.setVisibility(View.VISIBLE);
+//                changeEmail.setVisibility(View.GONE);
+//                changePassword.setVisibility(View.VISIBLE);
+//                sendEmail.setVisibility(View.GONE);
+//                remove.setVisibility(View.GONE);
             }
         });
 
