@@ -182,9 +182,6 @@ public class NoteContract {
          */
         public final static String FOLDER_NAME = "folder_name";
 
-
-
-
          public static final int COLOR_DEFAULT = 665;
 
          public static final int COLOR_RED = 666;

@@ -563,6 +563,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         for (int i = 0; i < mFolders.size() ; i++) {
             folderNames[i] = mFolders.get(i).getFolderName();
         }
+//        TODO: remove hardcodedstring
         SimpleListDialog.build()
                 .title("Choose folder to delete.\n Be careful it will delete \n all notes in this folder!")
                 .choiceMode(SimpleListDialog.SINGLE_CHOICE)

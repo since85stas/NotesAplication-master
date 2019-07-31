@@ -55,6 +55,8 @@ public class AuthMainActivity extends AppCompatActivity implements LoaderManager
     private String mUsername;
 
     private NoteCursorAdapter mCursorAdapter;
+
+
     private Loader<Cursor> mNoteLoader;
 
     private List<NoteFirePresenter> notesFromFire;
@@ -81,9 +83,13 @@ public class AuthMainActivity extends AppCompatActivity implements LoaderManager
 
         authListener = new FirebaseAuth.AuthStateListener() {
             @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+            public void onAuthStateChanged (@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
-                mUsername = firebaseAuth.getCurrentUser().getUid();
+                try {
+                    mUsername = firebaseAuth.getCurrentUser().getUid();
+                } catch (NullPointerException e) {
+                    Log.e(TAG, " " +e );
+                }
                 // database intance
 
                 mMessagesDatabaseReference = mFirebaseDatabase.getReference().child("bases").child(mUsername);
@@ -268,6 +274,7 @@ public class AuthMainActivity extends AppCompatActivity implements LoaderManager
                                     }
                                 });
                     }
+
                 } else if (newPassword.getText().toString().trim().equals("")) {
                     newPassword.setError("Enter password");
                     progressBar.setVisibility(View.GONE);

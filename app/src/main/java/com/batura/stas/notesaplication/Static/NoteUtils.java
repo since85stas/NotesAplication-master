@@ -39,6 +39,9 @@ public final class NoteUtils {
             case NoteContract.NoteEntry.COLOR_PURPLE:
                 backColorResId = R.color.purpleBack;
                 break;
+                default:
+                    backColorResId = R.color.defaultBack;
+                    break;
         }
         return backColorResId;
     }
@@ -160,3 +163,5 @@ public final class NoteUtils {
 
 
 }
+
+
