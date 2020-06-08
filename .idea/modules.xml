@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/NotesAplication-master1.iml" filepath="$PROJECT_DIR$/NotesAplication-master1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/NotesMaster.iml" filepath="$PROJECT_DIR$/NotesMaster.iml" group="NotesMaster" />
+      <module fileurl="file://$PROJECT_DIR$/app/NotesMaster-app.iml" filepath="$PROJECT_DIR$/app/NotesMaster-app.iml" group="NotesMaster/app" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
