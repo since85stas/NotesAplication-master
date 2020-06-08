@@ -67,6 +67,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Locale;
 
 import eltos.simpledialogfragment.SimpleDialog;
@@ -76,12 +77,15 @@ import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Action;
 import io.reactivex.functions.Consumer;
 
+import static com.batura.stas.notesaplication.NoteCursorAdapter.formatTime;
+
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>
         , SimpleDialog.OnDialogResultListener {
 
     public static final String TAG = MainActivity.class.getSimpleName();
     private static final int NOTE_LOADER = 0;
     private static final int FOLDERS_LOADER = 1;
+    private static final int NOTE_ALL_LOADER = 2;
     private static final int PASS_OK = 11;
 
     //intent Const
@@ -303,7 +307,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Intent intent = new Intent(MainActivity.this, EditorActivity.class);
                 Uri currentPetUri = ContentUris.withAppendedId(NoteContract.NoteEntry.CONTENT_URI, id);
                 intent.setData(currentPetUri);
-                intent.putExtra(EditorActivity.NOTE_FOLD_ID_INTENT,mCurrentFolder.getFolderId());
+                intent.putExtra(EditorActivity.NOTE_FOLD_ID_INTENT, mCurrentFolder.getFolderId());
                 startActivity(intent);
             }
         });
@@ -419,6 +423,11 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                     case R.id.nav_synchronize:
                         // launch synchronize activity
                         startActivity(new Intent(MainActivity.this, AuthMainActivity.class));
+                        return true;
+                    case R.id.nav_txt_save:
+//                        goingThroughAllNotes();
+                        TextDialogFragment fragment = new TextDialogFragment();
+                        fragment.show(getSupportFragmentManager(), "TxtDialog");
                         return true;
                     default:
                         navItemIndex = 0;
@@ -780,6 +789,33 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         null,
                         null,
                         null);
+            case (NOTE_ALL_LOADER):
+                projection = new String[]{
+                        NoteContract.NoteEntry._ID,
+                        NoteContract.NoteEntry.COLUMN_NOTE_TITLE,
+                        NoteContract.NoteEntry.COLUMN_NOTE_BODY,
+                        NoteContract.NoteEntry.COLUMN_NOTE_COLOR,
+                        NoteContract.NoteEntry.COLUMN_NOTE_FAVOURITE,
+                        NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD,
+                        NoteContract.NoteEntry.COLUMN_NOTE_PASSWORD_HASH,
+                        NoteContract.NoteEntry.COLUMN_NOTE_IMAGE,
+                        NoteContract.NoteEntry.COLUMN_NOTE_WIDGET,
+                        NoteContract.NoteEntry.COLUMN_NOTE_TIME,
+                        NoteContract.NoteEntry.COLUMN_NOTE_FOLDER
+                };
+
+                // задается условия для поиска ключ слов в БД
+                selection = setupSelectionString();
+                ///String orderBy   = setupOrderByString();
+                selectionArgs = null;
+
+                return new CursorLoader(this,
+                        NoteContract.NoteEntry.CONTENT_URI_ALL,
+                        projection,
+                        null,
+                        null,
+                        null);
+
         }
 
         return null;
@@ -807,23 +843,34 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         switch (loader.getId()) {
             case NOTE_LOADER:
                 mCursorAdapter.swapCursor(data);
+
+                break;
+            case FOLDERS_LOADER:
+                getFoldersFormDb(data);
+                break;
+            case NOTE_ALL_LOADER:
                 if (isTxtWrite) {
                     FileWriter txtFile = createTxtFile();
                     Log.d(TAG, "onLoadFinished: txt load finish");
                     if (txtFile != null) {
                         data.moveToFirst();
-                        while (!data.isLast()) {
-                            String title = data.getString(data.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE));
-                            String body = data.getString(data.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY));
-                            Long time = data.getLong(data.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME));
+                        do  {
+                            String title = data.getString(data.getColumnIndex(
+                                    NoteContract.NoteEntry.COLUMN_NOTE_TITLE));
+                            String body = data.getString(data.getColumnIndex(
+                                    NoteContract.NoteEntry.COLUMN_NOTE_BODY));
+                            Long time = data.getLong(data.getColumnIndex(
+                                    NoteContract.NoteEntry.COLUMN_NOTE_TIME));
                             addNoteToFile(txtFile, title, body, time);
+                        } while (data.moveToNext());
+                        try {
+                            txtFile.close();
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
                     }
+                    isTxtWrite = false;
                 }
-                break;
-            case FOLDERS_LOADER:
-                getFoldersFormDb(data);
-                break;
         }
     }
 
@@ -938,22 +985,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         startActivity(intent);
     }
 
-    private void goingThroughAllNotes() {
+    void goingThroughAllNotes() {
         isTxtWrite = true;
-        for (Folder folder: mFolders
-              ) {
-            mCurrentFolder = folder;
-            getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
-        }
 
-        isTxtWrite = false;
+            getLoaderManager().restartLoader(NOTE_ALL_LOADER,null,MainActivity.this);
+//        isTxtWrite = false;
     }
 
     private FileWriter createTxtFile() {
         String fileName = "GoodNotes.txt";
 
         try {
-            FileWriter write = new FileWriter(new File("sdcard/Android/" + fileName));
+            FileWriter write = new FileWriter(new File("sdcard/" + fileName));
             return write;
         } catch (IOException e) {
             e.printStackTrace();
@@ -963,10 +1006,18 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private void addNoteToFile(FileWriter writer, String title, String body, Long time) {
         String timeStr = "time";
+        Date dateObject = new Date(time);
+        String formattedDate = NoteCursorAdapter.formatDate(dateObject);
+        String formattetTime = formatTime(dateObject);
+//        dateTextView.setText(formattedDate);
+//        timeTextView.setText(formattetTime);
         try {
-            writer.append(title + " " + timeStr);
-            writer.append(body);
+            writer.append(getResources().getString(R.string.noteTitle)  + ": " + title.trim() + " " +
+                    getResources().getString(R.string.order_date) +
+                      ": " +formattedDate + " " + formattetTime);
             writer.append("\n");
+            writer.append("text: " + body);
+            writer.append("\n\n");
         } catch (IOException e) {
             e.printStackTrace();
         }

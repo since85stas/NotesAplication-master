@@ -200,4 +200,10 @@ Features:\n
     <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
     <string name="title_activity_signup">SignupActivity</string>
 
+    <string name="xxt_dialog_text">"This function will create a GoodNotes.txt file with all notes in your "
+                " \'sdcard\' folder on a smartphone. If you can't find it or smth go wrong "
+                "please, contact me via email"</string>
+
+    <string name="ok_but">Ok</string>
+
 </resources>

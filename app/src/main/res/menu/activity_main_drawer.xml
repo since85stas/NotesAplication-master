@@ -16,12 +16,18 @@
 
     <item
         android:orderInCategory="2"
+        android:id="@+id/nav_txt_save"
+        android:icon="@drawable/baseline_add_white_18"
+        android:title="Save in file" />
+
+    <item
+        android:orderInCategory="3"
         android:id="@+id/nav_set_pass"
         android:icon="@drawable/baseline_lock_black_24"
         android:title="@string/nav_set_password" />
 
     <item
-        android:orderInCategory="3"
+        android:orderInCategory="4"
         android:id="@+id/nav_rate"
         android:icon="@drawable/baseline_grade_black_24"
         android:title="@string/nav_settings" />
