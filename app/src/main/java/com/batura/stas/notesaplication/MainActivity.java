@@ -63,6 +63,9 @@ import com.jakewharton.rxbinding2.view.RxView;
 import com.tbruyelle.rxpermissions2.Permission;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -136,12 +139,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private String mPass = "";
     private boolean mPasswordCorrect;
 
-    Folder mMainFolder = new Folder(0, "main");
-    Folder mCurrentFolder;
+    private Folder mMainFolder = new Folder(0, "main");
+    private Folder mCurrentFolder;
 
     private Loader<Cursor> mNoteLoader;
     private Loader<Cursor> mFolderLoader;
     private ArrayList<Folder> mFolders;// = new ArrayList<Folder>();
+
+    private boolean isTxtWrite = false;
 
 
     @Override
@@ -197,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         mCurrentFolder = mMainFolder;
 
-
+        createTxtFile();
 
         if (mHasPass && !mPasswordCorrect) {
             Intent intent = new Intent(MainActivity.this, Password.class);
@@ -227,6 +232,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                                    if (permission.granted) {
                                        Intent intent = new Intent(MainActivity.this, EditorActivity.class);
                                        intent.putExtra(EditorActivity.NOTE_FOLD_ID_INTENT,mCurrentFolder.getFolderId());
+
+//                                       createTxtFile();
+
                                        startActivity(intent);
                                        Log.i(TAG, "Permission for storage granted");
 
@@ -799,6 +807,19 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         switch (loader.getId()) {
             case NOTE_LOADER:
                 mCursorAdapter.swapCursor(data);
+                if (isTxtWrite) {
+                    FileWriter txtFile = createTxtFile();
+                    Log.d(TAG, "onLoadFinished: txt load finish");
+                    if (txtFile != null) {
+                        data.moveToFirst();
+                        while (!data.isLast()) {
+                            String title = data.getString(data.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TITLE));
+                            String body = data.getString(data.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_BODY));
+                            Long time = data.getLong(data.getColumnIndex(NoteContract.NoteEntry.COLUMN_NOTE_TIME));
+                            addNoteToFile(txtFile, title, body, time);
+                        }
+                    }
+                }
                 break;
             case FOLDERS_LOADER:
                 getFoldersFormDb(data);
@@ -915,5 +936,40 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(getString(R.string.appMarketLink)));
         startActivity(intent);
+    }
+
+    private void goingThroughAllNotes() {
+        isTxtWrite = true;
+        for (Folder folder: mFolders
+              ) {
+            mCurrentFolder = folder;
+            getLoaderManager().restartLoader(NOTE_LOADER,null,MainActivity.this);
+        }
+
+        isTxtWrite = false;
+    }
+
+    private FileWriter createTxtFile() {
+        String fileName = "GoodNotes.txt";
+
+        try {
+            FileWriter write = new FileWriter(new File("sdcard/Android/" + fileName));
+            return write;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private void addNoteToFile(FileWriter writer, String title, String body, Long time) {
+        String timeStr = "time";
+        try {
+            writer.append(title + " " + timeStr);
+            writer.append(body);
+            writer.append("\n");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }
