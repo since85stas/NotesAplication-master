@@ -24,7 +24,6 @@ import java.io.IOException;
 /**
  * Created by seeyo on 21.08.2018.
  */
-
 public class BigImageActivity extends AppCompatActivity {
 
     private ShareActionProvider mShareActionProvider ;

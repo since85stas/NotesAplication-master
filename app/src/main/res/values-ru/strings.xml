@@ -140,5 +140,46 @@ limitations under the License.
     <string name="colorDilogTitle">Выберите цвет для заметки</string>
     <string name="pin">ПИН</string>
 
+    /* Additionals strings for version 1.1 --------------------------------------------------------
+    */
+    <string name="nav_synch">Синхронизировать</string>
+    <string name="action_sign_in_short">Регистрация</string>
+    <string name="email">Email</string>
+    <string name="minimum_password">Пароль слишком короткийб минимум 6 символов!</string>
+    <string name="auth_failed">Проблема входа проверьте пароль и почту</string>
+    <string name="write_to_db">Сохранить</string>
+    <string name="pull_from_db">Получить</string>
+    <string name="send_password_reset_email">Сбросить пароль</string>
+    <string name="remove_user">Удалить пользователя</string>
+    <string name="new_pass">Новый пароль</string>
+    <string name="title_activity_profile">Регистрация</string>
+    <string name="title_activity_login">Войти</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Пароль</string>
+    <string name="hint_name">Имя</string>
+    <string name="btn_login">Войти</string>
+    <string name="btn_link_to_register">Нет пользователя? Зарегестрируйтесь!</string>
+    <string name="btn_link_to_login">Уже зарегестрирован. Войти!</string>
+    <string name="title_activity_reset_password">ResetPasswordActivity</string>
+    <string name="btn_forgot_password">Забыли пароль?</string>
+    <string name="btn_reset_password">Сбросить пароль</string>
+    <string name="btn_back">Назад</string>
+    <string name="hint_new_email">Новый пароль</string>
+    <string name="btn_change">Изменить</string>
+    <string name="btn_send">Послать</string>
+    <string name="btn_remove">Удалить</string>
+    <string name="btn_sign_out">Выйти</string>
+    <string name="lbl_forgot_password">Забыли пароль?</string>
+    <string name="forgot_password_msg">We just need your registered Email Id to sent you password reset instructions.</string>
+    <string name="title_activity_signup">SignupActivity</string>
+
+    <string name="xxt_dialog_text">"Эта функция создает файл GoodNotes.txt со всеми записями
+        в папке \'sdcard\' на вашем телефоне. Если вы не сможете его найти или возникнут проблемы,
+        пожалуйста свяжитесь со мной"</string>
+
+    <string name="ok_but">Ok</string>
+
+    <string name="save_in_file">Сохранить в файл</string>
+
 
 </resources>

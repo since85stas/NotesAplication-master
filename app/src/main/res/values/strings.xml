@@ -190,7 +190,7 @@ Features:\n
     <string name="title_activity_reset_password">ResetPasswordActivity</string>
     <string name="btn_forgot_password">Forgot your password?</string>
     <string name="btn_reset_password">Reset Password</string>
-    <string name="btn_back"><![CDATA[<< Back]]></string>
+    <string name="btn_back">Back</string>
     <string name="hint_new_email">New Email</string>
     <string name="btn_change">Change</string>
     <string name="btn_send">Send</string>
@@ -205,5 +205,6 @@ Features:\n
                 "please, contact me via email"</string>
 
     <string name="ok_but">Ok</string>
+    <string name="save_in_file">Save in file</string>
 
 </resources>
