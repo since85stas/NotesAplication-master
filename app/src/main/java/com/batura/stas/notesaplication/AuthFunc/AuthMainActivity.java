@@ -85,6 +85,12 @@ public class AuthMainActivity extends AppCompatActivity implements LoaderManager
             @Override
             public void onAuthStateChanged (@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user == null) {
+                    // user auth state is changed - user is null
+                    // launch login activity
+                    startActivity(new Intent(AuthMainActivity.this, LoginActivity.class));
+                    finish();
+                }
                 try {
                     mUsername = firebaseAuth.getCurrentUser().getUid();
                 } catch (NullPointerException e) {
